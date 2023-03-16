@@ -1,50 +1,67 @@
 const μ= 4π*1e-7;
 
-
-mutable struct utils
-    k::AbstractArray{Complex{Float64}, 1}
-    # Ztmp::AbstractArray{Complex{Float64}, 1}
-    # Z_oj::AbstractArray{Complex{Float64}, 1}
-end
-
-macro mt_init(nω)
-    quote
-        nω= $(esc(nω))
-        mt_iinit(nω)
-    end
-end
-
-function mt_iinit(nω)
-        global ut= utils(fill(0. *im, nω));
-end
-
-
-## iip function to get impedance
-function get_Z!(Z,ω::AbstractArray{Float64, 1},h::AbstractArray{Float64, 1},ρ::AbstractArray{Float64, 1}, ut::utils)
-    
-    # k= @SVector fill(im.*0, size(ω)...)
-    @. ut.k= sqrt(im*ω*μ/ρ[end])
-    
-    fill!(Z, im.*0);
-    @. Z= ω*μ/ut.k;
-
+function get_Z!(Z,ρ::AbstractArray{Float64, 1},h::AbstractArray{Float64, 1},ωs::AbstractArray{Float64, 1})
     @assert length(h)== length(ρ)- 1
-    
-    for j in length(h):-1:1
-        @. ut.k= sqrt(im*ω*μ/ρ[j])
-        @. Z= ω*μ/ut.k*coth(-im*ut.k*h[j] + acoth(Z/(ω*μ/ut.k)))
+    for i in 1:length(ωs)
+        k= sqrt(im*ωs[i]*μ/ρ[end])
+        Z[i]= ωs[i]*μ/k;
+        for j in length(h):-1:1
+            k= sqrt(im*ωs[i]*μ/ρ[j])
+            Z[i]= ωs[i]*μ/k*coth(-im*k*h[j] + acoth(Z[i]/(ωs[i]*μ/k)))
+        end
     end
     conj!(Z);
     return nothing;
 end
 
-get_Z!(Z,ω::AbstractArray{Float64, 1},h::AbstractArray{Float64, 1},ρ::AbstractArray{Float64, 1})=
-get_Z!(Z, ω, h, ρ, ut)
-    
+function get_Z(ωs, ρ, h)
+    Z= fill(im.*0, size(ω));
+    get_Z!(Z, ωs, h, ρ)
+    return Z
+end
 
-## oop function to get impedance
-function get_Z(ω, h, ρ)
-    Z= fill(0. *im, size(ω));
-    get_Z!(Z, ω, ρ, h);
-    return Z;
+function get_appres!(ρₐ, Z, ω)
+    # abs.(Z_aray)./ω./μ
+    for i in 1:length(Z)
+        ρₐ[i]= abs(Z[i])^2/μ/ω[i]
+    end
+    return nothing;
+end
+
+function get_appres(Z, ω)
+    ρₐ= zeros(size(Z))
+    get_appres!(ρₐ, Z, ω)
+    return ρₐ
+end
+
+function get_phase!(ϕ, Z)
+    for i in 1:length(Z)
+        ϕ[i]= 180/π* atan(imag(Z[i])/real(Z[i]))
+    end
+    return nothing;
+end
+
+function get_appres(Z, ω)
+    ϕ= zeros(size(Z))
+    get_appres!(ϕ, Z, ω)
+    return ϕ
+end
+
+function forward!(d::response, m::model, ω)
+    get_Z!(d.Z, m.ρ, m.h, ω)
+    get_appres!(d.ρₐ, d.Z, ω)
+    get_phase!(d.ϕ, d.Z)
+    return nothing;
+end
+
+function forward(m::model, ω)
+    d= response(fill(im.*0, length(ω)),
+        zeros(length(ω)),
+        zeros(length(ω))
+    )
+    get_Z!(d.Z, m.ρ, m.h, ω)
+    get_appres!(d.ρₐ, d.Z, ω)
+    get_phase!(d.ϕ, d.Z)
+    
+    return d;
 end
