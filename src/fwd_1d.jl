@@ -1,81 +1,64 @@
 const μ= 4π*1e-7;
 
-function get_Z!(Z,ρ::AbstractArray{Float64, 1},h::AbstractArray{Float64, 1},ωs::AbstractArray{Float64, 1})
-    @assert length(h)== length(ρ)- 1
-    for i in 1:length(ωs)
-        k= sqrt(im*ωs[i]*μ/ρ[end])
-        Z[i]= ωs[i]*μ/k;
-        for j in length(h):-1:1
-            k= sqrt(im*ωs[i]*μ/ρ[j])
-            Z[i]= ωs[i]*μ/k*coth(-im*k*h[j] + acoth(Z[i]/(ωs[i]*μ/k)))
-        end
-    end
-    conj!(Z);
-    return nothing;
-end
-
-function get_Z(ρ, h, ωs)
-    Z= fill(im.*0., size(ωs));
-    @assert length(h)== length(ρ)- 1
-    for i in 1:length(ωs)
-        k= sqrt(im*ωs[i]*μ/ρ[end])
-        Z[i]= ωs[i]*μ/k;
-        for j in length(h):-1:1
-            k= sqrt(im*ωs[i]*μ/ρ[j])
-            Z[i]= ωs[i]*μ/k*coth(-im*k*h[j] + acoth(Z[i]/(ωs[i]*μ/k)))
-        end
-        Z[i]= conj(Z[i]);
-    end
-
-    return Z
-end
-
-function get_appres!(ρₐ, Z, ω)
-    # abs.(Z_aray)./ω./μ
-    for i in 1:length(Z)
-        ρₐ[i]= abs(Z[i])^2/μ/ω[i]
-    end
-    return nothing;
-end
-
-function get_appres(Z, ω)
-    ρₐ= zeros(size(Z))
-    for i in 1:length(Z)
-        ρₐ[i]= abs(Z[i])^2/μ/ω[i]
-    end
-    return ρₐ
-end
-
-function get_phase!(ϕ, Z)
-    for i in 1:length(Z)
-        ϕ[i]= 180/π* atan(imag(Z[i])/real(Z[i]))
-    end
-    return nothing;
-end
-
-function get_phase(Z)
-    ϕ= zeros(size(Z))
-    for i in 1:length(Z)
-        ϕ[i]= 180/π* atan(imag(Z[i])/real(Z[i]))
-    end
-    return ϕ
-end
-
-function forward!(d::response, m::model, ω)
-    get_Z!(d.Z, m.ρ, m.h, ω)
-    get_appres!(d.ρₐ, d.Z, ω)
-    get_phase!(d.ϕ, d.Z)
-    return nothing;
-end
-
-function forward(m::model, ω)
-    d= response(fill(im.*0, length(ω)),
-        zeros(length(ω)),
-        zeros(length(ω))
-    )
-    d.Z= get_Z(m.ρ, m.h, ω)
-    d.ρₐ= get_appres(d.Z, ω)
-    d.ϕ= get_phase(d.Z)
+"""
+`get_Z(ρ,h,ω)`:
+returns a tuple of ρₐ and ϕ, given arrays of resistivity `ρ` and thickness `h` for the angular frequenciy `ω`.
+"""
+function get_Z(ρ::Vector{T}, h::Vector{T}, ω::T) where T <: Union{Float32, Float64}
     
-    return d;
+    Z= complex(zero(eltype(ρ)));
+    k= sqrt(im*ω*μ/ρ[end])
+    Z= ω*μ/k;
+
+    j=length(h);
+     @inbounds while j>=1
+        k= sqrt(im*ω*μ/ρ[j])
+        Z= ω*μ/k*coth(-im*k*h[j] + acoth(Z/(ω*μ/k)))
+        j-=1;
+    end
+    Z= conj(Z);
+    return get_appres(Z, ω), get_phase(Z);
 end
+"""
+`forward(m::model, ω::Vector{T}) where T <: Union{Float32, Float64}`:
+returns a  `response` for the given model `m` at the frequencies  `ω`
+"""
+function forward(m::model, ω::Vector{T}) where T <: Union{Float32, Float64}
+    @assert length(m.h)== length(m.ρ)- 1 # this line check is why we do not use the same fn name here, so that the checks happen just once for all the frequencies.
+    n= length(ω);
+    ρₐ= zeros(eltype(m.ρ), n);
+    ϕ= zeros(eltype(m.ρ), n);
+    i=1;
+    @inbounds while i<=n
+        ρₐ[i], ϕ[i]= get_Z(m.ρ, m.h, ω[i]);
+        i+=1;
+    end
+    return response(ρₐ, ϕ);
+end
+
+"""
+`forward!(r::response, m::model, ω::Vector{T}) where T <: Union{Float32, Float64}`:
+updates response `r` type for the given model `m` at the frequencies  `ω`
+"""
+function forward!(r::response, m::model, ω::Vector{T}) where T <: Union{Float32, Float64}
+    @assert length(m.h)== length(m.ρ)- 1 
+    n= length(ω);
+    i=1;
+    @inbounds while i<=n
+        r.ρₐ[i], r.ϕ[i]= get_Z(m.ρ, m.h, ω[i]);
+        i+=1;
+    end
+    nothing;
+end
+
+# the following are defined on scalars, there in-place variants don't make sense
+
+"""
+`get_phase(Z)`: returns the phase for impedance
+"""
+get_phase(Z)= 180/π* atan(imag(Z)/real(Z));
+
+"""
+`get_appres(Z, ω)`: returns the ρₐ for impedance
+"""
+get_appres(Z, ω)= abs(Z)^2/(eltype(ω))(μ)/ω;

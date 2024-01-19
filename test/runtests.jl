@@ -8,7 +8,7 @@ m= model(ρ, h);
 T= 10 .^(range(-3,5,length= 57));
 ω= 2π./T;
 nω= length(T);
-resp= forward(m, ω);
+resp= response(ω);
 
 @testset "MT.jl" begin
     
@@ -73,7 +73,8 @@ resp= forward(m, ω);
     (0.00019853954397694497+0.00019096228797107294*im)];
 
     # Correctness test
-    @test resp.Z ≈ Z_tst;
+    @test resp.ρₐ ≈ get_appres.(Z_tst, ω);
+    @test resp.ϕ ≈ get_phase.(Z_tst);
     
     # Performance test
     alloc= @ballocated forward!(resp, m, ω);
