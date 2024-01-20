@@ -24,13 +24,16 @@ end
 returns a  `response` for the given model `m` at the frequencies  `ω`
 """
 function forward(m::model, ω::Vector{T}) where T <: Union{Float32, Float64}
-    @assert length(m.h)== length(m.ρ)- 1 # this line check is why we do not use the same fn name here, so that the checks happen just once for all the frequencies.
+    # the following line check is why we do not use the same fn name here, so that the checks happen just once for all the frequencies.
+    if !(length(m.h)== length(m.m)- 1)
+        error("number of model layers should be 1 less than the number of model parameters")
+    end
     n= length(ω);
-    ρₐ= zeros(eltype(m.ρ), n);
-    ϕ= zeros(eltype(m.ρ), n);
+    ρₐ= zeros(eltype(m.m), n);
+    ϕ= zeros(eltype(m.m), n);
     i=1;
     @inbounds while i<=n
-        ρₐ[i], ϕ[i]= get_Z(m.ρ, m.h, ω[i]);
+        ρₐ[i], ϕ[i]= get_Z(m.m, m.h, ω[i]);
         i+=1;
     end
     return response(ρₐ, ϕ);
@@ -41,11 +44,13 @@ end
 updates response `r` type for the given model `m` at the frequencies  `ω`
 """
 function forward!(r::response, m::model, ω::Vector{T}) where T <: Union{Float32, Float64}
-    @assert length(m.h)== length(m.ρ)- 1 
+    if !(length(m.h)== length(m.m)- 1)
+        error("number of model layers should be 1 less than the number of model parameters")
+    end
     n= length(ω);
     i=1;
     @inbounds while i<=n
-        r.ρₐ[i], r.ϕ[i]= get_Z(m.ρ, m.h, ω[i]);
+        r.ρₐ[i], r.ϕ[i]= get_Z(m.m, m.h, ω[i]);
         i+=1;
     end
     nothing;
