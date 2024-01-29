@@ -74,7 +74,7 @@ function jacobian!(J::jacobian_mt,
 
         @inbounds for i in eachindex(getfield(m, k))
             getfield(m, k)[i]= getfield(m, k)[i]+ ϵ; 
-            MT.forward!(mtjc.r1, model_occam, vars) 
+            MT.forward!(mtjc.r1, m, vars) 
         
             getfield(m, k)[i]= getfield(m, k)[i]- 2ϵ; 
             forward!(mtjc.r2, m, vars) 

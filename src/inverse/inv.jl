@@ -29,7 +29,7 @@ function inverse!(mₖ::model,
         W= nothing, # Weight matrix
         max_iters= 20, χ2=1.,
         response_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(robs))],
-        model_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(m₀))], # this will not be used but for the sake of generality for all inverse algs
+        model_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(mₖ))], # this will not be used but for the sake of generality for all inverse algs
         trans_utils::transform_utils= default_tf
     )
 
@@ -53,7 +53,7 @@ function inverse!(mₖ::model,
         setfield!(respₖ, k, view(lin_utils.Fₖ, (i-1)*n_vars+1: i*n_vars));
     end
     
-    mtjc= mt_jacobian_cache(ω);
+    mtjc= mt_jacobian_cache(vars);
 
     inv_utils= inverse_utils(∂(n_model), W, reduce(vcat, [copy(getfield(robs, k)) for k ∈ response_fields]));
     verbose= true
@@ -94,7 +94,7 @@ function inverse!(mₖ::model,
             getfield(mₖ, k).= getfield(mₖ₊₁, k)
         end
         forward!(respₖ, mₖ, vars);
-        chi2= χ²(reduce(vcat, [copy(getfield(respₖ, k)) for k ∈ response_fields]), inv_utils.dobs, inv_utils.W);
+        chi2= χ²(reduce(vcat, [copy(getfield(respₖ, k)) for k ∈ response_fields]), inv_utils.dobs, W= inv_utils.W);
         if chi2< χ2 break; end
         itr+=1;
     end

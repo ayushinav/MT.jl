@@ -5,13 +5,19 @@ mutable struct occam_cache{T}
     μgrid::Vector{T}
 end
 """
-`linsolve!`: Performs `B\y` using LinearSolve.jl
+`linsolve!`: Performs `inv(B)*y` using LinearSolve.jl
 """
 function linsolve!(x, prob_init, B, y)
     prob_init.A= B;
     prob_init.b= y;
     x.= solve!(prob_init)
     nothing
+end
+"""
+`Occam(;μgrid= [0.01, 1e6])`
+"""
+function Occam(;μgrid= [0.01, 1e6])
+    return occam_cache{eltype(μgrid)}(μgrid)
 end
 
 """
@@ -72,7 +78,7 @@ function occam_step!(mₖ₊₁::model, # to store the next update, which will e
             getfield(mₖ₊₁, k).= 10. .^trans_utils.tf.(getfield(mₖ₊₁, k));
         end        
         forward!(respₖ₊₁, mₖ₊₁, vars);
-        return χ²(reduce(vcat, [copy(getfield(respₖ₊₁, k)) for k ∈ response_fields]), inv_utils.dobs, inv_utils.W);
+        return χ²(reduce(vcat, [copy(getfield(respₖ₊₁, k)) for k ∈ response_fields]), inv_utils.dobs, W= inv_utils.W);
     end
 
     x₁= μgrid[1];
@@ -122,6 +128,6 @@ function occam_step!(mₖ₊₁::model, # to store the next update, which will e
 
     forward!(respₖ₊₁, mₖ₊₁, vars);
 
-    verbose && (print("golden section search: μ= $μ, χ²= ", χ²(reduce(vcat, [copy(getfield(respₖ₊₁, k)) for k ∈ response_fields]), inv_utils.dobs, inv_utils.W), "\n");)
+    verbose && (print("golden section search: μ= $μ, χ²= ", χ²(reduce(vcat, [copy(getfield(respₖ₊₁, k)) for k ∈ response_fields]), inv_utils.dobs, W= inv_utils.W), "\n");)
     return nothing;
 end

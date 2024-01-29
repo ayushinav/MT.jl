@@ -12,7 +12,7 @@ end
 """
 `χ²(dcal::T, dobs::T; W)`: returns a chi-squared error between the observed and the calcualted data. `W` can optionally be passed to weigh points differently.
 """
-function χ²(dcal::T, dobs::T; W) where T<:Union{AbstractVector{Float32}, AbstractVector{Float64}}
+function χ²(dcal::T, dobs::T; W::AbstractMatrix) where T<:Union{AbstractVector{Float32}, AbstractVector{Float64}}
     sqrt((dcal.-dobs)'*W*(dcal.-dobs)/length(dcal));
 end
 
