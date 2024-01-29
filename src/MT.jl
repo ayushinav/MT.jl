@@ -1,35 +1,26 @@
 module MT
 using Optim, LinearAlgebra
 using Plots
+using LinearSolve
 
-mutable struct model{T <: Union{AbstractVector{Float32}, AbstractVector{Float64}}}
-    m::T
-    h::T
-end
+include("forward/1dmt.jl")
+include("models/1dmt.jl")
+include("response/1dmt.jl")
+include("plots/plots.jl")
+include("inverse/bounds_transformation.jl");
+include("inverse/inv.jl");
+include("inverse/occam.jl");
+include("inverse/utils.jl");
 
-mutable struct response{T <: Union{AbstractVector{Float32}, AbstractVector{Float64}}}
-    ρₐ::T
-    ϕ::T
-end
-
-# function response(ω::Vector{T}) where T <: Union{Float32, Float64}
-#     return response(
-#         zero(ω),
-#         zero(ω)
-#     )
-# end
-
-include("fwd_1d.jl")
-include("plots.jl")
-include("inv.jl")
-
-# global ut::utils
-export μ, PRECISION
+export μ
 export model, response
+export get_Z, get_appres, get_phase, forward!
 export plot_response, prepare_plot, prepare_plot!
 export plot_model, plot_model!
-export get_Z, get_appres, get_phase, forward!, forward
-export jacobian!, gradient!, lls
-# Write your package code here.
+export sigmoid, d_sigmoid, inverse_sigmoid, transform_utils, default_tf;
+export inverse!
+export mt_jacobian_cache, jacobian_mt, jacobian!
+export occam_cache, linsolve!, occam_step!
+export ∂, χ², linear_utils, inverse_utils;
 
 end
