@@ -7,7 +7,8 @@
         max_iters= 20, χ2=1.,
         response_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(robs))],
         model_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(m₀))], # this will not be used but for the sake of generality for all inverse algs
-        trans_utils::transform_utils= default_tf
+        trans_utils::transform_utils= default_tf,
+        verbose= true
     )`:
     updates `mₖ` using occam iteration to fit `robs` within a misfit of `χ2`, by default set to 1.0. 
     Variables:
@@ -20,7 +21,8 @@
     `χ2=1.`: threshold misfit
     `response_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(robs))]`: choose data of response to perform inversion on, eg., ρₐ for MT, by default chooses all the data (ρₐ and ϕ)
     `model_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(m₀))]`: will generally be fixed, see docs for details
-    `trans_utils::transform_utils= default_tf`: for bounds transformation
+    `trans_utils::transform_utils= default_tf`: for bounds transformation,
+    `verbose`: whether to print updates after each iteration, defaults to true
 """
 function inverse!(mₖ::model,
         robs::response,
@@ -30,7 +32,8 @@ function inverse!(mₖ::model,
         max_iters= 20, χ2=1.,
         response_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(robs))],
         model_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(mₖ))], # this will not be used but for the sake of generality for all inverse algs
-        trans_utils::transform_utils= default_tf
+        trans_utils::transform_utils= default_tf,
+        verbose::Bool= true
     )
 
     prec= eltype(mₖ.m);
@@ -56,7 +59,6 @@ function inverse!(mₖ::model,
     mtjc= mt_jacobian_cache(vars);
 
     inv_utils= inverse_utils(∂(n_model), W, reduce(vcat, [copy(getfield(robs, k)) for k ∈ response_fields]));
-    verbose= true
 
     mₖ₊₁= model([copy(getfield(mₖ, k)) for k ∈ fieldnames(typeof(mₖ))]...)
     respₖ₊₁= response([copy(getfield(respₖ, k)) for k ∈ fieldnames(typeof(respₖ))]...)
@@ -99,14 +101,11 @@ function inverse!(mₖ::model,
         itr+=1;
     end
 
-    if itr<max_iters
+    if chi2<=χ2
         print("\n Convergence achieved with χ²= ", chi2);
-    elseif itr== max_iters
-        if chi2<=χ2
-            print("\n Convergence achieved with χ²= ", chi2);
-        end
     else
-        print("\n Convergence not achieved. μ= $μ \t χ²= ", chi2, ".\n Maybe try more iterations.");
+        print("\n Convergence not achieved. μ= $μ \t χ²= ", chi2, ".\n Maybe try more iterations, or modify the depth grid.");
     end
+    
     return nothing;
 end
