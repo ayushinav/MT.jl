@@ -1,4 +1,4 @@
-mutable struct response{T <: Union{AbstractVector{Float32}, AbstractVector{Float64}}}
+mutable struct response{T}
     ρₐ::T
     ϕ::T
 end

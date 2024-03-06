@@ -4,7 +4,7 @@ global const μ= 4π*1f-7; # Float32 will promote to Float64 without a problem
 `get_Z(ρ,h,ω)`:
 returns a tuple of ρₐ and ϕ, given arrays of resistivity `ρ` and thickness `h` for the angular frequenciy `ω`.
 """
-function get_Z(ρ::AbstractVector{T}, h::AbstractVector{T}, ω::T) where T <: Union{Float32, Float64}
+function get_Z(ρ::T, h::T, ω) where T 
     
     Z= complex(zero(eltype(ρ)));
     k= sqrt(im*ω*μ/ρ[end])
@@ -23,7 +23,7 @@ end
 `forward(m::model, ω::Vector{T}) where T <: Union{Float32, Float64}`:
 returns a  `response` for the given model `m` at the frequencies  `ω`
 """
-function forward(m::model, ω::Vector{T}) where T <: Union{Float32, Float64} # don't maek ω an abstract vector because we do the forward modeling by accessing each element, or maybe we can
+function forward(m::model, ω::AbstractVector{T}) where T # ω will always be a vector, until will find an exception
     # the following line check is why we do not use the same fn name here, so that the checks happen just once for all the frequencies.
     if !(length(m.h)== length(m.m)- 1)
         error("number of model layers should be 1 less than the number of model parameters")
@@ -43,7 +43,7 @@ end
 `forward!(r::response, m::model, ω::Vector{T}) where T <: Union{Float32, Float64}`:
 updates response `r` type for the given model `m` at the frequencies  `ω`
 """
-function forward!(r::response, m::model, ω::Vector{T}) where T <: Union{Float32, Float64}
+function forward!(r::response, m::model, ω::AbstractVector{T}) where T 
     if !(length(m.h)== length(m.m)- 1)
         error("number of model layers should be 1 less than the number of model parameters")
     end
