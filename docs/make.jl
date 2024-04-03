@@ -24,6 +24,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/ayushinav/MT",
+    repo="github.com/ayushinav/MT.git",
     devbranch="main",
 )

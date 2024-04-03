@@ -13,7 +13,7 @@ include("inverse/jacobian.jl");
 include("inverse/occam.jl");
 include("inverse/inv.jl");
 
-export μ
+# export μ
 export model, response
 export get_Z, get_appres, get_phase, forward!, forward
 export plot_response, prepare_plot, prepare_plot!

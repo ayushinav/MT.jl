@@ -55,8 +55,8 @@ function plot_model(m::model; max_depth= m.h[end]*5, kwargs...) # add depth lims
 
     xlabel, ylabel= get_model_labels(m);
     if max_depth <= h2[end]
-        @warn("`max_depth` you provided does not capture the model in entirety. \n Defaulting it to 2 x the total model thickness. \n If you want to constrain the plots use `ylim` argument.") 
-        max_depth= 2*h2[end];
+        @warn("`max_depth` you provided does not capture the model in entirety. \n Defaulting it to 5 x the total model thickness. \n If you want to constrain the plots use `ylim` argument.") 
+        max_depth= 5*h2[end];
     end
     
     Plots.plot([m.m[1], m.m...], [1,h2..., max_depth], scale=:log10, linetype=:steppost,

@@ -104,7 +104,7 @@ function inverse!(mₖ::model,
     if chi2<=χ2
         print("\n Convergence achieved with χ²= ", chi2);
     else
-        print("\n Convergence not achieved. μ= $μ \t χ²= ", chi2, ".\n Maybe try more iterations, or modify the depth grid.");
+        print("\n Convergence not achieved. \t χ²= ", chi2, ".\n Maybe try more iterations, or modify the depth grid.");
     end
     
     return nothing;
