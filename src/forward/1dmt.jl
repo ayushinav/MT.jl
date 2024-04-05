@@ -2,6 +2,7 @@ global const μ= 4π*1f-7; # Float32 will promote to Float64 without a problem
 
 """
 `get_Z(ρ,h,ω)`:
+
 returns a tuple of ρₐ and ϕ, given arrays of resistivity `ρ` and thickness `h` for the angular frequenciy `ω`.
 """
 function get_Z(ρ::T, h::T, ω) where T 
@@ -21,6 +22,7 @@ function get_Z(ρ::T, h::T, ω) where T
 end
 """
 `forward(m::model, ω::Vector{T}) where T <: Union{Float32, Float64}`:
+
 returns a  `response` for the given model `m` at the frequencies  `ω`
 """
 function forward(m::model, ω::AbstractVector{T}) where T # ω will always be a vector, until will find an exception
@@ -41,6 +43,7 @@ end
 
 """
 `forward!(r::response, m::model, ω::Vector{T}) where T <: Union{Float32, Float64}`:
+
 updates response `r` type for the given model `m` at the frequencies  `ω`
 """
 function forward!(r::response, m::model, ω::AbstractVector{T}) where T 

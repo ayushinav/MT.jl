@@ -51,13 +51,14 @@ end
 
 # This does not pass a forward function because the cache is mt specific
 """
-`jacobian!(J::jacobian_mt,
-    m::model, 
-    vars::Vector{T},
-    mtjc::mt_jacobian_cache;
-    model_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(m))], 
-    response_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(J))], 
-    ) where T <: Union{Float64, Float32}
+    jacobian!(J::jacobian_mt,
+        m::model, 
+        vars::Vector{T},
+        mtjc::mt_jacobian_cache;
+        model_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(m))], 
+        response_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(J))], 
+        ) where T <: Union{Float64, Float32}
+        
 overwrites a `jacobian_mt` cache to calculate the jacobian of a `model`. Need to pass `mt_jacobian_cache` for performance. 
 If no `model_fields` or `response_fields` are passed, all the fields of `model` and the `response` (defined in `jacobian`) will be used.
 """

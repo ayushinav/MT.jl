@@ -1,28 +1,28 @@
 """
-`function inverse!(mₖ::model,
-        robs::response,
-        vars::Vector{Float64},
-        alg_cache::occam_cache;
-        W= nothing, # Weight matrix
-        max_iters= 20, χ2=1.,
-        response_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(robs))],
-        model_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(m₀))], # this will not be used but for the sake of generality for all inverse algs
-        trans_utils::transform_utils= default_tf,
-        verbose= true
-    )`:
-    updates `mₖ` using occam iteration to fit `robs` within a misfit of `χ2`, by default set to 1.0. 
-    Variables:
-    `mₖ::model`: Inital model guess, will be updated during the inverse process
-    `robs::response`: response to invert for
-    `vars::Vector{Float64}`: variables required for forward modeling, eg., `ω` for MT
-    `alg_cache::occam_cache`: deterimines the algorithm to be performed for inversion
-    `W= nothing`: Weight matrix, will be `I` if nothing is provided
-    `max_iters= 20`: maximum number of iterations
-    `χ2=1.`: threshold misfit
-    `response_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(robs))]`: choose data of response to perform inversion on, eg., ρₐ for MT, by default chooses all the data (ρₐ and ϕ)
-    `model_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(m₀))]`: will generally be fixed, see docs for details
-    `trans_utils::transform_utils= default_tf`: for bounds transformation,
-    `verbose`: whether to print updates after each iteration, defaults to true
+    function inverse!(mₖ::model,
+            robs::response,
+            vars::Vector{Float64},
+            alg_cache::occam_cache;
+            W= nothing, # Weight matrix
+            max_iters= 20, χ2=1.,
+            response_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(robs))],
+            model_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(m₀))], # this will not be used but for the sake of generality for all inverse algs
+            trans_utils::transform_utils= default_tf,
+            verbose= true
+        ):
+updates `mₖ` using occam iteration to fit `robs` within a misfit of `χ2`, by default set to 1.0. 
+### Variables:
+* `mₖ::model`: Inital model guess, will be updated during the inverse process
+* `robs::response`: response to invert for
+* `vars::Vector{Float64}`: variables required for forward modeling, eg., `ω` for MT
+* `alg_cache::occam_cache`: deterimines the algorithm to be performed for inversion
+* `W= nothing`: Weight matrix, will be `I` if nothing is provided
+* `max_iters= 20`: maximum number of iterations
+* `χ2=1.`: threshold misfit
+* `response_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(robs))]`: choose data of response to perform inversion on, eg., ρₐ for MT, by default chooses all the data (ρₐ and ϕ)
+* `model_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(m₀))]`: will generally be fixed, see docs for details
+* `trans_utils::transform_utils= default_tf`: for bounds transformation,
+* `verbose`: whether to print updates after each iteration, defaults to true
 """
 function inverse!(mₖ::model,
         robs::response,

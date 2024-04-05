@@ -31,8 +31,7 @@ end
 
 """
 `struct inv_utils`:
-contains the utilities for inversion.
-once initialized, will not be updated in the inversion iterations `D`: second derivative operator, `W`: weight matrix, `dobs`: data response to be inverted for.
+contains the utilities for inversion, once initialized, will not be updated in the inversion iterations `D`: second derivative operator, `W`: weight matrix, `dobs`: data response to be inverted for.
 """
 mutable struct inverse_utils{T1, T2 <: Union{AbstractMatrix{Float32}, AbstractMatrix{Float64}}, 
     T3 <: Union{AbstractVector{Float32}, AbstractVector{Float64}}}

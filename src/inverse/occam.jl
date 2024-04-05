@@ -5,7 +5,7 @@ mutable struct occam_cache{T}
     μgrid::Vector{T}
 end
 """
-`linsolve!`: Performs `inv(B)*y` using LinearSolve.jl
+`linsolve!`: Performs `inv(B)*y` using `LinearSolve.jl`
 """
 function linsolve!(x, prob_init, B, y)
     prob_init.A= B;
@@ -21,33 +21,33 @@ function Occam(;μgrid= [0.01, 1e6])
 end
 
 """
-`function occam_step!(mₖ₊₁::model,
-    respₖ₊₁::response,
-    vars::Union{AbstractVector{Float32}, AbstractVector{Float64}},
-    χ2::Union{Float64, Float32},
-    μgrid::Vector{Float64},
-    lin_utils::linear_utils,
-    inv_utils::inverse_utils,
-    trans_utils::transform_utils,
-    linsolve_prob::LinearSolve.LinearCache;
-    model_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(mₖ₊₁))],
-    response_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(respₖ₊₁))],
-    verbose= false
-    )`:
-    performs a single step of occam inversion, using golden line search.
-    Variables:
-    `mₖ₊₁`: to store the next update, which will eventually be copied to mₖ
-    `respₖ₊₁`: to store the response for `mₖ₊₁`, for error calculation and anything
-    `vars`: to compute the forward model
-    `χ2::Union{Float64, Float32}`: threshold chi-squared error that needs to be met,
-    `μgrid::Vector{Float64}`: contains end points of the bounds for the lagrange multiplier,
-    `lin_utils::linear_utils`: contains the mₖ, Jₖ, Fₖ associate with the current iteration,
-    `inv_utils::inverse_utils`: contains D= ∂(n), W and dobs,
-    `trans_utils::transform_utils`: to  transform to and from the computational domain,
-    `linsolve_prob::LinearSolve.LinearCache`: for faster inverse operations,
-    `model_fields::Vector{Symbol`: which fields in model to consider changing,
-    `response_fields::Vector{Symbol}`: which fields in response to invert for,
-    `verbose`: whether to print the updates or not, default is true
+    function occam_step!(mₖ₊₁::model,
+        respₖ₊₁::response,
+        vars::Union{AbstractVector{Float32}, AbstractVector{Float64}},
+        χ2::Union{Float64, Float32},
+        μgrid::Vector{Float64},
+        lin_utils::linear_utils,
+        inv_utils::inverse_utils,
+        trans_utils::transform_utils,
+        linsolve_prob::LinearSolve.LinearCache;
+        model_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(mₖ₊₁))],
+        response_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(respₖ₊₁))],
+        verbose= false
+        ):
+performs a single step of occam inversion, using golden line search.
+### Variables:
+* `mₖ₊₁`: to store the next update, which will eventually be copied to mₖ
+* `respₖ₊₁`: to store the response for `mₖ₊₁`, for error calculation and anything
+* `vars`: to compute the forward model
+* `χ2::Union{Float64, Float32}`: threshold chi-squared error that needs to be met,
+* `μgrid::Vector{Float64}`: contains end points of the bounds for the lagrange multiplier,
+* `lin_utils::linear_utils`: contains the mₖ, Jₖ, Fₖ associate with the current iteration,
+* `inv_utils::inverse_utils`: contains D= ∂(n), W and dobs,
+* `trans_utils::transform_utils`: to  transform to and from the computational domain,
+* `linsolve_prob::LinearSolve.LinearCache`: for faster inverse operations,
+* `model_fields::Vector{Symbol`: which fields in model to consider changing,
+* `response_fields::Vector{Symbol}`: which fields in response to invert for,
+* `verbose`: whether to print the updates or not, default is true
 """
 function occam_step!(mₖ₊₁::model, # to store the next update, which will eventually be copied to mₖ
     respₖ₊₁::response, # to store the response for mₖ₊₁, for error calculation and anything

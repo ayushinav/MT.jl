@@ -1,3 +1,6 @@
+using Pkg
+Pkg.activate("../MT/.")
+
 using MT
 using Documenter
 
