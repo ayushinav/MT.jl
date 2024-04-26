@@ -30,7 +30,7 @@ mutable struct linear_utils{
 end
 
 """
-`struct inv_utils`:
+`struct inverse_utils`:
 contains the utilities for inversion, once initialized, will not be updated in the inversion iterations `D`: second derivative operator, `W`: weight matrix, `dobs`: data response to be inverted for.
 """
 mutable struct inverse_utils{T1, T2 <: Union{AbstractMatrix{Float32}, AbstractMatrix{Float64}}, 
@@ -38,4 +38,16 @@ mutable struct inverse_utils{T1, T2 <: Union{AbstractMatrix{Float32}, AbstractMa
     D::T1
     W::T2
     dobs::T3
+end
+
+"""
+`struct return_code`:
+contains the information if the inversion was successful
+"""
+mutable struct return_code{T1 <: model}
+    if_pass::Bool
+    parameters::AbstractArray
+    model_estimate::T1
+    misfit_threshold::AbstractFloat
+    misfit_achieved::AbstractFloat
 end

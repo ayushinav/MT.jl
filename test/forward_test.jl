@@ -1,18 +1,13 @@
-using MT
-using Test
-using BenchmarkTools
-
 h= [100., 1000.]; # m
 ρ= [100., 10., 1000.]; # Ωm
 m= model(ρ, h);
 T= 10 .^(range(-3,5,length= 57));
 ω= 2π./T;
 nω= length(T);
-resp= response(ω);
+resp= forward(m, ω);
 
-@testset "MT.jl" begin
-    
-    @show @ballocated forward!(resp, m, ω)
+@testset "forward tests" begin
+    # @show @ballocated forward!(resp, m, ω)
 
     Z_tst= [(0.3933382406337992+0.7107973536471329*im),
     (0.2896547948583126+0.5667129299244454*im),
@@ -77,5 +72,6 @@ resp= response(ω);
     @test resp.ϕ ≈ get_phase.(Z_tst);
     
     # Performance test
-    alloc= @ballocated forward!(resp, m, ω);
+    alloc = @ballocated forward!(resp, m, ω);
     @test alloc == 0
+end

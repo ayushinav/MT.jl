@@ -23,6 +23,12 @@ updates `mₖ` using occam iteration to fit `robs` within a misfit of `χ2`, by 
 * `model_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(m₀))]`: will generally be fixed, see docs for details
 * `trans_utils::transform_utils= default_tf`: for bounds transformation,
 * `verbose`: whether to print updates after each iteration, defaults to true
+
+### Returns:
+return message in the form of `return_code` and updates `mₖ` in-place.
+
+### Example:
+`inverse!(m_occam, r_obs, Occam([1e-2, 1e6]))`
 """
 function inverse!(mₖ::model,
         robs::response,
@@ -101,11 +107,12 @@ function inverse!(mₖ::model,
         itr+=1;
     end
 
-    if chi2<=χ2
-        print("\n Convergence achieved with χ²= ", chi2);
-    else
-        print("\n Convergence not achieved. \t χ²= ", chi2, ".\n Maybe try more iterations, or modify the depth grid.");
-    end
-    
+    return return_code(
+        chi2<=χ2,
+        [],
+        mₖ,
+        χ2,
+        chi2
+    )    
     return nothing;
 end

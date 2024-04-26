@@ -1,3 +1,6 @@
+using Pkg
+Pkg.activate("../MT/.")
+
 using MT
 using Documenter
 
@@ -17,9 +20,11 @@ makedocs(;
     pages=[
         "Home" => "index.md",
         "API" => "api.md",
-        "forward" => "forward.md",
         "inverse" => "inverse.md",
+        "forward" => "forward.md",
         "model" => "model.md",
+        "interface guide" => "interface_guide.md",
+        "probabilistic inverse" => "probabilisitc_inverse.md"
     ],
 )
 

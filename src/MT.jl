@@ -1,5 +1,5 @@
 module MT
-using Optim, LinearAlgebra
+using LinearAlgebra
 using Plots
 using LinearSolve
 

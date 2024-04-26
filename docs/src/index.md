@@ -17,12 +17,14 @@ Until this will go public, we can also use this page to develop the ideas for co
 No surprises here that we are almost always trying to solve for an under-determined system. The most popular framework in 1D is Occam and this is what is currently supported at the moment.
 
 ### Ideation
- We can simply add gradient descent (though not useful) but hopefully, we can add more neural network oriented framework for our approach. Impyling, occam codes go in a sub folder in the `inverse` codes.
+ We can simply add gradient descent (though not useful) but hopefully, we can add more neural network oriented framework for our approach. Impyling, occam codes go in a sub folder in the `inverse` codes. This can be better approached using `NonLinearSolve.jl`.
 
 Check out the implementation details:
 * [model](model.md)
 * [forward](forward.md)
 * [inverse](inverse.md)
+<!-- * [probabilistic_inverse](probabilisitc_inverse.md) -->
+* [interface_guide](interface_guide.md)
 
 <!-- ```@meta
 CurrentModule = MT
