@@ -46,4 +46,6 @@ function transform_utils(p::Vector{T}, tf::Function, itf::Function, dtf::Functio
 end
 
 # should generally be good for most MT inversions
-default_tf= transform_utils([-3., 6.], sigmoid, inverse_sigmoid, d_sigmoid);
+sigmoid_tf= transform_utils([-3., 6.], sigmoid, inverse_sigmoid, d_sigmoid);
+log_tf= transform_utils([], log10, (x) -> 10^x, (x) -> inv(x * log(10)));
+lin_tf= transform_utils([], (x) -> x, (x) -> 1., (x) -> x);

@@ -7,7 +7,7 @@
             max_iters= 20, χ2=1.,
             response_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(robs))],
             model_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(m₀))], # this will not be used but for the sake of generality for all inverse algs
-            trans_utils::transform_utils= default_tf,
+            trans_utils::transform_utils= sigmoid_tf,
             verbose= true
         ):
 updates `mₖ` using occam iteration to fit `robs` within a misfit of `χ2`, by default set to 1.0. 
@@ -21,7 +21,7 @@ updates `mₖ` using occam iteration to fit `robs` within a misfit of `χ2`, by 
 * `χ2=1.`: threshold misfit
 * `response_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(robs))]`: choose data of response to perform inversion on, eg., ρₐ for MT, by default chooses all the data (ρₐ and ϕ)
 * `model_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(m₀))]`: will generally be fixed, see docs for details
-* `trans_utils::transform_utils= default_tf`: for bounds transformation,
+* `trans_utils::transform_utils= sigmoid_tf`: for bounds transformation,
 * `verbose`: whether to print updates after each iteration, defaults to true
 
 ### Returns:
@@ -38,7 +38,7 @@ function inverse!(mₖ::model,
         max_iters= 20, χ2=1.,
         response_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(robs))],
         model_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(mₖ))], # this will not be used but for the sake of generality for all inverse algs
-        trans_utils::transform_utils= default_tf,
+        trans_utils::transform_utils= sigmoid_tf,
         verbose::Bool= true
     )
 
