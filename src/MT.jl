@@ -2,6 +2,8 @@ module MT
 using LinearAlgebra
 using Plots
 using LinearSolve
+using Turing
+using Distributions
 
 include("models/1dmt.jl")
 include("response/1dmt.jl")
@@ -12,8 +14,8 @@ include("inverse/bounds_transformation.jl");
 include("inverse/jacobian.jl");
 include("inverse/occam.jl");
 include("inverse/inv.jl");
-include("probabilistic/gaussian_distribution.jl")
 include("probabilistic/init_distributions.jl")
+include("probabilistic/gaussian_distribution.jl")
 include("probabilistic/utils.jl")
 include("probabilistic/inverse.jl")
 
