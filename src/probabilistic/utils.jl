@@ -6,28 +6,31 @@ mutable struct mcmc_cache
 end
 
 @model function mcmc_turing(
-    m₀::NamedTuple, # let's see
     m_sample::model,
     vars,
     r_obs::NamedTuple,
-    mDist::NamedTuple,
+    err_resp::response,
+    mDist::modelDistribution,
     rDist::responseDistribution;
     response_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(rDist))],
     model_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(mDist))],
     trans_utils::NamedTuple = (m = log_tf, h = lin_tf)
-    ) 
-    
-    for k in model_fields
-        kk ~ mDist[k]
-        broadcast!(getproperty(trans_utils[k], :itf), m₀[k], kk)
+    )
+
+    m₀ = [];
+    for k ∈ propertynames(mDist)
+        if k in model_fields
+            kk ~ getproperty(mDist, k)
+            push!(m₀, broadcast(getproperty(trans_utils[k], :itf), kk));
+        else
+            push!(m₀, getfield(m_sample, k));   
+        end
     end
 
+    m_sample = model(m₀...);
     r_sample = forward(m_sample, vars);
 
-    # formulate rDist using r_sample
-    update_responseDistribution!(rDist, r_sample)
-
     for k in response_fields
-        r_obs[k] ~ getfield(rDist, k)
+        r_obs[k] ~ getfield(rDist, k)(getfield(r_sample, k), getfield(err_resp, k))
     end
 end

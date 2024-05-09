@@ -15,7 +15,7 @@ include("inverse/jacobian.jl");
 include("inverse/occam.jl");
 include("inverse/inv.jl");
 include("probabilistic/init_distributions.jl")
-include("probabilistic/gaussian_distribution.jl")
+include("probabilistic/respDistribution.jl")
 include("probabilistic/utils.jl")
 include("probabilistic/inverse.jl")
 
@@ -28,10 +28,11 @@ export plot_model, plot_model!
 export sigmoid, d_sigmoid, inverse_sigmoid, transform_utils, default_tf, log_tf
 export mt_jacobian_cache, jacobian_mt, jacobian!
 export occam_cache, Occam, linsolve!, occam_step!
+export inverse!
 export ∂, χ², linear_utils, inverse_utils;
-export gaussian_responseDistribution, update_responseDistribution!
+export normal_dist, uniform_dist
 export modelDistribution, responseDistribution
 export mcmc_cache
-export inverse!; # both for occam and mcmc
+export stochastic_inverse
 
 end

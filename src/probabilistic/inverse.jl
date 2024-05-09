@@ -1,16 +1,14 @@
-
-function inverse!( 
+function stochastic_inverse(
     r_obs::response,
+    err_resp::response,
     vars,
     alg_cache::mcmc_cache;
-    trans_utils::NamedTuple = (m = log_tf, h = lin_tf), # change this to a NamedTuple
-    verbose = false)
-
-    # test if model size is compatible with model distribution, same with response and response distribution
+    trans_utils::NamedTuple = (m = log_tf, h = lin_tf)
+    )
 
     model_fields = [];
     modelD = [];
-    const_data = [];
+    const_data = []; #model([], []);
 
     # segregate the constants and the Distribution parts of the alg_cache
 
@@ -26,11 +24,12 @@ function inverse!(
 
     response_fields = Symbol.([])
     for k in fieldnames(typeof(alg_cache.likelihood))
-        if typeof(getfield(alg_cache.likelihood, k)) <: Distribution
+        if typeof(getfield(alg_cache.likelihood, k)) <: Function
             push!(response_fields, k)
         end
     end
-
+    
+    # putting trans_utils together for all the fields
 
     trans_utils_arr = [];
     for k ∈ fieldnames(typeof(alg_cache.apriori))
@@ -57,16 +56,15 @@ function inverse!(
         [getfield(r_obs, k) for k ∈ fieldnames(typeof(r_obs))]
     )...);
     
-    mDist = (;zip(model_fields, modelD)...);
-
     mcmc_model = mcmc_turing(
-        m₀, # ::NamedTuple
+        # m₀, # ::NamedTuple
         m_sample, # ::model
         vars,
         robs, # ::NamedTuple
-        mDist, # ::NamedTuple
-        alg_cache.likelihood, # ::responseDistribution2;
-        response_fields = Symbol.(response_fields), #::Vector{Symbol}= [k for k ∈ fieldnames(typeof(rDist))],
+        err_resp, # ::response
+        alg_cache.apriori, # ::NamedTuple
+        alg_cache.likelihood, # ::responseDistribution
+        response_fields = Symbol.(response_fields),
         model_fields = Symbol.(model_fields),
         trans_utils = transf_utils
     )

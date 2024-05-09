@@ -4,7 +4,7 @@ mutable struct modelDistribution{T1<: Union{Distribution, AbstractArray}, T2<: U
 end
 
 # we don't need these distributions as structs but as named tuples?
-mutable struct responseDistribution{T1<: Union{Distribution, Nothing}, T2<: Union{Distribution, Nothing}} # where T1,T2
+struct responseDistribution{T1<: Union{Function, Nothing}, T2<: Union{Function, Nothing}} # where T1,T2
     ρₐ::T1
     ϕ::T2
 end

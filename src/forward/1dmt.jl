@@ -5,7 +5,7 @@ global const μ= 4π*1f-7; # Float32 will promote to Float64 without a problem
 
 returns a tuple of ρₐ and ϕ, given arrays of resistivity `ρ` and thickness `h` for the angular frequenciy `ω`.
 """
-function get_Z(ρ::T, h::T, ω) where T 
+function get_Z(ρ::T1, h::T2, ω) where {T1, T2} 
     
     Z= complex(zero(eltype(ρ)));
     k= sqrt(im*ω*μ/ρ[end])
