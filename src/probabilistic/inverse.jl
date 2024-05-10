@@ -1,3 +1,22 @@
+"""
+    stochastic_inverse(
+        r_obs::response,
+        err_resp::response,
+        vars,
+        alg_cache::mcmc_cache;
+        trans_utils::NamedTuple = (m = log_tf, h = lin_tf)
+        )
+function to perform sampling 
+### Returns
+    `AbstractMCMC.jl Chain` containing the vectors used for performing samping. Note that all the variables will be named `var_inf`, for variable inferred. 
+    The vector in each sample will be all the fields of the model being inferred on concatenated together.
+### Variables
+* `r_obs`: `response` that needs to inverted for
+* `err_resp`: `response` variable containing the errors associated with observed response
+* `vars`: variables that need to be passed into the `forward` function along with `model` to generate a `response`
+* `alg_cache`: to tell the compiler what type of stochastic inversion method is to be used
+* `trans_utils`: A named tuple containing `transform_utils` for the fields of model that need to be scaled/modified. If not provided for any `model` field, the field won't be modified.
+"""
 function stochastic_inverse(
     r_obs::response,
     err_resp::response,
