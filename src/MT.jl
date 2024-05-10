@@ -8,7 +8,6 @@ using Distributions
 include("models/1dmt.jl")
 include("response/1dmt.jl")
 include("forward/1dmt.jl")
-include("plots/plots.jl")
 include("inverse/utils.jl");
 include("inverse/bounds_transformation.jl");
 include("inverse/jacobian.jl");
@@ -18,6 +17,8 @@ include("probabilistic/init_distributions.jl")
 include("probabilistic/respDistribution.jl")
 include("probabilistic/utils.jl")
 include("probabilistic/inverse.jl")
+include("utils.jl")
+include("plots/plots.jl")
 
 
 # export μ

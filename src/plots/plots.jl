@@ -5,14 +5,15 @@ end
 
 # most geophysical surveys generally have the same units across, what would be the point of passing units then?
 
-function prepare_plot(d::response, ω::Vector{T}; field_names::Vector{Symbol}= [k for k ∈ fieldnames(typeof(d))], kwargs...) where T <: Union{Float32, Float64} 
+function prepare_plot(d::response, ω::Vector{T}; d_err::response = zero(d), plot_type = :scatter, field_names::Vector{Symbol}= [k for k ∈ fieldnames(typeof(d))], kwargs...) where T <: Union{Float32, Float64} 
     
     units= utils(:Ωm, :ᵒ);
     yscale= utils(:log10, :identity)
     plts= [];
 
     for i in eachindex(field_names)
-        pi= Plots.plot(2π./ω, getfield(d, field_names[i]), xscale=:log10, 
+        pi= getfield(Plots, plot_type)(2π./ω, getfield(d, field_names[i]), xscale=:log10, 
+            yerr = getfield(d_err, field_names[i]),
             yscale= getfield(yscale, field_names[i]),
             ylabel= "$(field_names[i]) ($(getfield(units, field_names[i])))",
             xlabel= "T (s)"; kwargs...
@@ -23,13 +24,15 @@ function prepare_plot(d::response, ω::Vector{T}; field_names::Vector{Symbol}= [
     return plts
 end
 
-function prepare_plot!(plts::Vector{Any}, d::response, ω; field_names::Vector{Symbol}= [k for k ∈ fieldnames(typeof(d))], kwargs...)
+function prepare_plot!(plts::Vector{Any}, d::response, ω; d_err::response = zero(d), plot_type = :scatter, field_names::Vector{Symbol}= [k for k ∈ fieldnames(typeof(d))], kwargs...)
 
     units= utils(:Ωm, :ᵒ);
     yscale= utils(:log10, :identity)
+    plot_type = Symbol("$(plot_type)!");
 
     for i in eachindex(field_names)
         Plots.plot!(plts[i], 2π./ω, getfield(d, field_names[i]), xscale=:log10, 
+            yerr = getfield(d_err, field_names[i]),
             yscale= getfield(yscale, field_names[i]),
             ylabel= "$(field_names[i]) ($(getfield(units, field_names[i])))",
             xlabel= "T (s)"; kwargs...
