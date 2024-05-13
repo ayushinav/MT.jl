@@ -32,4 +32,30 @@ function zero_abstract(m::mtresponse) where {mtresponse <: MTResponse{<:Abstract
     )
 end
 
+# this probably does it for all 1D, 2D, 3D models and their corresponding responses? Atleast 1d for sure, some brainstorming maybe required for 2D and 3D.
+# Again, can we make a generated function here?
 
+
+function inverse(t::mtresponse; abstract = false) where {mtresponse <: MTResponse}
+    if abstract
+        return MTModel{
+            AbstractArray{<:Any, length(size(t.ρₐ))},
+            AbstractArray{<:Any, length(size(t.ρₐ))}
+        }
+    else
+        vec_type = typeof(t.ρₐ)
+        return MTModel{vec_type, vec_type}
+    end
+end
+
+function forward(t::mtmodel; abstract = false) where {mtmodel <: MTModel} # {<:AbstractVector{<:Any}, <:AbstractVector{<:Any}}}
+    if abstract
+        return MTResponse{
+            AbstractArray{<:Any, length(sie(m.m))},
+            AbstractArray{<:Any, length(sie(m.m))}
+        }
+    else
+        vec_type = typeof(t.m) 
+        return MTResponse{vec_type, vec_type}
+    end
+end

@@ -64,7 +64,7 @@ function stochastic_inverse(
 
     # make model and modelDistribution
 
-    # m_sample = model(const_data...);
+    m_sample = inverse(r_obs, abstract = true)(const_data...);
     # m₀ = (;zip(
     #     [fieldnames(typeof(m_sample))...], 
     #     [getfield(m_sample, k) for k ∈ fieldnames(typeof(m_sample))]
@@ -76,6 +76,7 @@ function stochastic_inverse(
     )...);
     
     mcmc_model = mcmc_turing(
+        m_sample,
         vars,
         robs, # ::NamedTuple
         err_resp, # ::response
