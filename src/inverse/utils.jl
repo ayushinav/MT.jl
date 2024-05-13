@@ -12,7 +12,7 @@ end
 """
 `χ²(dcal::T, dobs::T; W)`: returns a chi-squared error between the observed and the calcualted data. `W` can optionally be passed to weigh points differently.
 """
-function χ²(dcal::T, dobs::T; W::AbstractMatrix) where T<:Union{AbstractVector{Float32}, AbstractVector{Float64}}
+function χ²(dcal::T, dobs::T; W::AbstractMatrix) where T<:Union{AbstractVector{<:Any}, AbstractVector{<:Any}}
     sqrt((dcal.-dobs)'*W*(dcal.-dobs)/length(dcal));
 end
 
@@ -44,10 +44,13 @@ end
 `struct return_code`:
 contains the information if the inversion was successful
 """
-mutable struct return_code{T1 <: model}
+mutable struct return_code{T1 <: AbstractModel}
     if_pass::Bool
     parameters::AbstractArray
     model_estimate::T1
     misfit_threshold::AbstractFloat
     misfit_achieved::AbstractFloat
 end
+
+
+# linear_utils and inverse_utils are used only in occam, so we do not touch them for now

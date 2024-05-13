@@ -5,7 +5,7 @@ global const μ= 4π*1f-7; # Float32 will promote to Float64 without a problem
 
 returns a tuple of ρₐ and ϕ, given arrays of resistivity `ρ` and thickness `h` for the angular frequenciy `ω`.
 """
-function get_Z(ρ::T1, h::T2, ω) where {T1, T2} 
+function get_Z(ρ::T1, h::T2, ω::T) where {T1<:AbstractVector{<:Any}, T2<:AbstractVector{<:Any}, T} 
     
     Z= complex(zero(eltype(ρ)));
     k= sqrt(im*ω*μ/ρ[end])
@@ -20,12 +20,14 @@ function get_Z(ρ::T1, h::T2, ω) where {T1, T2}
     Z= conj(Z);
     return get_appres(Z, ω), get_phase(Z);
 end
+
+# dispatch on forward for 1d model
 """
 `forward(m::model, ω::Vector{T}) where T <: Union{Float32, Float64}`:
 
 returns a  `response` for the given model `m` at the frequencies  `ω`
 """
-function forward(m::model, ω::AbstractVector{T}) where T # ω will always be a vector, until will find an exception
+function forward(m::MTModel{<:AbstractVector{<:Any}, <:AbstractVector{<:Any}}, ω::AbstractVector{<:Any}) # ω will always be a vector, until will find an exception
     # the following line check is why we do not use the same fn name here, so that the checks happen just once for all the frequencies.
     if !(length(m.h)== length(m.m)- 1)
         error("number of model layers should be 1 less than the number of model parameters")
@@ -38,15 +40,17 @@ function forward(m::model, ω::AbstractVector{T}) where T # ω will always be a 
         ρₐ[i], ϕ[i]= get_Z(m.m, m.h, ω[i]);
         i+=1;
     end
-    return response(ρₐ, ϕ);
+    return MTResponse(ρₐ, ϕ);
 end
+
+# dispatch on forward! for 1d model
 
 """
 `forward!(r::response, m::model, ω::Vector{T}) where T <: Union{Float32, Float64}`:
 
 updates response `r` type for the given model `m` at the frequencies  `ω`
 """
-function forward!(r::response, m::model, ω::AbstractVector{T}) where T 
+function forward!(r::MTResponse, m::MTModel{<:AbstractVector{<:Any}, <:AbstractVector{<:Any}}, ω::AbstractVector{<:Any})
     if !(length(m.h)== length(m.m)- 1)
         error("number of model layers should be 1 less than the number of model parameters")
     end

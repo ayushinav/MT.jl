@@ -5,7 +5,7 @@
 move to model domain from optimization domain using a sigmoid transformation
 """
 
-function sigmoid(m::T, bounds::Vector{T})::T where T <:Union{Float32, Float64}
+function sigmoid(m::T1, bounds::Vector{T})::T where {T<:Union{Float32, Float64}, T1}
     σ(x)= 1/(1+exp(-x/(bounds[2]- bounds[1])));
     # return 10^(σ(m)*log10(bounds[2]/bounds[1])+ log10(bounds[1]))
     return σ(m)*(bounds[2]- bounds[1])+ bounds[1]
@@ -15,7 +15,7 @@ end
 `d_sigmoid(m)`:
 gradient for the transformation from optimization domain to model domain. Used for estimating jacobians, but is also useful in analysing sensitivities.
 """
-function d_sigmoid(m::T, bounds::Vector{T})::T where T <:Union{Float32, Float64}
+function d_sigmoid(m::T1, bounds::Vector{T})::T where {T<:Union{Float32, Float64}, T1}
     d_σ(x)= inv((1+exp(x))*(1+exp(-x)));
     # return σ(log10(m))*(log10(bounds[2])- log10(bounds[1]))+ log10(bounds[1])
     return d_σ(m/(bounds[2]- bounds[1]));#*(bounds[2]- bounds[1])
@@ -24,7 +24,7 @@ end
 """
 `inverse_sigmoid()`: get back to the optimization domain from model domain
 """
-function inverse_sigmoid(x::T, bounds::Vector{T})::T where T<:Union{Float32, Float64}
+function inverse_sigmoid(x::T1, bounds::Vector{T})::T where {T<:Union{Float32, Float64}, T1}
     # if x ≈ bounds[2] return 100 end
     # if x ≈ bounds[1] return -100 end
     

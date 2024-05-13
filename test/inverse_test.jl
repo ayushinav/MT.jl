@@ -1,13 +1,13 @@
 @testset "inverse tests" begin
     h= [1000., 1000.]; # m
     ρ= [100., 10., 1000.]; # Ωm
-    m= model(ρ, h);
+    m= MTModel(ρ, h);
     T= 10 .^(range(-2, 2, length= 57));
     ω= 2π./T;
     nω= length(T);
 
     r_obs = forward(m, ω);
-    m_occam = model(fill(100., 50), collect(range(0, 5e3, length = 49)))
+    m_occam = MTModel(fill(100., 50), collect(range(0, 5e3, length = 49)))
 
 
     err_ρ= 0.1 .* r_obs.ρₐ

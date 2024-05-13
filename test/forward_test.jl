@@ -1,6 +1,6 @@
 h= [100., 1000.]; # m
 ρ= [100., 10., 1000.]; # Ωm
-m= model(ρ, h);
+m= MTModel(ρ, h);
 T= 10 .^(range(-3,5,length= 57));
 ω= 2π./T;
 nω= length(T);

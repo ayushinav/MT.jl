@@ -1,11 +1,9 @@
-mutable struct response{T}
-    ρₐ::T
-    ϕ::T
+mutable struct MTResponse{T1<:AbstractArray{<:Any}, T2<:AbstractArray{<:Any}} <: AbstractGeophyResponse
+    ρₐ::T1
+    ϕ::T2
 end
 
-# function response(ω::Vector{T}) where T <: Union{Float32, Float64}
-#     return response(
-#         zero(ω),
-#         zero(ω)
-#     )
-# end
+#=
+More often than not, T1 and T2 will be same, that is typeof(ρₐ) and typeof(ϕ) will be same but this might become different when using a rock physics model in front of this. 
+For now, we go with the same design as for `MTModel`.
+=#

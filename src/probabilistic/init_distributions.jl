@@ -5,7 +5,7 @@
     end
 create a placeholder to store the `Distributions.jl` sampler for a priori
 """
-mutable struct modelDistribution{T1<: Union{Distribution, AbstractArray}, T2<: Union{Distribution, AbstractArray}}
+mutable struct MTModelDistribution{T1<: Union{Distribution, AbstractArray}, T2<: Union{Distribution, AbstractArray}}
     m::T1
     h::T2
 end
@@ -18,7 +18,7 @@ end
     end
 create a placeholder to store functions to obtain `Distributions.jl` samplers for the likelihood function
 """
-struct responseDistribution{T1<: Union{Function, Nothing}, T2<: Union{Function, Nothing}}
+struct MTResponseDistribution{T1<: Union{Function, Nothing}, T2<: Union{Function, Nothing}}
     ρₐ::T1
     ϕ::T2
 end

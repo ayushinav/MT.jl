@@ -1,7 +1,7 @@
 name = "MT"
 uuid = "333b7055-2ef7-4b1e-a2ef-5fb1688f630d"
 authors = ["Abhinav Pratap Singh"]
-version = "0.2.0"
+version = "0.3.0"
 
 [deps]
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"

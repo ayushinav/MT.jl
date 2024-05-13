@@ -12,8 +12,8 @@ placeholder to store
 * `Turing.jl` sampler to be used in `sampler`
 """
 mutable struct mcmc_cache
-    apriori::modelDistribution
-    likelihood::responseDistribution
+    apriori::MTModelDistribution
+    likelihood::MTResponseDistribution
     n_samples::Int
     sampler
 end
@@ -47,9 +47,9 @@ makes a `Turing.jl` model to perform MCMC sampling
 @model function mcmc_turing(
     vars,
     r_obs::NamedTuple,
-    err_resp::response,
-    mDist::modelDistribution,
-    rDist::responseDistribution;
+    err_resp::MTResponse,
+    mDist::MTModelDistribution,
+    rDist::MTResponseDistribution;
     response_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(rDist))],
     model_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(mDist))],
     trans_utils::NamedTuple = (m = log_tf, h = lin_tf)

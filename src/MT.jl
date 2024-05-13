@@ -5,9 +5,11 @@ using LinearSolve
 using Turing
 using Distributions
 
-include("models/1dmt.jl")
+include("abstract_types.jl")
+include("models/mt.jl")
 include("response/1dmt.jl")
 include("forward/1dmt.jl")
+include("utils.jl")
 include("inverse/utils.jl");
 include("inverse/bounds_transformation.jl");
 include("inverse/jacobian.jl");
@@ -17,13 +19,16 @@ include("probabilistic/init_distributions.jl")
 include("probabilistic/respDistribution.jl")
 include("probabilistic/utils.jl")
 include("probabilistic/inverse.jl")
-include("utils.jl")
+include("plots/utils.jl")
 include("plots/plots.jl")
 
 
 # export μ
-export model, response
+export AbstractModel, AbstractResponse
+export AbstractGeophyModel, AbstractGeophyResponse
+export MTModel, MTResponse
 export get_Z, get_appres, get_phase, forward!, forward
+# export zero, copy
 export plot_response, prepare_plot, prepare_plot!
 export plot_model, plot_model!
 export sigmoid, d_sigmoid, inverse_sigmoid, transform_utils, default_tf, log_tf
@@ -32,7 +37,7 @@ export occam_cache, Occam, linsolve!, occam_step!
 export inverse!
 export ∂, χ², linear_utils, inverse_utils;
 export normal_dist, uniform_dist
-export modelDistribution, responseDistribution
+export MTModelDistribution, MTResponseDistribution
 export mcmc_cache
 export stochastic_inverse
 

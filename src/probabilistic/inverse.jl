@@ -18,12 +18,12 @@ function to perform sampling
 * `trans_utils`: A named tuple containing `transform_utils` for the fields of model that need to be scaled/modified. If not provided for any `model` field, the field won't be modified.
 """
 function stochastic_inverse(
-    r_obs::response,
-    err_resp::response,
+    r_obs::resp1,
+    err_resp::resp2,
     vars,
     alg_cache::mcmc_cache;
     trans_utils::NamedTuple = (m = log_tf, h = lin_tf)
-    )
+    ) where {resp1 <: AbstractResponse, resp2 <: AbstractResponse}
 
     model_fields = [];
     modelD = [];
@@ -64,11 +64,11 @@ function stochastic_inverse(
 
     # make model and modelDistribution
 
-    m_sample = model(const_data...);
-    m₀ = (;zip(
-        [fieldnames(typeof(m_sample))...], 
-        [getfield(m_sample, k) for k ∈ fieldnames(typeof(m_sample))]
-    )...);
+    # m_sample = model(const_data...);
+    # m₀ = (;zip(
+    #     [fieldnames(typeof(m_sample))...], 
+    #     [getfield(m_sample, k) for k ∈ fieldnames(typeof(m_sample))]
+    # )...);
 
     robs = (;zip(
         [fieldnames(typeof(r_obs))...], 
@@ -76,8 +76,6 @@ function stochastic_inverse(
     )...);
     
     mcmc_model = mcmc_turing(
-        # m₀, # ::NamedTuple
-        m_sample, # ::model
         vars,
         robs, # ::NamedTuple
         err_resp, # ::response

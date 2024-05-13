@@ -61,7 +61,7 @@ function occam_step!(mₖ₊₁::model, # to store the next update, which will e
     model_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(mₖ₊₁))],
     response_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(respₖ₊₁))],
     verbose::Bool= true
-    )
+    ) where {model <: AbstractGeophyModel, response <: AbstractGeophyResponse}
 
     ϕ= (1+sqrt(5))/2;
     chi2min= (typeof(χ2))(1e6);
@@ -129,3 +129,5 @@ function occam_step!(mₖ₊₁::model, # to store the next update, which will e
     verbose && (print("golden section search: μ= $μ, χ²= ", χ²(reduce(vcat, [copy(getfield(respₖ₊₁, k)) for k ∈ response_fields]), inv_utils.dobs, W= inv_utils.W), "\n");)
     return nothing;
 end
+
+# we'd need a test sometime in future to check if the `r_obs` is indeed a response of `forward(m)`.

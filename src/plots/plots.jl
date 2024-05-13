@@ -1,21 +1,17 @@
-struct utils
-    ρₐ::Symbol
-    ϕ::Symbol
-end
-
 # most geophysical surveys generally have the same units across, what would be the point of passing units then?
 
-function prepare_plot(d::response, ω::Vector{T}; d_err::response = zero(d), plot_type = :scatter, field_names::Vector{Symbol}= [k for k ∈ fieldnames(typeof(d))], kwargs...) where T <: Union{Float32, Float64} 
-    
-    units= utils(:Ωm, :ᵒ);
-    yscale= utils(:log10, :identity)
+function prepare_plot(d::resp1, ω; d_err::resp2 = zero(d), plot_type = :scatter, field_names::Vector{Symbol}= [k for k ∈ fieldnames(typeof(d))], 
+    kwargs...) where {resp1 <: AbstractResponse, resp2 <: AbstractResponse}
+
+    units= get_units(d);
+    yscale= get_scale(d);
     plts= [];
 
     for i in eachindex(field_names)
         pi= getfield(Plots, plot_type)(2π./ω, getfield(d, field_names[i]), xscale=:log10, 
             yerr = getfield(d_err, field_names[i]),
-            yscale= getfield(yscale, field_names[i]),
-            ylabel= "$(field_names[i]) ($(getfield(units, field_names[i])))",
+            yscale= yscale[i], 
+            ylabel= "$(units[i])",
             xlabel= "T (s)"; kwargs...
         )
         push!(plts, pi);
@@ -24,17 +20,18 @@ function prepare_plot(d::response, ω::Vector{T}; d_err::response = zero(d), plo
     return plts
 end
 
-function prepare_plot!(plts::Vector{Any}, d::response, ω; d_err::response = zero(d), plot_type = :scatter, field_names::Vector{Symbol}= [k for k ∈ fieldnames(typeof(d))], kwargs...)
+function prepare_plot!(plts::Vector{Any}, d::resp1, ω; d_err::resp2 = zero(d), plot_type = :scatter, field_names::Vector{Symbol}= [k for k ∈ fieldnames(typeof(d))],
+     kwargs...) where {resp1 <: AbstractResponse, resp2 <: AbstractResponse}
 
-    units= utils(:Ωm, :ᵒ);
-    yscale= utils(:log10, :identity)
+    units= get_units(d);
+    yscale= get_scale(d);
     plot_type = Symbol("$(plot_type)!");
 
     for i in eachindex(field_names)
         Plots.plot!(plts[i], 2π./ω, getfield(d, field_names[i]), xscale=:log10, 
             yerr = getfield(d_err, field_names[i]),
-            yscale= getfield(yscale, field_names[i]),
-            ylabel= "$(field_names[i]) ($(getfield(units, field_names[i])))",
+            yscale= yscale[i], 
+            ylabel= "$(units[i])",
             xlabel= "T (s)"; kwargs...
         )
     end
@@ -45,14 +42,9 @@ function plot_response(plts::Vector{Any}; kwargs...)
     Plots.plot(plts..., layout= (length(plts), 1), size= (400, 400*length(plts)), margin= 3Plots.mm; kwargs...)
 end
 
-
-function get_model_labels(m::model) # can be defined for different types of models of other surveys
-    return "ρ (Ωm)", "Depth (m)"; 
-end
-
 # for any other survey, we will almost always have two options, either a layer model or model defined at differnt points. Our function does it on a layer model, for a model defined at points, one can simply interpolate and choose small grid spacing for the interpolator, converting the point model into a layer model
 
-function plot_model(m::model; max_depth= m.h[end]*5, kwargs...) # add depth lims later?, add kwargs
+function plot_model(m::MTModel; max_depth= m.h[end]*5, kwargs...) # add depth lims later?, add kwargs
 
     h2= cumsum(m.h);
 
@@ -69,7 +61,7 @@ function plot_model(m::model; max_depth= m.h[end]*5, kwargs...) # add depth lims
     
 end
 
-function plot_model!(plt, m::model; max_depth= m.h[end]*5, kwargs...) 
+function plot_model!(plt, m::MTModel; max_depth= m.h[end]*5, kwargs...) 
 
     h2= cumsum(m.h);
 

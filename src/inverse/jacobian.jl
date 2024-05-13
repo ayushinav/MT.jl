@@ -10,8 +10,8 @@ end
 `mt_jacobian_cache`: cache `struct` to store the values during the estimation of jacobian. 
 """
 function mt_jacobian_cache(vars) #can change this with zero response
-    r1= forward(model([1.,1.], [1.]), vars)
-    r2= forward(model([1.,1.], [1.]), vars)
+    r1= forward(MTModel([1.,1.], [1.]), vars)
+    r2= forward(MTModel([1.,1.], [1.]), vars)
     return mt_jacobian_cache{typeof(r1)}(r1,r2)
 end
 """
@@ -68,7 +68,7 @@ function jacobian!(J::jacobian_mt,
     mtjc::mt_jacobian_cache;
     model_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(m))], 
     response_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(J))], 
-    ) where T <: Union{Float64, Float32}
+    ) where {T <: Union{Float64, Float32}, model <: AbstractModel}
     nl= 0;
     @inbounds for k ∈ model_fields
         ϵ= sqrt(eps(eltype(getfield(m, k))));
@@ -89,3 +89,5 @@ function jacobian!(J::jacobian_mt,
         nl+= length(getfield(m, k));
     end
 end
+
+# jacobian works fine for 1D MT model, we would have to check for 2D/3D models.

@@ -40,7 +40,7 @@ function inverse!(mₖ::model,
         model_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(mₖ))], # this will not be used but for the sake of generality for all inverse algs
         trans_utils::transform_utils= sigmoid_tf,
         verbose::Bool= true
-    )
+    ) where {model <: AbstractGeophyModel, response <: AbstractGeophyResponse}
 
     prec= eltype(mₖ.m);
     model_fields= [:m];
@@ -50,11 +50,11 @@ function inverse!(mₖ::model,
     n_vars= length(vars);
     n_resp= length(response_fields)* n_vars;
 
-    (W== nothing) && (W= prec.(I(n_resp)));
+    (W == nothing) && (W= prec.(I(n_resp)));
 
     lin_utils= linear_utils(view(mₖ.m, :), zeros(prec, n_resp), zeros(prec, n_resp, n_model));
 
-    respₖ= response{AbstractVector{prec}}([zero(vars) for k in fieldnames(typeof(robs))]...)
+    respₖ= zero_abstract(robs); # MTResponse{AbstractVector{prec}}([zero(vars) for k in fieldnames(typeof(robs))]...)
     jₖ= jacobian_mt(fieldnames(typeof(robs)), eltype(vars));
 
     for (i,k) ∈ enumerate(response_fields)
@@ -66,8 +66,8 @@ function inverse!(mₖ::model,
 
     inv_utils= inverse_utils(∂(n_model), W, reduce(vcat, [copy(getfield(robs, k)) for k ∈ response_fields]));
 
-    mₖ₊₁= model([copy(getfield(mₖ, k)) for k ∈ fieldnames(typeof(mₖ))]...)
-    respₖ₊₁= response([copy(getfield(respₖ, k)) for k ∈ fieldnames(typeof(respₖ))]...)
+    mₖ₊₁= copy(mₖ); # MTModel([copy(getfield(mₖ, k)) for k ∈ fieldnames(typeof(mₖ))]...)
+    respₖ₊₁= copy(respₖ); # MTResponse([copy(getfield(respₖ, k)) for k ∈ fieldnames(typeof(respₖ))]...)
 
     lin_prob= LinearProblem(inv_utils.D'inv_utils.D,
         lin_utils.Jₖ'*(inv_utils.dobs+ lin_utils.Jₖ*lin_utils.mₖ- lin_utils.Fₖ));

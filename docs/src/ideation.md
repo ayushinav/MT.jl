@@ -21,4 +21,20 @@ Looks like another change is coming up because when we want to do probabilistic 
 
 What happens with precompilation is another detail we'll have to figure out soon...
 
-No longer exporting `μ` because it is a common variable and may interact at places where `μ` is not defined properly. Better to encounter errors than running something with bugs
+No longer exporting `μ` because it is a common variable and may interact at places where `μ` is not defined properly. Better to encounter errors than running something with bugs.
+
+**Ideation for abstract types**
+
+Let's define the tree as :
+We'll have a outermost abstract type `AbstractModel`, under which would be `AbstractGeophyModel`, make other subtypes as `AbstractGeoEMModel` but for now, let's add `MTModel` without `AbstractGeoEMModel`. 
+
+Let's start by defining abstract type `AbstractResponse`, and then `AbstractGeophyResponse`, under which will be `MTResponse` for now.
+
+For plotting, and/or any other purposes. we'll have `utils.jl`.
+
+While we're at it, we should also specify more type information that the `MTmodel` field will acquire. We can also probably use `StaticArrays` inside occam codes, because all the vectors would be of the same size, similarly for MCMC models. Let's compare the performance for our current MT models. Also, know that if you're wanting to use `Float64`/ `Float32`, the autodiff packages require `Dual` types. Better to leave things at `AbstractArrays`.
+
+Using parametric types under non parameteric abstract types is possible because the types do not inherit the fields of the abstract type unless done so explicitly. In short, types are for multiple dispatch and to make the codes informed about the types
+
+
+Now, instead of having a 2D or a 3D type separately, we can simply do multiple dispatch on the `MTModel`s, eg., for 1d model, it would be `MTModel{Vector{T1}, Vector{T2}}`, for 2D, it would be `MTModel{Matrix{T1}, Matrix{T2}}`, for 3D, we would have `MTModel{Array{T1, 3}, Array{T2, 3}}`. SOMEWHAT similarly for `MTResponse`.
