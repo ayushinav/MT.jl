@@ -38,3 +38,8 @@ Using parametric types under non parameteric abstract types is possible because 
 
 
 Now, instead of having a 2D or a 3D type separately, we can simply do multiple dispatch on the `MTModel`s, eg., for 1d model, it would be `MTModel{Vector{T1}, Vector{T2}}`, for 2D, it would be `MTModel{Matrix{T1}, Matrix{T2}}`, for 3D, we would have `MTModel{Array{T1, 3}, Array{T2, 3}}`. SOMEWHAT similarly for `MTResponse`.
+
+
+## Docs
+
+* Mention the points about immutable structs wherever you're creating them.

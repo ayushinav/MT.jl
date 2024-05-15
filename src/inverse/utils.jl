@@ -46,7 +46,7 @@ contains the information if the inversion was successful
 """
 mutable struct return_code{T1 <: AbstractModel}
     if_pass::Bool
-    parameters::AbstractArray
+    parameters::NamedTuple
     model_estimate::T1
     misfit_threshold::AbstractFloat
     misfit_achieved::AbstractFloat

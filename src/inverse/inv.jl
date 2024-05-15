@@ -23,6 +23,7 @@ updates `mₖ` using occam iteration to fit `robs` within a misfit of `χ2`, by 
 * `model_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(m₀))]`: will generally be fixed, see docs for details
 * `trans_utils::transform_utils= sigmoid_tf`: for bounds transformation,
 * `verbose`: whether to print updates after each iteration, defaults to true
+* `mᵣ` : model to be regularized against
 
 ### Returns:
 return message in the form of `return_code` and updates `mₖ` in-place.
@@ -30,7 +31,7 @@ return message in the form of `return_code` and updates `mₖ` in-place.
 ### Example:
 `inverse!(m_occam, r_obs, Occam([1e-2, 1e6]))`
 """
-function inverse!(mₖ::model,
+function inverse!(mₖ::model1,
         robs::response,
         vars::Vector{Float64},
         alg_cache::occam_cache;
@@ -39,8 +40,9 @@ function inverse!(mₖ::model,
         response_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(robs))],
         model_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(mₖ))], # this will not be used but for the sake of generality for all inverse algs
         trans_utils::transform_utils= sigmoid_tf,
-        verbose::Bool= true
-    ) where {model <: AbstractGeophyModel, response <: AbstractGeophyResponse}
+        verbose::Bool= true,
+        mᵣ::model2 = zero(mₖ)
+    ) where {model1 <: AbstractGeophyModel, model2 <: AbstractGeophyModel, response <: AbstractGeophyResponse}
 
     prec= eltype(mₖ.m);
     model_fields= [:m];
@@ -76,6 +78,8 @@ function inverse!(mₖ::model,
     forward!(respₖ, mₖ, vars); # for the first iteration
     itr= 1;
     chi2= prec(1e6);
+
+    μ_last = 0.;
     while itr<= max_iters
         verbose && (print("$itr: ");)
         jacobian!(jₖ, mₖ, vars, mtjc, model_fields= model_fields, response_fields= response_fields);
@@ -85,6 +89,7 @@ function inverse!(mₖ::model,
         end
 
         occam_step!(mₖ₊₁, # to store the next update, which will eventually be copied to mₖ
+            mᵣ, # model to be regularized against
             respₖ₊₁, # to store the response for mₖ₊₁, for error calculation and anything
             vars, # to compute the forward model
             χ2, # threshold chi-squared error that needs to be met
@@ -109,7 +114,7 @@ function inverse!(mₖ::model,
 
     return return_code(
         chi2<=χ2,
-        [],
+        (μ = μ_last,),
         mₖ,
         χ2,
         chi2
