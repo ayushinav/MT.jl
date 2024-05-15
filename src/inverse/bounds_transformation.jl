@@ -47,5 +47,5 @@ end
 
 # should generally be good for most MT inversions
 sigmoid_tf= transform_utils([-3., 6.], sigmoid, inverse_sigmoid, d_sigmoid);
-log_tf= transform_utils([], log10, (x) -> 10^x, (x) -> inv(x * log(10)));
-lin_tf= transform_utils([], (x) -> x, (x) -> 1., (x) -> x);
+log_tf= transform_utils([], (x) -> 10^x, log10, (x) -> inv(x * log(10)));
+lin_tf= transform_utils([], (x) -> x, (x) -> x, (x) -> 1.);

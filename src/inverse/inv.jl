@@ -88,7 +88,7 @@ function inverse!(mₖ::model1,
             getfield(mₖ, k).= trans_utils.itf.(log10.(getfield(mₖ, k)));
         end
 
-        occam_step!(mₖ₊₁, # to store the next update, which will eventually be copied to mₖ
+        μ_last = occam_step!(mₖ₊₁, # to store the next update, which will eventually be copied to mₖ
             mᵣ, # model to be regularized against
             respₖ₊₁, # to store the response for mₖ₊₁, for error calculation and anything
             vars, # to compute the forward model
