@@ -6,8 +6,8 @@
         sampler
     end
 placeholder to store 
-* apriori in the form of [`modelDistribution`](@ref modelDistribution)
-* likelihood in the form of [`responseDistribution`](@ref responseDistribution)
+* apriori in the form of [`MTModelDistribution`](@ref)
+* likelihood in the form of [`MTResponseDistribution`](@ref)
 * number of samples to obtain in `n_samples`
 * `Turing.jl` sampler to be used in `sampler`
 """
@@ -36,8 +36,8 @@ makes a `Turing.jl` model to perform MCMC sampling
 * `vars`: variables that need to be passed into the `forward` function along with `model` to generate a `response`
 * `r_obs`: named tuple containing the observed data, with the same keys as the fields in the corresponding `response`
 * `err_resp`: `response` variable that contains the errors
-* `mDist`: [`modelDistribution`](@ref modelDistribution) contains the apriori information
-* `rDist`: [`responseDistribution`](@ref responseDistribution) contains the likelihood information
+* `mDist`: [`MTModelDistribution`](@ref) contains the apriori information
+* `rDist`: [`MTResponseDistribution`](@ref) contains the likelihood information
 
 ### Keyword/optional arguments
 * `response_fields`:  which fields in `response` to invert for
@@ -60,7 +60,7 @@ makes a `Turing.jl` model to perform MCMC sampling
     for k ∈ propertynames(mDist)
         if k in model_fields
             var_inf ~ getproperty(mDist, k)
-            push!(m₀, broadcast(getproperty(trans_utils[k], :itf), var_inf));
+            push!(m₀, broadcast(getproperty(trans_utils[k], :tf), var_inf));
         else
             push!(m₀, getfield(m_sample, k));   
         end
