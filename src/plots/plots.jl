@@ -131,7 +131,7 @@ plots a 1D MT model, for now.
 * `max_depth` : max depth to which the last layer should extend, defaults to 5 x the total model thickness. If you want to constrain the plots use `ylim` argument.
 * `kwargs` : Controls properties of the plot, splats the argument to `Plots.jl` 
 """
-function plot_model(m::MTModel; max_depth= 5*cumsum(m.h), kwargs...) # add depth lims later?, add kwargs
+function plot_model(m::MTModel; max_depth= 5*sum(m.h), kwargs...) # add depth lims later?, add kwargs
 
     h2= cumsum(m.h);
 

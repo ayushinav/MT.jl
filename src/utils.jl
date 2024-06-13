@@ -48,6 +48,11 @@ function inverse(t::mtresponse; abstract = false) where {mtresponse <: MTRespons
     end
 end
 
+function sample(d::mtdist) where {mtdist <: MTModelDistribution}
+    vec_type = typeof(rand(d.m))
+    return MTModel{vec_type, vec_type}
+end
+
 function forward(t::mtmodel; abstract = false) where {mtmodel <: MTModel} # {<:AbstractVector{<:Any}, <:AbstractVector{<:Any}}}
     if abstract
         return MTResponse{

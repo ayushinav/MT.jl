@@ -26,6 +26,8 @@ include("plots/plots.jl")
 # export μ
 export AbstractModel, AbstractResponse
 export AbstractGeophyModel, AbstractGeophyResponse
+export AbstractModelDistribution, AbstractResponseDistribution
+export AbstractGeophyModelDistribution, AbstractGeophyResponseDistribution
 export MTModel, MTResponse
 export get_Z, get_appres, get_phase, forward!, forward
 # export zero, copy
@@ -39,6 +41,6 @@ export ∂, χ², linear_utils, inverse_utils;
 export normal_dist, uniform_dist
 export MTModelDistribution, MTResponseDistribution
 export mcmc_cache
-export stochastic_inverse
+export stochastic_inverse, get_model_list
 
 end
