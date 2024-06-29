@@ -6,6 +6,7 @@ using Turing
 using Distributions
 
 include("abstract_types.jl")
+include("probabilistic/init_distributions.jl")
 include("models/mt.jl")
 include("response/1dmt.jl")
 include("forward/1dmt.jl")
@@ -15,7 +16,6 @@ include("inverse/bounds_transformation.jl");
 include("inverse/jacobian.jl");
 include("inverse/occam.jl");
 include("inverse/inv.jl");
-include("probabilistic/init_distributions.jl")
 include("probabilistic/respDistribution.jl")
 include("probabilistic/utils.jl")
 include("probabilistic/inverse.jl")

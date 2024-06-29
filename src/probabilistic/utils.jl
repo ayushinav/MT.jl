@@ -47,6 +47,7 @@ makes a `Turing.jl` model to perform MCMC sampling
 """
 @model function mcmc_turing(
     m_sample::model,
+    const_data,
     vars,
     r_obs::NamedTuple,
     err_resp::MTResponse,
@@ -57,17 +58,21 @@ makes a `Turing.jl` model to perform MCMC sampling
     trans_utils::NamedTuple = (m = log_tf, h = lin_tf)
     ) where {model <: AbstractModel, mdist <: AbstractModelDistribution, rdist <: AbstractResponseDistribution}
 
-    m₀ = [];
+    m0 = (;zip(
+        [propertynames(mDist)...],
+        const_data
+    )...);
+
     for k ∈ propertynames(mDist)
         if k in model_fields
-            var_inf ~ getproperty(mDist, k)
-            push!(m₀, broadcast(getproperty(trans_utils[k], :tf), var_inf));
-        else
-            push!(m₀, getfield(m_sample, k));   
+            m0[k] ~ getproperty(mDist, k)  
         end
     end
 
-    m_sample = typeof(m_sample)(m₀...);
+    m_sample = typeof(m_sample)(
+        [broadcast(getproperty(trans_utils[k], :tf), m0[k]) for k in propertynames(mDist)]...
+    );
+    
     r_sample = forward(m_sample, vars);
 
     for k in response_fields
