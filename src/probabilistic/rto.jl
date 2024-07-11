@@ -31,7 +31,7 @@ function stochastic_inverse(
         verbose = alg_cache.verbose
     )
 
-    @show retcode.if_pass
+    @show retcode.misfit_achieved
     pert_model = copy(alg_cache.m₀);
     pert_m = zero(alg_cache.m₀.m);
 

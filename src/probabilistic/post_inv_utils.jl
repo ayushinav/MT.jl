@@ -18,8 +18,8 @@ function get_model_list(chains::chain, mDist::mdist;
     end
 
     preds= []
-    for k in mcmc_chain.name_map.parameters
-        push!(preds, mcmc_chain[k].data[:])
+    for k in chains.name_map.parameters
+        push!(preds, chains[k].data[:])
     end
     pred= hcat(preds...);
     model_list = [];
@@ -50,3 +50,140 @@ function get_model_list(chains::chain, mDist::mdist;
     return model_list
 
 end 
+
+"""
+    get_ρ_at_z(pred, zs)
+returns the values of the model splatted as a vector in `pred` at points defined by `zs`
+"""
+function get_ρ_at_z(pred, zs)
+    n= 1+ length(pred) ÷2;
+    h= cumsum(pred[n+1:end]);
+    res= zeros(length(zs));
+    idx= zs.<= h[1];
+    res[idx].= pred[1];
+    
+    for i in 2:length(h)
+        idx = ((h[i-1].< zs .<= h[i]));
+        res[idx] .= pred[i];
+    end
+    idx= zs.> h[end];
+    res[idx].= pred[n];
+    return res;
+end
+
+"""
+    pre_image(mDist::mdist, chains; trans_utils = (m = log_tf, h = lin_tf,),
+        grid = (m = collect(-1:0.1:5), h = collect(10 .^ (0:0.1:6)))
+        ) where {mdist <: AbstractGeophyModelDistribution}
+returns the variables required to plot the PDF image of stochastic inversion
+
+## Arguments
+- `mDist`: Geophysical model distribution used to obtain the `chain` for `stochastic_inverse`
+- `chain`: `Chains` obtained from `stochastic_inverse`
+
+## Keyword Arguments
+- `trans_utils`: `NamedTuple` containing `transform_utils` to move to and from computational and model domain
+- `grid`: `NamedTuple` containing the points where the stochastic image is evaluated
+"""
+function pre_image(mDist::mdist, chains; trans_utils = (m = log_tf, h = lin_tf,),
+    grid = (m = collect(-1:0.1:5), h = collect(10 .^ (0:0.1:6)))
+    ) where {mdist <: AbstractGeophyModelDistribution}
+    # we know that geophy model will have `m` and `h`
+
+    # the following code is tested only for 1D
+
+    m_length = length(rand(mDist.m));
+    h_length = (typeof(mDist.h) <: Distribution) ? length(rand(mDist.h)) : length(mDist.h);
+
+    preds= []
+    for k in chains.name_map.parameters
+        push!(preds, chains[k].data[:])
+    end
+    pred= hcat(preds...);
+
+    if size(pred, 2) == m_length
+        broadcast!(getproperty(trans_utils[:m], :tf), pred, pred);
+    elseif size(pred, 2) == (m_length + h_length)
+        broadcast!(getproperty(trans_utils[:m], :tf), view(pred, :, 1:m_length), view(pred, :, 1:m_length));
+        broadcast!(getproperty(trans_utils[:h], :tf), view(pred, :, m_length+1:m_length+h_length), view(pred, :, m_length+1:m_length+h_length));
+    else
+        error("size of parameters from model distribution `mDist` does not match the values from chains.")
+    end
+
+    if size(pred, 2) == (m_length)
+        return (m = pred, h = [mDist.h..., sum(mDist.h)]), grid, trans_utils;
+    else
+        m2 = zeros(eltype(h), size(pred, 1), length(grid[:h]))
+        for i in 1:size(pred, 1)
+            m2[i,:] .= get_ρ_at_z(pred[i,:], grid[:h]);
+        end
+        return (m = m2, h = grid[:h]), grid, trans_utils
+    end
+end
+
+
+function kde_image(pre_image::NamedTuple, grid, trans_utils; kwargs...)
+
+    K(u)= inv(sqrt(2π))*exp(-u^2/2)
+
+    function get_kde(data, xgrid)
+        σ= std(data);
+        h= 1.06* σ;
+        px= zeros(size(xgrid))
+        for (i, x) in enumerate(xgrid)
+            s= 0;
+            for idata in data
+                s= s+ K((x- idata)/h);
+            end
+            px[i]= inv(length(data)* h)* s 
+        end
+        return px;
+    end
+
+    kde_preds = zeros(length(pre_image[:h]), length(grid[:m]));
+    m_length = length(pre_image[:h])
+
+    @show size(kde_preds)
+
+    for i in 1:length(m_length)
+        kde_preds[i,:].= get_kde(broadcast(getproperty(trans_utils[:m], :itf), pre_image[:m][:, i]), grid[:m]);
+        norm_factor= sum(kde_preds[i, :]);
+        kde_preds[i,:].= kde_preds[i,:]./norm_factor;
+    end
+
+    return kde_preds
+
+    p1= heatmap(broadcast(getproperty(trans_utils[:m], :tf), grid[:m]),
+     cumsum(pre_image[:h]), kde_preds; kwargs...) #, cmap=reverse(cgrad(:grays))) #, clim = (0, 0.1))
+    plot!(p1, xlabel = "ρ (Ωm)", ylabel = "depth (m)")
+    return p1
+end
+
+## WIP
+# function mean_std_image(pre_image::NamedTuple, grid, trans_utils; kwargs...)
+
+#     μ_model = mean(broadcast(getproperty(trans_utils[:m], :itf), pre_image[:m][:, i]))
+#     σ_model = std(broadcast(getproperty(trans_utils[:m], :itf), pre_image[:m][:, i]))
+
+#     μ₊_model = μ_model .+ σ_model
+#     μ₋_model = μ_model .- σ_model
+
+#     plt = plot_model()
+
+#     m_length = length(pre_image[:h])
+
+#     @show size(kde_preds)
+
+#     for i in 1:length(m_length)
+#         kde_preds[i,:].= get_kde(broadcast(getproperty(trans_utils[:m], :itf), pre_image[:m][:, i]), grid[:m]);
+#         norm_factor= sum(kde_preds[i, :]);
+#         kde_preds[i,:].= kde_preds[i,:]./norm_factor;
+#     end
+
+#     return kde_preds
+
+#     p1= heatmap(broadcast(getproperty(trans_utils[:m], :tf), grid[:m]),
+#      cumsum(pre_image[:h]), kde_preds; kwargs...) #, cmap=reverse(cgrad(:grays))) #, clim = (0, 0.1))
+#     plot!(p1, xlabel = "ρ (Ωm)", ylabel = "depth (m)")
+#     return p1
+# end
