@@ -152,7 +152,7 @@ end
     plot_model!(plt, m::MTModel; max_depth= 5*cumsum(m.h), kwargs...) 
 Plots on the same model with the same functionality as `plot_model`.
 """
-function plot_model!(plt, m::MTModel; max_depth= 5*cumsum(m.h), kwargs...) 
+function plot_model!(plt, m::MTModel; max_depth= 5*sum(m.h), kwargs...) 
 
     h2= cumsum(m.h);
 

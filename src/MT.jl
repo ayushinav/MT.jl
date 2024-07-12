@@ -4,6 +4,7 @@ using Plots
 using LinearSolve
 using Turing
 using Distributions
+using Statistics
 
 using ProgressMeter
 
@@ -25,7 +26,7 @@ include("probabilistic/rto.jl")
 include("probabilistic/post_inv_utils.jl")
 include("plots/utils.jl")
 include("plots/plots.jl")
-
+include("plots/prob_utils.jl")
 
 # export μ
 export AbstractModel, AbstractResponse
@@ -46,5 +47,6 @@ export normal_dist, uniform_dist
 export MTModelDistribution, MTResponseDistribution
 export mcmc_cache
 export stochastic_inverse, get_model_list
+export get_kde_image, get_mean_std_image
 
 end

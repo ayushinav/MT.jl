@@ -119,5 +119,4 @@ function inverse!(mₖ::model1,
         χ2,
         chi2
     )    
-    return nothing;
 end
