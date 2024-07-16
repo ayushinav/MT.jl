@@ -14,11 +14,11 @@ include("models/mt.jl")
 include("response/1dmt.jl")
 include("forward/1dmt.jl")
 include("utils.jl")
-include("inverse/utils.jl");
-include("inverse/bounds_transformation.jl");
-include("inverse/jacobian.jl");
-include("inverse/occam.jl");
-include("inverse/inv.jl");
+include("inverse/utils.jl")
+include("inverse/bounds_transformation.jl")
+include("inverse/jacobian.jl")
+include("inverse/occam.jl")
+include("inverse/inv.jl")
 include("probabilistic/respDistribution.jl")
 include("probabilistic/utils.jl")
 include("probabilistic/inverse.jl")
@@ -42,7 +42,7 @@ export sigmoid, d_sigmoid, inverse_sigmoid, transform_utils, default_tf, log_tf
 export mt_jacobian_cache, jacobian_mt, jacobian!
 export occam_cache, Occam, linsolve!, occam_step!
 export inverse!
-export ∂, χ², linear_utils, inverse_utils;
+export ∂, χ², linear_utils, inverse_utils
 export normal_dist, uniform_dist
 export MTModelDistribution, MTResponseDistribution
 export mcmc_cache

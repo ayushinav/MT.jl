@@ -1,7 +1,8 @@
 """
 create a model type for a given resistivity distribution that can be used to calculate forward response for 1d MT
 """
-mutable struct MTModel{T1<:AbstractArray{<:Any}, T2<:AbstractArray{<:Any}} <: AbstractGeophyModel
+mutable struct MTModel{T1 <: AbstractArray{<:Any}, T2 <: AbstractArray{<:Any}} <:
+               AbstractGeophyModel
     m::T1
     h::T2
 end

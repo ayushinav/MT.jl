@@ -1,4 +1,5 @@
-mutable struct MTResponse{T1<:AbstractArray{<:Any}, T2<:AbstractArray{<:Any}} <: AbstractGeophyResponse
+mutable struct MTResponse{T1 <: AbstractArray{<:Any}, T2 <: AbstractArray{<:Any}} <:
+               AbstractGeophyResponse
     ρₐ::T1
     ϕ::T2
 end

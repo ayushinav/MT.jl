@@ -10,10 +10,9 @@ function normal_dist(resp::AbstractVector, err_resp::AbstractMatrix)
 end
 
 """
-`uniform_dist(resp::AbstractVector, err_resp::AbstractVector)`: returns a uniform normal distribution ∈ [`resp`-`err_resp`/2, `resp`+`err_resp`/2] 
+`uniform_dist(resp::AbstractVector, err_resp::AbstractVector)`: returns a uniform normal distribution ∈ [`resp`-`err_resp`/2, `resp`+`err_resp`/2]
 """
 function uniform_dist(resp::AbstractVector, err_resp::AbstractVector)
-    Product(
-        [Uniform(resp[k] - err_resp[k]/2, resp[k] + err_resp[k]/2) for k in eachindex(resp)]
-    )
+    Product([Uniform(resp[k] - err_resp[k] / 2, resp[k] + err_resp[k] / 2)
+             for k in eachindex(resp)])
 end
