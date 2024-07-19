@@ -82,7 +82,7 @@ function get_kde_image(pre_image::NamedTuple, grid::NamedTuple, trans_utils::Nam
     for i in 1:m_length
         kde_img[i, :] .= get_kde(broadcast(getproperty(trans_utils[:m], :itf),
                                            pre_image[:m][:, i]), grid[:m])
-        norm_factor = sum(kde_preds[i, :])
+        norm_factor = sum(kde_img[i, :])
         kde_img[i, :] .= kde_img[i, :] ./ norm_factor
     end
     # return kde_preds

@@ -45,7 +45,7 @@ This is a slightly specific function which will allocate the matrices for only t
 """
 function jacobian_mt(resp_fields, var_eltype)
     eltypes = [var_eltype for k in resp_fields]
-    empty_mats = [[] for k in resp_fields]
+    empty_mats = [[;;] for k in resp_fields]
     return jacobian_mt{var_eltype}(empty_mats...)
 end
 

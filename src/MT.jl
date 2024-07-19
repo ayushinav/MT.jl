@@ -47,6 +47,6 @@ export normal_dist, uniform_dist
 export MTModelDistribution, MTResponseDistribution
 export mcmc_cache
 export stochastic_inverse, get_model_list
-export get_kde_image, get_mean_std_image
+export pre_image, get_kde_image, get_mean_std_image
 
 end

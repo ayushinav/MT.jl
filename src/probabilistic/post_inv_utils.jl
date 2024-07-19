@@ -27,9 +27,9 @@ function get_model_list(chains::chain, mDist::mdist;
     for i in 1:size(pred, 1)
         m = [];
         prev_length = 1;
-        for (i,k) in enumerate(fieldnames(model_type))
+        for (j,k) in enumerate(fieldnames(model_type))
             if typeof(getproperty(mDist, k)) <: Distribution
-                next_length = prev_length + length_vec[i]
+                next_length = prev_length + length_vec[j]
                 push!(m, pred[i, prev_length : next_length -1])
                 prev_length = 0 + next_length
             else
