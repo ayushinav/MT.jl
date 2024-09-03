@@ -86,7 +86,11 @@ function stochastic_inverse(
     )
     
     # print("MODEL WORKS?")
+    # @show typeof(sampler) <: Turing.AdvancedVI.VariationalInference
 
-    chains = Turing.sample(mcmc_model, alg_cache.sampler, alg_cache.n_samples)
-    return chains;
+    if typeof(alg_cache.sampler) <: Turing.AdvancedVI.VariationalInference
+        return vi(mcmc_model, alg_cache.sampler)
+    else
+        return Turing.sample(mcmc_model, alg_cache.sampler, alg_cache.n_samples)
+    end
 end

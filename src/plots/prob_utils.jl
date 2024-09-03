@@ -49,7 +49,7 @@ function pre_image(mDist::mdist, chains::chain; trans_utils=(m=log_tf, h=lin_tf)
     if size(pred, 2) == (m_length)
         return (m=pred, h=[mDist.h..., sum(mDist.h)]), grid, trans_utils, mDist
     else
-        m2 = zeros(eltype(h), size(pred, 1), length(grid[:h]))
+        m2 = zeros(eltype(grid[:h]), size(pred, 1), length(grid[:h]))
         for i in 1:size(pred, 1)
             m2[i, :] .= get_ρ_at_z(pred[i, :], grid[:h])
         end
@@ -101,18 +101,13 @@ function get_mean_std_image(pre_image::NamedTuple, grid::NamedTuple,
                             trans_utils::NamedTuple, mDist::mdist, return_vals=false;
                             kwargs...) where {mdist <: AbstractGeophyModelDistribution}
     m_length = size(pre_image[:m], 2)
-    @show m_length
     μ_m = vec(mean(broadcast(getproperty(trans_utils[:m], :itf),
                              pre_image[:m][:, 1:m_length]); dims=1))
     σ_m = vec(std(broadcast(getproperty(trans_utils[:m], :itf),
                             pre_image[:m][:, 1:m_length]); dims=1))
 
-    @show μ_m
-
     μ₊_m = μ_m .+ σ_m
     μ₋_m = μ_m .- σ_m
-
-    @show length.([pre_image[:h], grid[:h]])
 
     h_model = copy(pre_image[:h])
 
@@ -123,12 +118,12 @@ function get_mean_std_image(pre_image::NamedTuple, grid::NamedTuple,
     else
         h_model = h_model[1:(end - 1)]
     end
-    @show length(h_model), length(μ_m)
 
-    μ_model = sample(mDist)(broadcast(getproperty(trans_utils[:m], :tf), μ_m), h_model)
-    μ₊_model = sample(mDist)(broadcast(getproperty(trans_utils[:m], :tf), μ₊_m), h_model)
-    μ₋_model = sample(mDist)(broadcast(getproperty(trans_utils[:m], :tf), μ₋_m), h_model)
-    @show size.([μ_model.m, μ_model.h])
+    μ_model = sample(mDist)(broadcast(getproperty(trans_utils[:m], :tf), μ_m), broadcast(getproperty(trans_utils[:h], :tf), h_model))
+    μ₊_model = sample(mDist)(broadcast(getproperty(trans_utils[:m], :tf), μ₊_m), broadcast(getproperty(trans_utils[:h], :tf), h_model))
+    μ₋_model = sample(mDist)(broadcast(getproperty(trans_utils[:m], :tf), μ₋_m), broadcast(getproperty(trans_utils[:h], :tf), h_model))
+
+    # @show  broadcast(getproperty(trans_utils[:h], :tf), h_model)
 
     plt = plot_model(μ_model; color="blue", label="μ")
     plot_model!(plt, μ₊_model; color="green", label="μ ± 1σ")

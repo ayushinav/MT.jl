@@ -84,7 +84,7 @@ function prepare_plot(d::resp1, ω, d_err::resp2; plot_type=:scatter,
     for i in eachindex(field_names)
         pi = getfield(Plots, plot_type)(2π ./ ω, getfield(d, field_names[i]); xscale=:log10,
                                         yerr=getfield(d_err, field_names[i]),
-                                        yscale=yscale[i], ylabel="$(units[i])",
+                                        yscale=yscale[i], ylabel="$(field_names[i]) ($(units[i]))",
                                         xlabel="T (s)", kwargs...)
         push!(plts, pi)
     end
@@ -108,7 +108,7 @@ function prepare_plot!(plts::Vector{Any}, d::resp1, ω, d_err::resp2; plot_type=
     for i in eachindex(field_names)
         Plots.plot!(plts[i], 2π ./ ω, getfield(d, field_names[i]); xscale=:log10,
                     yerr=getfield(d_err, field_names[i]), yscale=yscale[i],
-                    ylabel="$(units[i])", xlabel="T (s)", kwargs...)
+                    ylabel="$(field_names[i]) ($(units[i]))", xlabel="T (s)", kwargs...)
     end
     nothing
 end
