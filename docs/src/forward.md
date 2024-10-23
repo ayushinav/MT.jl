@@ -3,42 +3,46 @@
 ## Demo
 Currently, only the recursion solution for MT forward modeling is supported. Once a model is defined, we can get the estimate as:
 
-```julia
+```@example forward_demo
 using MT
+using Plots
 ρ= [500., 100., 400., 1000.];
 h= [100., 1000., 10000.];
-m= model(ρ, h)
+m= MTModel(ρ, h)
 
 T= 10 .^(range(-1,5,length= 57));
 ω= 2π./T;
 
-resp= forward(m, ω)
+resp= forward(m, ω);
+nothing # hide
 ```
 
 ## Plots
-Since MT `response` has two fields, and we also want to see the curves for other `model`s, usually for inversion, it's easier to create a wrapper and then plot them.
-```julia
-plt= prepare_plot(resp, ω)
+Since MT `MTResponse` has two fields, and we also want to see the curves for other `MTModel`s, usually for inversion, it's easier to create a wrapper and then plot them.
+
+```@example forward_demo
+plt= prepare_plot(resp, ω, label = false)
 plot_response(plt, margin= 5Plots.mm)
 ```
-![](assets/response.png)
 
-Another `response` can be overlain using:
-```julia
+Another `MTResponse` can be overlain using:
+```@example forward_demo
+using MT
 ρ= [100., 10., 400.];
 h= [100., 10000.];
-m2= model(ρ, h)
+m2= MTModel(ρ, h)
 resp2= forward(m2, ω)
-prepare_plot!(plt, resp2, ω, label="2nd")
+prepare_plot!(plt, resp2, ω, label="2nd", plt_type = :plot)
 plot_response(plt, margin= 5Plots.mm)
 ```
-![](assets/response2.png)
+
+Note that we've plotted the second response curve as a line, which can simply be achieved by passing `plt_type = :plot`
 
 ## Benchmark
 
 In-place operations for fast non-allocating computations are also supported. These would greatly speed up the inverse processes.
 
-```julia
+```@example forward_demo
 using BenchmarkTools
 @benchmark forward!(resp, m, ω)
 ```
@@ -54,4 +58,5 @@ BenchmarkTools.Trial: 10000 samples with 1 evaluation.
 
  Memory estimate: 0 bytes, allocs estimate: 0.
 ```
+
 The above benchmark was done on Mac M1.

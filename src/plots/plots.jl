@@ -106,7 +106,7 @@ function prepare_plot!(plts::Vector{Any}, d::resp1, ω, d_err::resp2; plot_type=
     plot_type = Symbol("$(plot_type)!")
 
     for i in eachindex(field_names)
-        Plots.plot!(plts[i], 2π ./ ω, getfield(d, field_names[i]); xscale=:log10,
+        getfield(Plots, plot_type)(plts[i], 2π ./ ω, getfield(d, field_names[i]); xscale=:log10,
                     yerr=getfield(d_err, field_names[i]), yscale=yscale[i],
                     ylabel="$(field_names[i]) ($(units[i]))", xlabel="T (s)", kwargs...)
     end

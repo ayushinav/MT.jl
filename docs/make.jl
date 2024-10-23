@@ -1,5 +1,5 @@
 using Pkg
-Pkg.activate("../MT/.")
+Pkg.activate("../MT.jl/.")
 
 using MT
 using Documenter
@@ -24,7 +24,8 @@ makedocs(;
         "forward" => "forward.md",
         "model" => "model.md",
         "interface guide" => "interface_guide.md",
-        "probabilistic inverse" => "probabilisitc_inverse.md"
+        "probabilistic inverse" => "probabilisitc_inverse.md",
+        "mtpy tutorial" => "working_with_mtpy.md"
     ],
 )
 

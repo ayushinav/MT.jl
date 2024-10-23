@@ -8,11 +8,11 @@ Specifying a model is easy. Let's say you want to add a resistivity distribution
 * Layer 4: 100 $\Omega m$, half-space
 
 Define the model using `model` and you are done.
-```julia
+```@example model_demo
 using MT
 ρ= [500., 100., 400., 1000.];
 h= [100., 100., 100.];
-m= model(ρ, h)
+m= MTModel(ρ, h)
 ```
 This `model` can then just be passed into `forward` function to get the `response`.
 
@@ -21,9 +21,6 @@ This `model` can then just be passed into `forward` function to get the `respons
     Always use `Float64` or `Float32` types while defining the vectors for resistivities and thickness. This is done for performance while not imposing any serious constraints since most of the data is generally processed using `Float64` on most CPUs and `Float32` on most GPUs.
 
 The model can then be plotted using 
-```julia
+```@example model_demo
 plot_model(m, label= false, max_depth= 1e4)
 ```
-
-![](assets/model.png)
-<!-- Make this a live page using Pluto.jl? -->
