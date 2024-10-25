@@ -11,6 +11,12 @@ Abstract model type that is the supertype of all geophysical models in the packa
 """
 abstract type AbstractGeophyModel <: AbstractModel end
 
+"""
+Abstract model type that is the supertype of all rock models in the package.
+"""
+abstract type AbstractRockphyModel <: AbstractModel end
+
+
 # responses
 
 """
@@ -22,6 +28,11 @@ abstract type AbstractResponse end
 Abstract model type that is the supertype of all geophysical responses in the package.
 """
 abstract type AbstractGeophyResponse <: AbstractResponse end
+
+"""
+Abstract model type that is the supertype of all rock physics responses in the package.
+"""
+abstract type AbstractRockphyResponse <: AbstractResponse end
 
 # distributions
 
