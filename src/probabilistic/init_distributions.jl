@@ -28,3 +28,20 @@ struct MTResponseDistribution{T1 <: Union{Function, Nothing}, T2 <:
     ρₐ::T1
     ϕ::T2
 end
+
+mutable struct RockphyModelDistribution{T1 <: Union{Distribution, AbstractArray},
+    T2 <: Union{Distribution, AbstractArray}} <: AbstractRockphyModelDistribution
+    params::T1 # vector of parameters 
+    p_names::Vector{<:Symbol} # Vector of symbols telling the parameters in vector 
+    ϕ::T2 # phase ratios
+    model_list::Vector{<:Type}
+    mixing_type::Type
+    # add water and partition ratios
+
+    # @assert ϕ and model_lists have same length
+    # @assert p contains all the variables required by all models in model_list
+end
+
+struct RockphyResponseDistribution{T} <: AbstractResponseDistribution
+    σ::T
+end

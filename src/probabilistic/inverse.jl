@@ -22,7 +22,7 @@ function stochastic_inverse(
     err_resp::resp2,
     vars,
     alg_cache::mcmc_cache;
-    trans_utils::NamedTuple = (m = log_tf, h = lin_tf)
+    trans_utils::NamedTuple = (m = log_tf, h = lin_tf) # need to take care of this
     ) where {resp1 <: AbstractResponse, resp2 <: AbstractResponse}
 
     model_fields = [];
@@ -31,8 +31,8 @@ function stochastic_inverse(
 
     # segregate the constants and the Distribution parts of the alg_cache
 
-    for k in fieldnames(typeof(alg_cache.apriori))
-        if typeof(getfield(alg_cache.apriori, k)) <: Distribution
+    for k in fieldnames(typeof(alg_cache.apriori)) # make it properynames and make alg_cache.apriori a NamedTuple
+        if typeof(getfield(alg_cache.apriori, k)) <: Distribution # getfield will be replaced by getproperty
             push!(model_fields, k);
             push!(modelD, getfield(alg_cache.apriori, k));
             push!(const_data, rand(getfield(alg_cache.apriori, k)))
@@ -43,10 +43,12 @@ function stochastic_inverse(
 
 
     response_fields = Symbol.([])
-    for k in fieldnames(typeof(alg_cache.likelihood))
+    for k in fieldnames(typeof(alg_cache.likelihood)) # similarly, here it will be propertynames for likelihood being a NamedTuple
         if typeof(getfield(alg_cache.likelihood, k)) <: Function
             push!(response_fields, k)
+            # @show k
         end
+        # @show k, typeof(k)
     end
     
     # putting trans_utils together for all the fields
@@ -61,9 +63,12 @@ function stochastic_inverse(
     end
 
     transf_utils = (;zip(
-        [fieldnames(typeof(alg_cache.apriori))...], trans_utils_arr)...);
+        [fieldnames(typeof(alg_cache.apriori))...], trans_utils_arr)...); # NamedTuple for trans_utils and defaults
 
     # make model and modelDistribution
+    # @show const_data
+    # @show MT.inverse(r_obs, abstract = true)
+    # @show response_fields
 
     m_sample = MT.inverse(r_obs, abstract = true)(const_data...);
 

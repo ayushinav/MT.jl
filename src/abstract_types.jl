@@ -48,6 +48,11 @@ Abstract model type that is the supertype of all geophysical `model` distributio
 """
 abstract type AbstractGeophyModelDistribution <: AbstractModelDistribution end
 
+"""
+Abstract model type that is the supertype of all rock physics `model` distributions in the package.
+"""
+abstract type AbstractRockphyModelDistribution <: AbstractModelDistribution end
+
 ## responses
 
 """
@@ -59,3 +64,8 @@ abstract type AbstractResponseDistribution end
 Abstract model type that is the supertype of all geophysical `response` distributions in the package.
 """
 abstract type AbstractGeophyResponseDistribution <: AbstractResponseDistribution end
+
+"""
+Abstract model type that is the supertype of all rock physics `response` distributions in the package.
+"""
+abstract type AbstractRockphyResponseDistribution <: AbstractResponseDistribution end

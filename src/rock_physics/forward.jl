@@ -6,7 +6,7 @@ const global charge_e = 1.602e-19;
 """
 T is in K
 """
-function forward(m::SEO3)
+function forward(m::model, p) where {model <: SEO3}
     fO₂ = 10. ^(-24441.9/m.T + 13.296)
 
     # sT 
@@ -22,11 +22,10 @@ function forward(m::SEO3)
 
 end
 
-
 """
 T is in K
 """
-function forward(m::Ni2011)
+function forward(m::Ni2011, p)
 
     Tcorr = 1146.8 # K
     D = 0.006 # unitless, Partition coefficient {ol/melt}

@@ -39,15 +39,29 @@ function zero_abstract(m::mtresponse) where {
 end
 
 # this probably does it for all 1D, 2D, 3D models and their corresponding responses? Atleast 1d for sure, some brainstorming maybe required for 2D and 3D.
-# Again, can we make a generated function here?
+# Again, can we make a generated function here? Do we need to?
 
 function inverse(t::mtresponse; abstract=false) where {mtresponse <: MTResponse}
     if abstract
-        return MTModel{AbstractArray{<:Any, length(size(t.ρₐ))},
+        return MTModel{AbstractArray{<:Any, length(size(t.ρₐ))}, # length(size(...)) => dimensionality
                        AbstractArray{<:Any, length(size(t.ρₐ))}}
     else
         vec_type = typeof(t.ρₐ)
         return MTModel{vec_type, vec_type}
+    end
+end
+
+function inverse(t::rpresponse; abstract=false) where {rpresponse <: RockphyCond}
+    if abstract
+        return mixing_models{AbstractArray{<:Any, 1},
+                       AbstractArray{<:Any, 1},
+        }
+    else
+        vec_type = Vector{eltype(t.σ)}
+        return mixing_models{vec_type,
+                       vec_type,
+        }
+        # return MTModel{vec_type, vec_type}
     end
 end
 

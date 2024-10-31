@@ -13,8 +13,8 @@ placeholder to store
   - number of samples to obtain in `n_samples`
   - `Turing.jl` sampler to be used in `sampler`
 """
-mutable struct mcmc_cache{T1 <: AbstractGeophyModelDistribution,
-                          T2 <: AbstractGeophyResponseDistribution}
+mutable struct mcmc_cache{T1 <: AbstractModelDistribution,
+                          T2 <: AbstractResponseDistribution}
     apriori::T1
     likelihood::T2
     n_samples::Int
@@ -51,7 +51,7 @@ makes a `Turing.jl` model to perform MCMC sampling
   - `trans_utils`: to transform the model field variables to and from computational (inference) domain
 """
 @model function mcmc_turing(m_sample::model, const_data, vars, r_obs::NamedTuple,
-                            err_resp::MTResponse, mDist::mdist, rDist::rdist;
+                            err_resp::response, mDist::mdist, rDist::rdist;
                             response_fields::Vector{Symbol}=[k
                                                              for k in fieldnames(typeof(rDist))],
                             model_fields::Vector{Symbol}=[k
@@ -59,25 +59,34 @@ makes a `Turing.jl` model to perform MCMC sampling
                             trans_utils::NamedTuple=(m=log_tf, h=lin_tf)) where {
                                                                                  model <:
                                                                                  AbstractModel,
+                                                                                 response <: AbstractResponse,
                                                                                  mdist <:
                                                                                  AbstractModelDistribution,
                                                                                  rdist <:
                                                                                  AbstractResponseDistribution
                                                                                  }
     m0 = (; zip([propertynames(mDist)...], const_data)...)
+    # works with mDist being a NamedTuple
 
     for k in propertynames(mDist)
         if k in model_fields
             m0[k] ~ getproperty(mDist, k)
+            # works with mDist being a NamedTuple
         end
     end
 
     m_sample = typeof(m_sample)([broadcast(getproperty(trans_utils[k], :tf), m0[k])
                                  for k in propertynames(mDist)]...)
+    # works with mDist being a NamedTuple
 
     r_sample = forward(m_sample, vars)
+    # @show r_sample
+    # @show r_obs
+    # @show m_sample
+    # print("\n")
 
     for k in response_fields
         r_obs[k] ~ getfield(rDist, k)(getfield(r_sample, k), getfield(err_resp, k))
+        # works with rDist being a NamedTuple
     end
 end
