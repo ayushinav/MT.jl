@@ -5,6 +5,8 @@ using LinearSolve
 using Turing
 using Distributions
 using Statistics
+using ConcreteStructs
+using UnPack
 
 using ProgressMeter
 
@@ -48,6 +50,10 @@ export inverse!
 export ∂, χ², linear_utils, inverse_utils
 export normal_dist, uniform_dist
 export MTModelDistribution, MTResponseDistribution
+export RockphyModelDistribution, RockphyResponseDistribution
+export SEO3
+export Ni2011
+export construct_mixing_models, mixing_models, HS1962_plus, HS1962_minus, single_phase
 export mcmc_cache
 export stochastic_inverse, get_model_list
 export pre_image, get_kde_image, get_mean_std_image
