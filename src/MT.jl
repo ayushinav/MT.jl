@@ -5,16 +5,17 @@ using LinearSolve
 using Turing
 using Distributions
 using Statistics
-using ConcreteStructs
+# using ConcreteStructs
 using UnPack
-
 using ProgressMeter
+import Base:show
 
 include("abstract_types.jl")
 include("probabilistic/init_distributions.jl")
 include("models/mt.jl")
 include("response/1dmt.jl")
 include("forward/1dmt.jl")
+include("rock_physics/rp_cache.jl")
 include("rock_physics/conductivity_types.jl")
 include("rock_physics/forward.jl")
 include("rock_physics/mixing_phases.jl")
@@ -32,6 +33,7 @@ include("probabilistic/post_inv_utils.jl")
 include("plots/utils.jl")
 include("plots/plots.jl")
 include("plots/prob_utils.jl")
+include("rock_physics/pretty_printing.jl")
 
 # export μ
 export AbstractModel, AbstractResponse
@@ -51,7 +53,7 @@ export ∂, χ², linear_utils, inverse_utils
 export normal_dist, uniform_dist
 export MTModelDistribution, MTResponseDistribution
 export RockphyModelDistribution, RockphyResponseDistribution
-export SEO3
+export SEO3, UHO2014
 export Ni2011
 export construct_mixing_models, mixing_models, HS1962_plus, HS1962_minus, single_phase
 export mcmc_cache

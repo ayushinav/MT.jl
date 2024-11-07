@@ -27,8 +27,8 @@ The temperature range for the experiment cover 1000 to 1200 degrees C.
 "A new model of olivine electrical conductivity", Geophysical Journal International,
 Volume 166, Issue 1, July 2006, Pages 435–437 (https://doi.org/10.1111/j.1365-246X.2006.03041).
 """
-@concrete mutable struct SEO3 <: AbstractMineralModel
-    T
+mutable struct SEO3{F} <: AbstractMineralModel
+    T::F
 end
 
 """
@@ -44,9 +44,9 @@ end
 "Toward a unified hydrous olivine electrical conductivity law", [GeoChemistry, Geophysics, Geosystems],
 Volume 15, Issue 12 (https://doi.org/10.1002/2014GC005496)
 """
-@concrete mutable struct UHO2014 <: AbstractMineralModel
-    T
-    Ch2o_ol
+mutable struct UHO2014{F1, F2} <: AbstractMineralModel
+    T::F1
+    Ch2o_ol::F2
 end
 
 # melts
@@ -65,9 +65,9 @@ Laboratory derived relation from electrical conductivity studies of hydrous and 
 "Electrical conductivity of hydrous basaltic melts: implications for partial melting in the upper mantle",
 Contrib Mineral Petrol 162, 637–650 (2011) (https://doi.org/10.1007/s00410-011-0617-4).
 """
-@concrete mutable struct Ni2011 <: AbstractMeltModel
-    T
-    Ch2o_m
+mutable struct Ni2011{F1, F2} <: AbstractMeltModel
+    T::F1
+    Ch2o_m::F2
     function Ni2011(T, Ch2o_m)
         if T < params_Ni2011.T_corr
             @warn "T (= $T K) should be greater than $(params_Ni2011.T_corr) K for `Ni2011` otherwise erroneous values are obtained"
