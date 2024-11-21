@@ -35,7 +35,7 @@ mutable struct RockphyModelDistribution{T1 <: Union{Distribution, AbstractArray}
     p_names::Vector{<:Symbol} # Vector of symbols telling the parameters in vector 
     ϕ::T2 # phase ratios
     model_list::Vector{<:Type}
-    mixing_type::Type
+    mixing_type::Vector{<:Type}
     # add water and partition ratios
 
     # @assert ϕ and model_lists have same length

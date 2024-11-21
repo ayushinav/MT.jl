@@ -76,6 +76,24 @@ mutable struct Ni2011{F1, F2} <: AbstractMeltModel
     end
 end
 
+"""
+    Sifre2014(T, Ch2o_m, Cco2_m)
+
+## Arguments
+
+  - `T` : Temperature of melt (should be greater than 1146.8 K)
+  - `Ch2o_m` : water concentration in melt (in ppm)
+  - `Cco2_m` : Co2 concentration in melt (in ppm)
+
+## References
+Electrical conductivity during incipient melting in the oceanic low-velocity zone", Nature, Volume 509, https://doi.org/10.1038/nature13245
+"""
+mutable struct Sifre2014{F1, F2, F3} <: AbstractMeltModel
+    T::F1
+    Ch2o_m::F2
+    Cco2_m::F3
+end
+
 # ====== mixing laws =====
 struct HS1962_plus end
 struct HS1962_minus end

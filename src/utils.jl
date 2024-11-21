@@ -70,6 +70,11 @@ function sample(d::mtdist) where {mtdist <: MTModelDistribution}
     return MTModel{vec_type, vec_type}
 end
 
+function sample(d::rpdist) where {rpdist <: AbstractRockphyModelDistribution}
+    vec_type = typeof(rand(d.params))
+    return mixing_models{vec_type, vec_type}
+end
+
 function forward(t::mtmodel; abstract=false) where {mtmodel <: MTModel} # {<:AbstractVector{<:Any}, <:AbstractVector{<:Any}}}
     if abstract
         return MTResponse{AbstractArray{<:Any, length(sie(m.m))},

@@ -29,14 +29,14 @@ function construct_mixing_models(params::Vector, p_names::Vector, ϕ::Vector, mo
     all parameters required : $var_list \n
     """
 
-    if mixing_type <: Union{HS1962_plus, HS1962_minus}
+    if first(mixing_type) <: Union{HS1962_plus, HS1962_minus}
         @assert length(model_list)==2 "`$mixing_type` model allows for only 2 models to mix, the first one being the solid and the second melt"
         @assert length(ϕ)==1 "only the fraction of the second component, ie melt, $(model_list[2]) is needed"
         @assert length(params)==length(p_names) "mismatch between the number of parameter names and their values"
 
         return mixing_models(params, p_names, ϕ, model_list, mixing_type)
 
-    elseif mixing_type <: single_phase
+    elseif first(mixing_type) <: single_phase
         @assert length(model_list)==1 "single phase models require only one model in `model_list`"
         @assert length(ϕ) == 1&&first(ϕ) == 1 "single phase models will have total fraction for the single phase"
         return mixing_models(params, p_names, ϕ, model_list, mixing_type)
@@ -79,7 +79,7 @@ function forward(m::model, p) where {model <: mixing_models}
         push!(σs, σ)
     end
 
-    σ_net = mix_models(σs, m.ϕ, m.mixing_type())
+    σ_net = mix_models(σs, m.ϕ, first(m.mixing_type)())
 
     return RockphyCond([σ_net])
 end
@@ -90,19 +90,15 @@ function mix_models(σs, ϕ, ::HS1962_plus)
     # σ_plus = inv(sum(ϕ .* inv.(σ_max .+ σs))) - σ_max
     # return σ_plus
 
-    σ_max = maximum(σs)
-    esig_1 = minimum(σs)
-    phi = first(ϕ)
-
-    σ_max = maximum(σs)
-    σ_min = minimum(σs)
+    σ_max = 10f0 ^ maximum(σs)
+    σ_min = 10f0 ^ minimum(σs)
     phi = first(ϕ)
 
     num = 3 * (1 - phi) * (σ_max - σ_min) # numerator
     den = 3 * σ_max - phi * (σ_max - σ_min) # denominator
     esig = σ_max * (1 - (num / den))
 
-    return esig
+    return log10(esig)
 end
 
 function mix_models(σs, ϕ, ::HS1962_minus)

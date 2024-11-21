@@ -40,6 +40,7 @@ export AbstractModel, AbstractResponse
 export AbstractGeophyModel, AbstractGeophyResponse
 export AbstractModelDistribution, AbstractResponseDistribution
 export AbstractGeophyModelDistribution, AbstractGeophyResponseDistribution
+export RockphyModelDistribution, RockphyResponseDistribution
 export MTModel, MTResponse
 export get_Z, get_appres, get_phase, forward!, forward
 # export zero, copy
@@ -54,7 +55,7 @@ export normal_dist, uniform_dist
 export MTModelDistribution, MTResponseDistribution
 export RockphyModelDistribution, RockphyResponseDistribution
 export SEO3, UHO2014
-export Ni2011
+export Ni2011, Sifre2014
 export construct_mixing_models, mixing_models, HS1962_plus, HS1962_minus, single_phase
 export mcmc_cache
 export stochastic_inverse, get_model_list

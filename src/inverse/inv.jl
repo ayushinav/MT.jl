@@ -42,8 +42,7 @@ function inverse!(mₖ::model1, robs::response, vars::Vector{Float64}, alg_cache
                   response_fields::Vector{Symbol}=[k for k in fieldnames(typeof(robs))],
                   model_fields::Vector{Symbol}=[k for k in fieldnames(typeof(mₖ))], # this will not be used but for the sake of generality for all inverse algs
                   trans_utils::transform_utils=sigmoid_tf, verbose::Bool=true,
-                  mᵣ::model2=zero(mₖ)) where {model1 <: AbstractGeophyModel,
-                                              model2 <: AbstractGeophyModel,
+                  mᵣ= nothing) where {model1 <: AbstractGeophyModel,
                                               response <: AbstractGeophyResponse}
     prec = eltype(mₖ.m)
     model_fields = [:m]
@@ -52,7 +51,7 @@ function inverse!(mₖ::model1, robs::response, vars::Vector{Float64}, alg_cache
     n_vars = length(vars)
     n_resp = length(response_fields) * n_vars
 
-    (W == nothing) && (W = prec.(I(n_resp)))
+    (W === nothing) && (W = prec.(I(n_resp)))
 
     lin_utils = linear_utils(view(mₖ.m, :), zeros(prec, n_resp),
                              zeros(prec, n_resp, n_model))
@@ -93,6 +92,12 @@ function inverse!(mₖ::model1, robs::response, vars::Vector{Float64}, alg_cache
         copyto!(lin_utils.Jₖ, lin_utils.Jₖ .* lin_utils.mₖ' .* log(10))
         for k in model_fields # to computational domain
             getfield(mₖ, k) .= trans_utils.itf.(log10.(getfield(mₖ, k)))
+            if mᵣ === nothing
+                mᵣ = zero(m_r)
+            else
+                # transferring regularizer model to computational domain in occam
+                getfield(mᵣ, k) .= trans_utils.itf.(log10.(getfield(mᵣ, k))) # TODO : check why we need log10 here and corresponding 10.^ in occam.jl #139
+            end
         end
 
         μ_last = occam_step!(mₖ₊₁, # to store the next update, which will eventually be copied to mₖ
