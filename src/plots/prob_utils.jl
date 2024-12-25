@@ -125,9 +125,10 @@ function get_mean_std_image(pre_image::NamedTuple, grid::NamedTuple,
 
     # @show  broadcast(getproperty(trans_utils[:h], :tf), h_model)
 
-    plt = plot_model(μ_model; color="blue", label="μ")
-    plot_model!(plt, μ₊_model; color="green", label="μ ± 1σ")
-    plot_model!(plt, μ₋_model; color="green", label=false, legend=:outertopright)
+    plt = plot_model(μ_model; color="blue", label="μ", linewidth = 3.5)
+    plot_model!(plt, μ₊_model; color="green", label="μ ± 1σ", linewidth = 3.5)
+    plot_model!(plt, μ₋_model; color="green", label=false, legend=:outertopright, linewidth = 3.5)
+    # @show kwargs
     plot!(plt; kwargs...)
 
     if return_vals

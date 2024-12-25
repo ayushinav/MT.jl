@@ -56,7 +56,7 @@ export MTModelDistribution, MTResponseDistribution
 export RockphyModelDistribution, RockphyResponseDistribution
 export SEO3, UHO2014
 export Ni2011, Sifre2014
-export construct_mixing_models, mixing_models, HS1962_plus, HS1962_minus, single_phase
+export construct_mixing_models, mixing_models, HS1962_plus, HS1962_minus, single_phase, MAL
 export mcmc_cache
 export stochastic_inverse, get_model_list
 export pre_image, get_kde_image, get_mean_std_image

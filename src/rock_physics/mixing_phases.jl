@@ -20,7 +20,7 @@ returns a `mixing_models` type containing all the variables for rock physics mod
       + `HS1962_plus` : mixing two phases to get the Hashim Strikman upper bound
       + `HS1962_minus` : mixing two phases to get the Hashim Strikman lower bound
 """
-function construct_mixing_models(params::Vector, p_names::Vector, ϕ::Vector, model_list::Vector, mixing_type::Type)
+function construct_mixing_models(params::Vector, p_names::Vector, ϕ::Vector, model_list::Vector, mixing_type::Vector) # TODO : make mixing type vector?
     var_list = vcat([[fieldnames(ir)...] for ir in model_list]...)
     unique!(var_list)
     f_ = reduce(&, [ir ∈ p_names for ir in var_list])
@@ -29,16 +29,18 @@ function construct_mixing_models(params::Vector, p_names::Vector, ϕ::Vector, mo
     all parameters required : $var_list \n
     """
 
-    if first(mixing_type) <: Union{HS1962_plus, HS1962_minus}
+    if typeof(first(mixing_type)) <: Union{HS1962_plus, HS1962_minus, MAL}
         @assert length(model_list)==2 "`$mixing_type` model allows for only 2 models to mix, the first one being the solid and the second melt"
         @assert length(ϕ)==1 "only the fraction of the second component, ie melt, $(model_list[2]) is needed"
         @assert length(params)==length(p_names) "mismatch between the number of parameter names and their values"
 
         return mixing_models(params, p_names, ϕ, model_list, mixing_type)
 
-    elseif first(mixing_type) <: single_phase
+    elseif typeof(first(mixing_type)) <: single_phase
         @assert length(model_list)==1 "single phase models require only one model in `model_list`"
         @assert length(ϕ) == 1&&first(ϕ) == 1 "single phase models will have total fraction for the single phase"
+        return mixing_models(params, p_names, ϕ, model_list, mixing_type)
+
         return mixing_models(params, p_names, ϕ, model_list, mixing_type)
 
     else
@@ -55,7 +57,7 @@ constructs a `mixing_models` type which can then be used to do rock physics mode
 """
 mutable struct mixing_models{T1, T2} <: AbstractRockphyModel
     params::T1 # vector of parameters 
-    p_names::Vector{Symbol} # Vector of symbols telling the parameters in vector 
+    p_names::Vector{Symbol} # Vector of symbols telling the parameters in vector
     ϕ::T2 # phase ratios
     model_list::Vector{<:Any}
     mixing_type
@@ -79,7 +81,7 @@ function forward(m::model, p) where {model <: mixing_models}
         push!(σs, σ)
     end
 
-    σ_net = mix_models(σs, m.ϕ, first(m.mixing_type)())
+    σ_net = mix_models(σs, m.ϕ, first(m.mixing_type))
 
     return RockphyCond([σ_net])
 end
@@ -99,6 +101,28 @@ function mix_models(σs, ϕ, ::HS1962_plus)
     esig = σ_max * (1 - (num / den))
 
     return log10(esig)
+end
+
+function mix_models(σs, ϕ, mal::MAL)
+    
+    # σ_fluid = 10f0 ^ maximum(σs)
+    # σ_matrix = 10f0 ^ minimum(σs)
+
+    σ_fluid = 10f0 ^ (σs[2])
+    σ_matrix = 10f0 ^ (σs[1])
+
+    # @show σ_fluid, σ_matrix, σs, 10 .^ σs
+
+    phi = first(ϕ)
+    sig = σ_fluid
+    
+    if phi < 1
+    # [MAL(0.2)]
+        p = log10(1-phi^ mal.m)* inv(log10(1-phi))
+        sig = σ_fluid * phi^ mal.m + σ_matrix * (1-phi)^p
+    end
+    
+    return log10(sig)
 end
 
 function mix_models(σs, ϕ, ::HS1962_minus)

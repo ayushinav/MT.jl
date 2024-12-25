@@ -93,7 +93,7 @@ function inverse!(mₖ::model1, robs::response, vars::Vector{Float64}, alg_cache
         for k in model_fields # to computational domain
             getfield(mₖ, k) .= trans_utils.itf.(log10.(getfield(mₖ, k)))
             if mᵣ === nothing
-                mᵣ = zero(m_r)
+                mᵣ = zero(mₖ)
             else
                 # transferring regularizer model to computational domain in occam
                 getfield(mᵣ, k) .= trans_utils.itf.(log10.(getfield(mᵣ, k))) # TODO : check why we need log10 here and corresponding 10.^ in occam.jl #139

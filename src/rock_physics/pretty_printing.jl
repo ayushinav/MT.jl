@@ -13,10 +13,10 @@ function Base.show(io::IO, m::model) where {model <: Union{MT.AbstractMineralMod
 end
 
 function Base.show(io::IO, m::model) where {model <: mixing_models}
-    if first(m.mixing_type) <: MT.single_phase
+    if typeof(first(m.mixing_type)) <: MT.single_phase
         println("# Single phase composition")
         println(first(m.model_list))
-    elseif first(m.mixing_type) <: Union{MT.HS1962_plus, MT.HS1962_minus}
+    elseif typeof(first(m.mixing_type)) <: Union{MT.HS1962_plus, MT.HS1962_minus}
         println("# Two phase composition using ", m.mixing_type)
         # for i in 1:2
         println(1 - first(m.ϕ), " : ", m.model_list[1])

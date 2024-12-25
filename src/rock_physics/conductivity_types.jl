@@ -49,6 +49,10 @@ mutable struct UHO2014{F1, F2} <: AbstractMineralModel
     Ch2o_ol::F2
 end
 
+mutable struct const_matrix{F} <: AbstractMineralModel
+    σ::F
+end
+
 # melts
 """
     Ni201(T, Ch2o_m)
@@ -95,10 +99,14 @@ mutable struct Sifre2014{F1, F2, F3} <: AbstractMeltModel
 end
 
 # ====== mixing laws =====
-struct HS1962_plus end
-struct HS1962_minus end
-struct HSn_plus end
-struct HSn_minus end
-struct single_phase end
+# TODO? : abstract mixing type?
+mutable struct HS1962_plus end
+mutable struct HS1962_minus end
+mutable struct MAL 
+    m
+end
+mutable struct HSn_plus end
+mutable struct HSn_minus end
+mutable struct single_phase end
 
 # == response

@@ -35,6 +35,8 @@ function forward(m::UHO2014, p)
     return log10(σ)
 end
 
+forward(m::const_matrix, p) = log10(m.σ)
+
 # melt
 
 function forward(m::Ni2011, p)
