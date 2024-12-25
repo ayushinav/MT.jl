@@ -1,11 +1,9 @@
-const p_names_definition = (
-    T = "Temperature (K)",
-    Ch2o_m = "Water concentration in melt (ppm)",
-    Ch2o_ol = "Water concentration in olivine (ppm)",
-    Cco2_m = "CO₂ concentration in melt (ppm)"
-)
+const p_names_definition = (T="Temperature (K)", Ch2o_m="Water concentration in melt (ppm)",
+    Ch2o_ol="Water concentration in olivine (ppm)",
+    Cco2_m="CO₂ concentration in melt (ppm)")
 
-function Base.show(io::IO, m::model) where {model <: Union{MT.AbstractMineralModel, MT.AbstractMeltModel}}
+function Base.show(io::IO,
+        m::model) where {model <: Union{MT.AbstractMineralModel, MT.AbstractMeltModel}}
     println("Model : ", typeof(m).name.name)
     for k in propertynames(m)
         println(p_names_definition[k], " : ", getfield(m, k))

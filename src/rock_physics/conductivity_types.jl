@@ -90,6 +90,7 @@ end
   - `Cco2_m` : Co2 concentration in melt (in ppm)
 
 ## References
+
 Electrical conductivity during incipient melting in the oceanic low-velocity zone", Nature, Volume 509, https://doi.org/10.1038/nature13245
 """
 mutable struct Sifre2014{F1, F2, F3} <: AbstractMeltModel
@@ -102,7 +103,7 @@ end
 # TODO? : abstract mixing type?
 mutable struct HS1962_plus end
 mutable struct HS1962_minus end
-mutable struct MAL 
+mutable struct MAL
     m
 end
 mutable struct HSn_plus end

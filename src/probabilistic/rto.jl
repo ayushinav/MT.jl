@@ -38,11 +38,7 @@ function stochastic_inverse(r_obs::resp1,
 
     # check this L'L
     lin_prob = LinearProblem(L'L, pert_m)
-    linsolve_prob = init(lin_prob;
-        assumptions=LinearSolve.OperatorAssumptions(
-            true)) #; condition=LinearSolve.OperatorCondition.WellConditioned))
-
-
+    linsolve_prob = init(lin_prob; assumptions=LinearSolve.OperatorAssumptions(true)) #; condition=LinearSolve.OperatorCondition.WellConditioned))
 
     μ = 1.0
 
@@ -87,21 +83,18 @@ function stochastic_inverse(r_obs::resp1,
                 getfield(r_obs, k), Diagonal(getfield(err_resp, k))))
         end
 
+        function f(x) end
 
-        function f(x)
-
-        end
-    
         x₁ = μgrid[1]
         x₃ = μgrid[end]
         x₂ = 10.0^((log10(x₃) + ϕ * log10(x₁)) / (1 + ϕ))
         x₄ = 10.0^((log10(x₁) + ϕ * log10(x₃)) / (1 + ϕ))
-    
+
         # fx₁ = f(x₁)
         # fx₃ = f(x₃)
         fx₂ = f(x₂)
         fx₄ = f(x₄)
-    
+
         tol = 1e-5
         count = 0
         while (x₃ - x₁) >= tol
@@ -116,7 +109,7 @@ function stochastic_inverse(r_obs::resp1,
                 fx₄ = fx₂
                 x₂ = 10.0^((log10(x₃) + ϕ * log10(x₁)) / (1 + ϕ))
                 fx₂ = f(x₂)
-    
+
             else
                 x₁ = x₂
                 x₂ = x₄
@@ -126,10 +119,8 @@ function stochastic_inverse(r_obs::resp1,
             end
         end
         μ = sqrt(x₁ * x₃)
-    
+
         # At the moment mₖ₊₁ contains the update for the last μ, we rewrite it with the best μ found.
-    
-    
 
         # the next occam function needs m to be a function of μ and DOES NOT INCLUDE ANY REGULARIZATION
         # perturbed response
@@ -152,18 +143,15 @@ function stochastic_inverse(r_obs::resp1,
         broadcast(trans_utils[:m].itf, m_chains)', [Symbol("ρ[$i]") for i in 1:n])
 end
 
-
 # mutable struct RTO_MTModel <: AbstractGeophyModel
 #     ξ
 #     h
 #     μ
 # end
 
-
 #= RTO issue
 We know about observed data d_obs, the errors associated in C\_
 
 We first use Occam to get m⁰
-
 
 =#

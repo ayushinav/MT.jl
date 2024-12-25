@@ -54,13 +54,13 @@ function forward(m::Sifre2014, p)
     H_h2o = a_h2o * exp(-b_h2o * m.Ch2o_m * 1.0f-4) + c_h2o
     lS_h2o = d_h2o * H_h2o + e_h2o
     S_h2o = exp(lS_h2o)
-    melt_h2o = S_h2o * exp(-H_h2o * inv(1f3 * gas_R * m.T))
+    melt_h2o = S_h2o * exp(-H_h2o * inv(1.0f3 * gas_R * m.T))
 
     # Esig CO2 melt
     H_co2 = a_c2o * exp(-b_c2o * m.Cco2_m * 1.0f-4) + c_c2o
     lS_co2 = d_c2o * H_co2 + e_c2o
     S_co2 = exp(lS_co2)
-    melt_co2 = S_co2 * exp(-H_co2 * inv(1f3 * gas_R * m.T))
+    melt_co2 = S_co2 * exp(-H_co2 * inv(1.0f3 * gas_R * m.T))
 
     # summation of conduction mechanisms
     σ = melt_co2 + melt_h2o

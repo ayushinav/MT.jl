@@ -13,8 +13,8 @@ placeholder to store
   - number of samples to obtain in `n_samples`
   - `Turing.jl` sampler to be used in `sampler`
 """
-mutable struct mcmc_cache{T1 <: AbstractModelDistribution,
-                          T2 <: AbstractResponseDistribution}
+mutable struct mcmc_cache{
+    T1 <: AbstractModelDistribution, T2 <: AbstractResponseDistribution}
     apriori::T1
     likelihood::T2
     n_samples::Int
@@ -50,21 +50,18 @@ makes a `Turing.jl` model to perform MCMC sampling
   - `model_fields`: fields in `model` to draw inference on
   - `trans_utils`: to transform the model field variables to and from computational (inference) domain
 """
-@model function mcmc_turing(m_sample::model, const_data, vars, r_obs::NamedTuple,
-                            err_resp::response, mDist::mdist, rDist::rdist;
-                            response_fields::Vector{Symbol}=[k
-                                                             for k in fieldnames(typeof(rDist))],
-                            model_fields::Vector{Symbol}=[k
-                                                          for k in fieldnames(typeof(mDist))],
-                            trans_utils::NamedTuple=(m=log_tf, h=lin_tf)) where {
-                                                                                 model <:
-                                                                                 AbstractModel,
-                                                                                 response <: AbstractResponse,
-                                                                                 mdist <:
-                                                                                 AbstractModelDistribution,
-                                                                                 rdist <:
-                                                                                 AbstractResponseDistribution
-                                                                                 }
+@model function mcmc_turing(m_sample::model,
+        const_data,
+        vars,
+        r_obs::NamedTuple,
+        err_resp::response,
+        mDist::mdist,
+        rDist::rdist;
+        response_fields::Vector{Symbol}=[k for k in fieldnames(typeof(rDist))],
+        model_fields::Vector{Symbol}=[k for k in fieldnames(typeof(mDist))],
+        trans_utils::NamedTuple=(m=log_tf, h=lin_tf)) where {
+        model <: AbstractModel, response <: AbstractResponse,
+        mdist <: AbstractModelDistribution, rdist <: AbstractResponseDistribution}
     m0 = (; zip([propertynames(mDist)...], const_data)...)
     # works with mDist being a NamedTuple
 

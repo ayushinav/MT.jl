@@ -15,12 +15,11 @@ returns the variables required to plot the PDF image of stochastic inversion
   - `trans_utils`: `NamedTuple` containing `transform_utils` to move to and from computational and model domain
   - `grid`: `NamedTuple` containing the points where the stochastic image is evaluated
 """
-function pre_image(mDist::mdist, chains::chain; trans_utils=(m=log_tf, h=lin_tf),
-                   grid=(m=collect(-1:0.1:5), h=collect(10 .^ (0:0.1:6)))) where {
-                                                                                  mdist <:
-                                                                                  AbstractGeophyModelDistribution,
-                                                                                  chain <:
-                                                                                  Chains}
+function pre_image(mDist::mdist,
+        chains::chain;
+        trans_utils=(m=log_tf, h=lin_tf),
+        grid=(m=collect(-1:0.1:5), h=collect(10 .^ (0:0.1:6)))) where {
+        mdist <: AbstractGeophyModelDistribution, chain <: Chains}
     # we know that geophy model will have `m` and `h`
 
     # the following code is tested only for 1D
@@ -37,11 +36,11 @@ function pre_image(mDist::mdist, chains::chain; trans_utils=(m=log_tf, h=lin_tf)
     if size(pred, 2) == m_length
         broadcast!(getproperty(trans_utils[:m], :tf), pred, pred)
     elseif size(pred, 2) == (m_length + h_length)
-        broadcast!(getproperty(trans_utils[:m], :tf), view(pred, :, 1:m_length),
-                   view(pred, :, 1:m_length))
+        broadcast!(getproperty(trans_utils[:m], :tf),
+            view(pred, :, 1:m_length), view(pred, :, 1:m_length))
         broadcast!(getproperty(trans_utils[:h], :tf),
-                   view(pred, :, (m_length + 1):(m_length + h_length)),
-                   view(pred, :, (m_length + 1):(m_length + h_length)))
+            view(pred, :, (m_length + 1):(m_length + h_length)),
+            view(pred, :, (m_length + 1):(m_length + h_length)))
     else
         error("size of parameters from model distribution `mDist` does not match the values from chains.")
     end
@@ -57,9 +56,9 @@ function pre_image(mDist::mdist, chains::chain; trans_utils=(m=log_tf, h=lin_tf)
     end
 end
 
-function get_kde_image(pre_image::NamedTuple, grid::NamedTuple, trans_utils::NamedTuple,
-                       mDist::mdist, return_vals=false;
-                       kwargs...) where {mdist <: AbstractGeophyModelDistribution}
+function get_kde_image(
+        pre_image::NamedTuple, grid::NamedTuple, trans_utils::NamedTuple, mDist::mdist,
+        return_vals=false; kwargs...) where {mdist <: AbstractGeophyModelDistribution}
     K(u) = inv(sqrt(2π)) * exp(-u^2 / 2)
 
     function get_kde(data, xgrid)
@@ -80,15 +79,15 @@ function get_kde_image(pre_image::NamedTuple, grid::NamedTuple, trans_utils::Nam
     kde_img = zeros(m_length, length(grid[:m]))
 
     for i in 1:m_length
-        kde_img[i, :] .= get_kde(broadcast(getproperty(trans_utils[:m], :itf),
-                                           pre_image[:m][:, i]), grid[:m])
+        kde_img[i, :] .= get_kde(
+            broadcast(getproperty(trans_utils[:m], :itf), pre_image[:m][:, i]), grid[:m])
         norm_factor = sum(kde_img[i, :])
         kde_img[i, :] .= kde_img[i, :] ./ norm_factor
     end
     # return kde_preds
 
     plt = heatmap(broadcast(getproperty(trans_utils[:m], :tf), grid[:m]),
-                  cumsum(pre_image[:h]), kde_img; kwargs...) #, cmap=reverse(cgrad(:grays))) #, clim = (0, 0.1))
+        cumsum(pre_image[:h]), kde_img; kwargs...) #, cmap=reverse(cgrad(:grays))) #, clim = (0, 0.1))
     plot!(plt; xlabel="ρ (Ωm)", ylabel="depth (m)")
     if return_vals
         return (; kde_img, plt)
@@ -97,14 +96,16 @@ function get_kde_image(pre_image::NamedTuple, grid::NamedTuple, trans_utils::Nam
     end
 end
 
-function get_mean_std_image(pre_image::NamedTuple, grid::NamedTuple,
-                            trans_utils::NamedTuple, mDist::mdist, return_vals=false;
-                            kwargs...) where {mdist <: AbstractGeophyModelDistribution}
+function get_mean_std_image(
+        pre_image::NamedTuple, grid::NamedTuple, trans_utils::NamedTuple, mDist::mdist,
+        return_vals=false; kwargs...) where {mdist <: AbstractGeophyModelDistribution}
     m_length = size(pre_image[:m], 2)
-    μ_m = vec(mean(broadcast(getproperty(trans_utils[:m], :itf),
-                             pre_image[:m][:, 1:m_length]); dims=1))
-    σ_m = vec(std(broadcast(getproperty(trans_utils[:m], :itf),
-                            pre_image[:m][:, 1:m_length]); dims=1))
+    μ_m = vec(mean(
+        broadcast(getproperty(trans_utils[:m], :itf), pre_image[:m][:, 1:m_length]);
+        dims=1))
+    σ_m = vec(std(
+        broadcast(getproperty(trans_utils[:m], :itf), pre_image[:m][:, 1:m_length]);
+        dims=1))
 
     μ₊_m = μ_m .+ σ_m
     μ₋_m = μ_m .- σ_m
@@ -119,15 +120,19 @@ function get_mean_std_image(pre_image::NamedTuple, grid::NamedTuple,
         h_model = h_model[1:(end - 1)]
     end
 
-    μ_model = sample(mDist)(broadcast(getproperty(trans_utils[:m], :tf), μ_m), broadcast(getproperty(trans_utils[:h], :tf), h_model))
-    μ₊_model = sample(mDist)(broadcast(getproperty(trans_utils[:m], :tf), μ₊_m), broadcast(getproperty(trans_utils[:h], :tf), h_model))
-    μ₋_model = sample(mDist)(broadcast(getproperty(trans_utils[:m], :tf), μ₋_m), broadcast(getproperty(trans_utils[:h], :tf), h_model))
+    μ_model = sample(mDist)(broadcast(getproperty(trans_utils[:m], :tf), μ_m),
+        broadcast(getproperty(trans_utils[:h], :tf), h_model))
+    μ₊_model = sample(mDist)(broadcast(getproperty(trans_utils[:m], :tf), μ₊_m),
+        broadcast(getproperty(trans_utils[:h], :tf), h_model))
+    μ₋_model = sample(mDist)(broadcast(getproperty(trans_utils[:m], :tf), μ₋_m),
+        broadcast(getproperty(trans_utils[:h], :tf), h_model))
 
     # @show  broadcast(getproperty(trans_utils[:h], :tf), h_model)
 
-    plt = plot_model(μ_model; color="blue", label="μ", linewidth = 3.5)
-    plot_model!(plt, μ₊_model; color="green", label="μ ± 1σ", linewidth = 3.5)
-    plot_model!(plt, μ₋_model; color="green", label=false, legend=:outertopright, linewidth = 3.5)
+    plt = plot_model(μ_model; color="blue", label="μ", linewidth=3.5)
+    plot_model!(plt, μ₊_model; color="green", label="μ ± 1σ", linewidth=3.5)
+    plot_model!(
+        plt, μ₋_model; color="green", label=false, legend=:outertopright, linewidth=3.5)
     # @show kwargs
     plot!(plt; kwargs...)
 

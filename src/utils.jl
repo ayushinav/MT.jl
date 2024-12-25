@@ -31,10 +31,8 @@ Should work probably, but we'll look into. Also
 
 # probably only required in occam codes, maybe a generated function is needed?
 
-function zero_abstract(m::mtresponse) where {
-                                             mtresponse <:
-                                             MTResponse{<:AbstractVector{<:Any},
-                                                        <:AbstractVector{<:Any}}}
+function zero_abstract(m::mtresponse) where {mtresponse <: MTResponse{
+        <:AbstractVector{<:Any}, <:AbstractVector{<:Any}}}
     MTResponse{AbstractVector, AbstractVector}(zero(m.ρₐ), zero(m.ϕ))
 end
 
@@ -44,7 +42,7 @@ end
 function inverse(t::mtresponse; abstract=false) where {mtresponse <: MTResponse}
     if abstract
         return MTModel{AbstractArray{<:Any, length(size(t.ρₐ))}, # length(size(...)) => dimensionality
-                       AbstractArray{<:Any, length(size(t.ρₐ))}}
+            AbstractArray{<:Any, length(size(t.ρₐ))}}
     else
         vec_type = typeof(t.ρₐ)
         return MTModel{vec_type, vec_type}
@@ -53,14 +51,10 @@ end
 
 function inverse(t::rpresponse; abstract=false) where {rpresponse <: RockphyCond}
     if abstract
-        return mixing_models{AbstractArray{<:Any, 1},
-                       AbstractArray{<:Any, 1},
-        }
+        return mixing_models{AbstractArray{<:Any, 1}, AbstractArray{<:Any, 1}}
     else
         vec_type = Vector{eltype(t.σ)}
-        return mixing_models{vec_type,
-                       vec_type,
-        }
+        return mixing_models{vec_type, vec_type}
         # return MTModel{vec_type, vec_type}
     end
 end
@@ -77,8 +71,8 @@ end
 
 function forward(t::mtmodel; abstract=false) where {mtmodel <: MTModel} # {<:AbstractVector{<:Any}, <:AbstractVector{<:Any}}}
     if abstract
-        return MTResponse{AbstractArray{<:Any, length(sie(m.m))},
-                          AbstractArray{<:Any, length(sie(m.m))}}
+        return MTResponse{
+            AbstractArray{<:Any, length(sie(m.m))}, AbstractArray{<:Any, length(sie(m.m))}}
     else
         vec_type = typeof(t.m)
         return MTResponse{vec_type, vec_type}

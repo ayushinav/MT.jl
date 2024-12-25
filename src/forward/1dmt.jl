@@ -6,7 +6,7 @@ const global μ = 4π * 1.0f-7; # Float32 will promote to Float64 without a prob
 returns a tuple of ρₐ and ϕ, given arrays of resistivity `ρ` and thickness `h` for the angular frequenciy `ω`.
 """
 function get_Z(ρ::T1, h::T2,
-               ω::T) where {T1 <: AbstractVector{<:Any}, T2 <: AbstractVector{<:Any}, T}
+        ω::T) where {T1 <: AbstractVector{<:Any}, T2 <: AbstractVector{<:Any}, T}
     Z = complex(zero(eltype(ρ)))
     k = sqrt(im * ω * μ / ρ[end])
     Z = ω * μ / k
@@ -28,7 +28,7 @@ end
 returns a  `response` for the given model `m` at the frequencies  `ω`
 """
 function forward(m::MTModel{<:AbstractVector{<:Any}, <:AbstractVector{<:Any}},
-                 ω::AbstractVector{<:Any}) # ω will always be a vector, until will find an exception
+        ω::AbstractVector{<:Any}) # ω will always be a vector, until will find an exception
     # the following line check is why we do not use the same fn name here, so that the checks happen just once for all the frequencies.
     if !(length(m.h) == length(m.m) - 1)
         error("number of model layers should be 1 less than the number of model parameters")
@@ -51,9 +51,9 @@ end
 
 updates response `r` type for the given model `m` at the frequencies  `ω`
 """
-function forward!(r::MTResponse,
-                  m::MTModel{<:AbstractVector{<:Any}, <:AbstractVector{<:Any}},
-                  ω::AbstractVector{<:Any})
+function forward!(
+        r::MTResponse, m::MTModel{<:AbstractVector{<:Any}, <:AbstractVector{<:Any}},
+        ω::AbstractVector{<:Any})
     if !(length(m.h) == length(m.m) - 1)
         error("number of model layers should be 1 less than the number of model parameters")
     end

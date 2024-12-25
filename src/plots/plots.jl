@@ -18,17 +18,16 @@ Prepares and returns a vector of plots for a response `d` (y-axis) parametrized 
   - `kwargs` : Controls properties of the plot, splats the argument to `Plots.jl`
 """
 function prepare_plot(d::resp1, ω; plot_type=:scatter,
-                      field_names::Vector{Symbol}=[k for k in fieldnames(typeof(d))],
-                      kwargs...) where {resp1 <: AbstractResponse}
+        field_names::Vector{Symbol}=[k for k in fieldnames(typeof(d))],
+        kwargs...) where {resp1 <: AbstractResponse}
     units = get_units(d)
     yscale = get_scale(d)
     plts = []
 
     for i in eachindex(field_names)
         pi = getfield(Plots, plot_type)(2π ./ ω, getfield(d, field_names[i]); xscale=:log10,
-                                        # yerr = getfield(d_err, field_names[i]),
-                                        yscale=yscale[i], ylabel="$(units[i])",
-                                        xlabel="T (s)", kwargs...)
+            # yerr = getfield(d_err, field_names[i]),
+            yscale=yscale[i], ylabel="$(units[i])", xlabel="T (s)", kwargs...)
         push!(plts, pi)
     end
 
@@ -41,16 +40,16 @@ kwargs...) where {resp1 <: AbstractResponse}
 Modifies `plts`, the vector of plots, with same functionality as `prepare_plot(d, ω)`.
 """
 function prepare_plot!(plts::Vector{Any}, d::resp1, ω; plot_type=:scatter,
-                       field_names::Vector{Symbol}=[k for k in fieldnames(typeof(d))],
-                       kwargs...) where {resp1 <: AbstractResponse}
+        field_names::Vector{Symbol}=[k for k in fieldnames(typeof(d))],
+        kwargs...) where {resp1 <: AbstractResponse}
     units = get_units(d)
     yscale = get_scale(d)
     plot_type = Symbol("$(plot_type)!")
 
     for i in eachindex(field_names)
         Plots.plot!(plts[i], 2π ./ ω, getfield(d, field_names[i]); xscale=:log10,
-                    # yerr = getfield(d_err, field_names[i]),
-                    yscale=yscale[i], ylabel="$(units[i])", xlabel="T (s)", kwargs...)
+            # yerr = getfield(d_err, field_names[i]),
+            yscale=yscale[i], ylabel="$(units[i])", xlabel="T (s)", kwargs...)
     end
     nothing
 end
@@ -74,18 +73,16 @@ Prepares and returns a vector of plots for a response `d` (y-axis) parametrized 
   - `kwargs` : Controls properties of the plot, splats the argument to `Plots.jl`
 """
 function prepare_plot(d::resp1, ω, d_err::resp2; plot_type=:scatter,
-                      field_names::Vector{Symbol}=[k for k in fieldnames(typeof(d))],
-                      kwargs...) where {resp1 <: AbstractResponse, resp2 <:
-                                                                   AbstractResponse}
+        field_names::Vector{Symbol}=[k for k in fieldnames(typeof(d))],
+        kwargs...) where {resp1 <: AbstractResponse, resp2 <: AbstractResponse}
     units = get_units(d)
     yscale = get_scale(d)
     plts = []
 
     for i in eachindex(field_names)
         pi = getfield(Plots, plot_type)(2π ./ ω, getfield(d, field_names[i]); xscale=:log10,
-                                        yerr=getfield(d_err, field_names[i]),
-                                        yscale=yscale[i], ylabel="$(field_names[i]) ($(units[i]))",
-                                        xlabel="T (s)", kwargs...)
+            yerr=getfield(d_err, field_names[i]), yscale=yscale[i],
+            ylabel="$(field_names[i]) ($(units[i]))", xlabel="T (s)", kwargs...)
         push!(plts, pi)
     end
 
@@ -98,24 +95,24 @@ kwargs...) where {resp1 <: AbstractResponse, resp2 <: AbstractResponse}
 Modifies `plts`, the vector of plots, with same functionality as `prepare_plot(d, ω, d_err)`.
 """
 function prepare_plot!(plts::Vector{Any}, d::resp1, ω, d_err::resp2; plot_type=:scatter,
-                       field_names::Vector{Symbol}=[k for k in fieldnames(typeof(d))],
-                       kwargs...) where {resp1 <: AbstractResponse,
-                                         resp2 <: AbstractResponse}
+        field_names::Vector{Symbol}=[k for k in fieldnames(typeof(d))],
+        kwargs...) where {resp1 <: AbstractResponse, resp2 <: AbstractResponse}
     units = get_units(d)
     yscale = get_scale(d)
     plot_type = Symbol("$(plot_type)!")
 
     for i in eachindex(field_names)
-        getfield(Plots, plot_type)(plts[i], 2π ./ ω, getfield(d, field_names[i]); xscale=:log10,
-                    yerr=getfield(d_err, field_names[i]), yscale=yscale[i],
-                    ylabel="$(field_names[i]) ($(units[i]))", xlabel="T (s)", kwargs...)
+        getfield(Plots, plot_type)(
+            plts[i], 2π ./ ω, getfield(d, field_names[i]); xscale=:log10,
+            yerr=getfield(d_err, field_names[i]), yscale=yscale[i],
+            ylabel="$(field_names[i]) ($(units[i]))", xlabel="T (s)", kwargs...)
     end
     nothing
 end
 
 function plot_response(plts::Vector{Any}; kwargs...)
-    Plots.plot(plts...; layout=(length(plts), 1), size=(400, 400 * length(plts)),
-               margin=3Plots.mm, kwargs...)
+    Plots.plot(plts...; layout=(length(plts), 1),
+        size=(400, 400 * length(plts)), margin=3Plots.mm, kwargs...)
 end
 
 # for any other survey, we will almost always have two options, either a layer model or model defined at differnt points. Our function does it on a layer model, for a model defined at points, one can simply interpolate and choose small grid spacing for the interpolator, converting the point model into a layer model
@@ -142,8 +139,8 @@ function plot_model(m::MTModel; max_depth=5 * sum(m.h), kwargs...) # add depth l
         max_depth = 5 * h2[end]
     end
 
-    Plots.plot([m.m[1], m.m...], [1, h2..., max_depth]; scale=:log10, linetype=:steppost,
-               yflip=true, xlabel=xlabel, ylabel=ylabel, kwargs...)
+    Plots.plot([m.m[1], m.m...], [1, h2..., max_depth]; scale=:log10,
+        linetype=:steppost, yflip=true, xlabel=xlabel, ylabel=ylabel, kwargs...)
 end
 
 """
@@ -160,6 +157,6 @@ function plot_model!(plt, m::MTModel; max_depth=5 * sum(m.h), kwargs...)
         max_depth = 2 * h2[end]
     end
 
-    Plots.plot!(plt, [m.m[1], m.m...], [1, h2..., max_depth]; scale=:log10,
-                linetype=:steppost, yflip=true, kwargs...)
+    Plots.plot!(plt, [m.m[1], m.m...], [1, h2..., max_depth];
+        scale=:log10, linetype=:steppost, yflip=true, kwargs...)
 end
