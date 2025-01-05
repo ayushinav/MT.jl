@@ -1,4 +1,5 @@
-@testset "inverse tests" begin
+@testitem "inverse tests" tags = [:occam] begin
+    using LinearAlgebra
     h = [1000.0, 1000.0] # m
     ρ = [100.0, 10.0, 1000.0] # Ωm
     m = MTModel(ρ, h)

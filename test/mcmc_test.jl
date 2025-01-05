@@ -1,7 +1,5 @@
-using Distributions
-using Turing
-
-@testset "fixed discretization" begin
+@testitem "fixed discretization" tags = [:mcmc] begin
+    using Distributions, Turing
 
     m_test = MTModel([100.0, 10.0, 1000.0], [1e3, 1e3])
     f = 10 .^ range(-4, stop=1, length=25)
@@ -53,7 +51,8 @@ using Turing
     @test sqrt(ph_err) / n_samples .<= sum(err_resp.ϕ)
 end
 
-@testset "variable discretization" begin
+@testitem "variable discretization" tags = [:mcmc] begin
+    using Distributions, Turing
 
     m_test = MTModel([100.0, 10.0, 1000.0], [1e3, 1e3])
     f = 10 .^ range(-4, stop=1, length=25)

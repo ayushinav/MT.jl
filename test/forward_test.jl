@@ -1,12 +1,13 @@
-h = [100.0, 1000.0]; # m
-ρ = [100.0, 10.0, 1000.0]; # Ωm
-m = MTModel(ρ, h);
-T = 10 .^ (range(-3, 5, length=57));
-ω = 2π ./ T;
-nω = length(T);
-resp = forward(m, ω);
+@testitem "forward tests" tags = [:forward] begin
+    using BenchmarkTools
+    h = [100.0, 1000.0]; # m
+    ρ = [100.0, 10.0, 1000.0]; # Ωm
+    m = MTModel(ρ, h);
+    T = 10 .^ (range(-3, 5, length=57));
+    ω = 2π ./ T;
+    nω = length(T);
+    resp = forward(m, ω);
 
-@testset "forward tests" begin
     # @show @ballocated forward!(resp, m, ω)
 
     Z_tst = [(0.3933382406337992 + 0.7107973536471329 * im),
