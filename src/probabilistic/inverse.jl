@@ -22,7 +22,8 @@ function stochastic_inverse(
     err_resp::resp2,
     vars,
     alg_cache::mcmc_cache;
-    trans_utils::NamedTuple = (m = log_tf, h = lin_tf) # need to take care of this
+    trans_utils::NamedTuple = (m = log_tf, h = lin_tf,), # need to take care of this
+    kwargs...
     ) where {resp1 <: AbstractResponse, resp2 <: AbstractResponse}
 
     model_fields = [];
@@ -92,10 +93,17 @@ function stochastic_inverse(
     
     # print("MODEL WORKS?")
     # @show typeof(sampler) <: Turing.AdvancedVI.VariationalInference
+    @show kwargs
 
     if typeof(alg_cache.sampler) <: Turing.AdvancedVI.VariationalInference
         return vi(mcmc_model, alg_cache.sampler)
     else
-        return Turing.sample(mcmc_model, alg_cache.sampler, alg_cache.n_samples)
+        return Turing.sample(mcmc_model, alg_cache.sampler, alg_cache.n_samples, verbose = false; kwargs...)
     end
 end
+
+
+
+
+import Turing:AbstractChains
+

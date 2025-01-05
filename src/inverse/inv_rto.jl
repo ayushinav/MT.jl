@@ -26,6 +26,7 @@ updates `mₖ` using occam iteration to fit `robs` within a misfit of `χ2`, by 
   - `model_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(m₀))]`: will generally be fixed, see docs for details
   - `trans_utils::transform_utils= sigmoid_tf`: for bounds transformation,
   - `verbose`: whether to print updates after each iteration, defaults to true
+  - `mᵣ` : model to be regularized against
 
 ### Returns:
 
@@ -35,13 +36,13 @@ return message in the form of `return_code` and updates `mₖ` in-place.
 
 `inverse!(m_occam, r_obs, Occam([1e-2, 1e6]))`
 """
-function inverse!(mₖ::model1, robs::response, vars::Vector{Float64}, alg_cache::occam_cache;
+function inverse_rto!(mₖ::model1, robs::response, vars::Vector{Float64}, alg_cache::occam_cache;
                   W=nothing, # Weight matrix
                   max_iters=20, χ2=1.0,
                   response_fields::Vector{Symbol}=[k for k in fieldnames(typeof(robs))],
                   model_fields::Vector{Symbol}=[k for k in fieldnames(typeof(mₖ))], # this will not be used but for the sake of generality for all inverse algs
                   trans_utils::transform_utils=sigmoid_tf, verbose::Bool=true,
-                  ) where {model1 <: AbstractGeophyModel,
+                  mᵣ= nothing) where {model1 <: AbstractGeophyModel,
                                               response <: AbstractGeophyResponse}
     prec = eltype(mₖ.m)
     model_fields = [:m]
@@ -83,6 +84,8 @@ function inverse!(mₖ::model1, robs::response, vars::Vector{Float64}, alg_cache
     itr = 1
     chi2 = prec(1e6)
 
+    @show mᵣ
+
     μ_last = 0.0
     while itr <= max_iters
         verbose && (print("$itr: "))
@@ -91,9 +94,19 @@ function inverse!(mₖ::model1, robs::response, vars::Vector{Float64}, alg_cache
         copyto!(lin_utils.Jₖ, lin_utils.Jₖ .* lin_utils.mₖ' .* log(10))
         for k in model_fields # to computational domain
             getfield(mₖ, k) .= trans_utils.itf.(log10.(getfield(mₖ, k)))
+            if mᵣ === nothing
+                mᵣ = zero(mₖ)
+            else
+                # transferring regularizer model to computational domain in occam
+                getfield(mᵣ, k) .= trans_utils.itf.(log10.(getfield(mᵣ, k))) # TODO : check why we need log10 here and corresponding 10.^ in occam.jl #139
+            end
         end
 
+        @show itr
+        @show mᵣ.m
+
         μ_last = occam_step!(mₖ₊₁, # to store the next update, which will eventually be copied to mₖ
+                             mᵣ, # model to be regularized against
                              respₖ₊₁, # to store the response for mₖ₊₁, for error calculation and anything
                              vars, # to compute the forward model
                              χ2, # threshold chi-squared error that needs to be met
@@ -108,6 +121,9 @@ function inverse!(mₖ::model1, robs::response, vars::Vector{Float64}, alg_cache
         for k in model_fields # copying things to mₖ
             getfield(mₖ, k) .= getfield(mₖ₊₁, k)
         end
+
+        @show mᵣ
+        
         forward!(respₖ, mₖ, vars)
         chi2 = χ²(reduce(vcat, [copy(getfield(respₖ, k)) for k in response_fields]),
                   inv_utils.dobs; W=inv_utils.W)

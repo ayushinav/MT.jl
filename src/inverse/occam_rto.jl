@@ -1,27 +1,6 @@
 """
-`occam_cache`: specifies the inverse algorithm while having a cache.
-"""
-mutable struct occam_cache{T}
-    μgrid::Vector{T}
-end
-"""
-`linsolve!`: Performs `inv(B)*y` using `LinearSolve.jl`
-"""
-function linsolve!(x, prob_init, B, y)
-    prob_init.A = B
-    prob_init.b = y
-    x .= solve!(prob_init)
-    nothing
-end
-"""
-`Occam(;μgrid= [0.01, 1e6])`
-"""
-function Occam(; μgrid=[0.01, 1e6])
-    return occam_cache{eltype(μgrid)}(μgrid)
-end
-
-"""
     function occam_step!(mₖ₊₁::model,
+        mᵣ::model,
         respₖ₊₁::response,
         vars::Union{AbstractVector{Float32}, AbstractVector{Float64}},
         χ2::Union{Float64, Float32},
@@ -40,6 +19,7 @@ performs a single step of occam inversion, using golden line search.
 ### Variables:
 
   - `mₖ₊₁`: to store the next update, which will eventually be copied to mₖ
+  - `mᵣ` : model to regularize against
   - `respₖ₊₁`: to store the response for `mₖ₊₁`, for error calculation and anything
   - `vars`: to compute the forward model
   - `χ2::Union{Float64, Float32}`: threshold chi-squared error that needs to be met,
@@ -52,7 +32,8 @@ performs a single step of occam inversion, using golden line search.
   - `response_fields::Vector{Symbol}`: which fields in response to invert for, # to store the next update, which will eventually be copied to mₖ
   - `verbose`: whether to print the updates or not, default is true # model to regularize against
 """
-function occam_step!(mₖ₊₁::model1, # to store the next update, which will eventually be copied to mₖ
+function occam_step_rto!(mₖ₊₁::model1, # to store the next update, which will eventually be copied to mₖ
+                     mᵣ::model2, # model to regularize against
                      respₖ₊₁::response, # to store the response for mₖ₊₁, for error calculation and anything
                      vars::Union{AbstractVector{Float32}, AbstractVector{Float64}}, # to compute the forward model
                      χ2::Union{Float64, Float32}, # threshold chi-squared error that needs to be met
@@ -78,7 +59,9 @@ function occam_step!(mₖ₊₁::model1, # to store the next update, which will 
                   lin_utils.Jₖ' * inv_utils.W * lin_utils.Jₖ,
                   lin_utils.Jₖ' *
                   inv_utils.W *
-                  (inv_utils.dobs + lin_utils.Jₖ * lin_utils.mₖ - lin_utils.Fₖ))
+                  (inv_utils.dobs + lin_utils.Jₖ * lin_utils.mₖ - lin_utils.Jₖ * mᵣ.m -
+                   lin_utils.Fₖ))
+        mₖ₊₁.m .= mₖ₊₁.m .- mᵣ.m
         for k in model_fields # to model domain
             getfield(mₖ₊₁, k) .= 10.0 .^ trans_utils.tf.(getfield(mₖ₊₁, k))
         end
@@ -132,11 +115,18 @@ function occam_step!(mₖ₊₁::model1, # to store the next update, which will 
 
     for k in model_fields # to model domain
         getfield(mₖ₊₁, k) .= 10.0 .^ trans_utils.tf.(getfield(mₖ₊₁, k)) # why do we have 10^ here
+        if sum(getfield(mᵣ, k)) ≈ 0. 
+            mᵣ = nothing
+        else
+            # transferring regularizer model to computational domain in occam
+            getfield(mᵣ, k) .= 10.0 .^ trans_utils.tf.(getfield(mᵣ, k))
+        end
     end
+    @show mᵣ
 
     forward!(respₖ₊₁, mₖ₊₁, vars)
 
-    verbose && (print("Works golden section search: μ= $μ, χ²= ",
+    verbose && (print("golden section search: μ= $μ, χ²= ",
            χ²(reduce(vcat, [copy(getfield(respₖ₊₁, k)) for k in response_fields]),
               inv_utils.dobs; W=inv_utils.W), "\n"))
     return μ
