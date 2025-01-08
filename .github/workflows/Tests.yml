@@ -14,6 +14,7 @@ concurrency:
 
 jobs:
   tests:
+    runs-on: ${{ matrix.os }}
     name: "Tests"
     strategy:
       fail-fast: false
@@ -27,8 +28,7 @@ jobs:
     steps:
         - uses: actions/checkout@v4
         - uses: julia-actions/setup-julia@v2
-        #   with:
-        #     julia-version: "${{ matrix.version }}"
+          with:
+            julia-version: "${{ matrix.version }}"
     #   coverage-directories: "src,ext"
     #   julia-runtest-depwarn: "yes"  # TensorBoardLogger has a global depwarn
-    # secrets: "inherit"
