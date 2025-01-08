@@ -18,19 +18,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version:
-          - "1"
-          - "lts"
-          - "pre"
+        version: ["1.10"]
         group:
           - "forward"
           - "occam"
           - "mcmc"
           - "types"
-    uses: julia-actions/julia-buildpkg@v1
-    with:
-      group: "${{ matrix.group }}"
-      julia-version: "${{ matrix.version }}"
+    steps:
+        - uses: actions/checkout@v4
+        - uses: julia-actions/setup-julia@v2
+        #   with:
+        #     julia-version: "${{ matrix.version }}"
     #   coverage-directories: "src,ext"
     #   julia-runtest-depwarn: "yes"  # TensorBoardLogger has a global depwarn
     # secrets: "inherit"
