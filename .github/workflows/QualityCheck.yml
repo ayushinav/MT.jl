@@ -20,4 +20,4 @@ jobs:
         with:
           words: |
             rto
-            nto
+            Missings

@@ -1,6 +1,8 @@
 name: FormatPR
 on:
   pull_request:
+    paths-ignore:
+      - 'src/rock_physics/rp_cache.jl'
   schedule:
     - cron: '0 0 * * *'
 jobs:
