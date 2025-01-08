@@ -12,8 +12,8 @@ end
 """
     SEO3(T)
 
-Laboratory derived relation from naturally occuring Dunite (Olivine)
-aggregate, with a small amount of pyroxene pressent to control silica activity.
+Laboratory derived relation from naturally occurring Dunite (Olivine)
+aggregate, with a small amount of pyroxene present to control silica activity.
 The SEO3 anhydrous method has a dependency on oxygen fugacity and charge carrier mobility
 (as a function of temperature) to calculate the conductivity of Olivine.
 The temperature range for the experiment cover 1000 to 1200 degrees C.

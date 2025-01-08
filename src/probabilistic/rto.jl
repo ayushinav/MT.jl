@@ -57,7 +57,7 @@ function stochastic_inverse(r_obs::resp1,
         end
 
         # perturbed model : the one we regularize against
-        # we first draw a pertubation in the computational domain
+        # we first draw a perturbation in the computational domain
 
         pert_m .= rand(MultivariateNormal(
             zero(pert_m), Diagonal(ones(n) .|> eltype(pert_m)))) # sample ξ

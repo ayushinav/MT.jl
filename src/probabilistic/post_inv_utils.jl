@@ -6,7 +6,7 @@ returns a list of models from the `Chains` variable obtained from [`stochastic_i
 
 ## Arguments
 
-  - `chains` : `Chains` object obtaiend from the `Turing` model
+  - `chains` : `Chains` object obtained from the `Turing` model
   - `mDist` : *a priori* distribution defined before performing stochastic inversion
 """
 function get_model_list(chains::chain,

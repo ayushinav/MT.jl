@@ -1,7 +1,7 @@
 @testitem "rock-physics tests" tags = [:rp] begin
     using MT
     methods_list = [SEO3, UHO2014, # mineral
-        Ni2011, Sifre2014]; # melt
+        Ni2011, Sifre2014] # melt
 
     inps = (; zip(
         Symbol.(methods_list), [

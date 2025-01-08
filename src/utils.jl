@@ -72,7 +72,7 @@ end
 function forward(t::mtmodel; abstract=false) where {mtmodel <: MTModel} # {<:AbstractVector{<:Any}, <:AbstractVector{<:Any}}}
     if abstract
         return MTResponse{
-            AbstractArray{<:Any, length(sie(m.m))}, AbstractArray{<:Any, length(sie(m.m))}}
+            AbstractArray{<:Any, length(size(m.m))}, AbstractArray{<:Any, length(size(m.m))}}
     else
         vec_type = typeof(t.m)
         return MTResponse{vec_type, vec_type}
