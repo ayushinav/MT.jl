@@ -1,6 +1,9 @@
 name: Code Quality Check
 
-on: push
+on: 
+  push:
+    paths-ignore:
+      - 'src/rock_physics/rp_cache.jl'
 
 jobs:
   code-style:
