@@ -93,5 +93,4 @@ function stochastic_inverse(r_obs::resp1, err_resp::resp2, vars, alg_cache::mcmc
     end
 end
 
-import Turing:AbstractChains
-
+import Turing: AbstractChains

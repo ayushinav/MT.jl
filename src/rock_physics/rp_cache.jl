@@ -25,4 +25,3 @@ const params_Sifre2014 = (
 
     # C2O melt
     a_c2o=789166, b_c2o=0.1808, c_c2o=32820, d_c2o=5.50e-5, e_c2o=5.7956)
-    
