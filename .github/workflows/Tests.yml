@@ -1,0 +1,34 @@
+name: "Tests"
+
+on:
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+  push:
+    paths-ignore:
+      - 'docs/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref_name != github.event.repository.default_branch || github.ref != 'refs/tags/v*' }}
+
+jobs:
+  tests:
+    runs-on: 'ubuntu-latest'
+    name: "Tests"
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ["1.10"]
+        group:
+          - "forward"
+          - "occam"
+          - "mcmc"
+          - "types"
+    steps:
+        - uses: actions/checkout@v4
+        - uses: julia-actions/setup-julia@v2
+          with:
+            julia-version: "${{ matrix.version }}"
+    #   coverage-directories: "src,ext"
+    #   julia-runtest-depwarn: "yes"  # TensorBoardLogger has a global depwarn

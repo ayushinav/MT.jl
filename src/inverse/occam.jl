@@ -53,38 +53,37 @@ performs a single step of occam inversion, using golden line search.
   - `verbose`: whether to print the updates or not, default is true # model to regularize against
 """
 function occam_step!(mₖ₊₁::model1, # to store the next update, which will eventually be copied to mₖ
-                     respₖ₊₁::response, # to store the response for mₖ₊₁, for error calculation and anything
-                     vars::Union{AbstractVector{Float32}, AbstractVector{Float64}}, # to compute the forward model
-                     χ2::Union{Float64, Float32}, # threshold chi-squared error that needs to be met
-                     μgrid::Vector{Float64}, # contains end points of the bounds for the lagrange multiplier
-                     lin_utils::linear_utils, # contains the mₖ, Jₖ, Fₖ associate with the current iteration
-                     inv_utils::inverse_utils, # contains D= ∂(n), W and dobs
-                     trans_utils::transform_utils, # to  transform to and from the computational domain
-                     linsolve_prob::LinearSolve.LinearCache; # for faster inverse operations
-                     model_fields::Vector{Symbol}=[k for k in fieldnames(typeof(mₖ₊₁))],
-                     response_fields::Vector{Symbol}=[k
-                                                      for k in fieldnames(typeof(respₖ₊₁))],
-                     verbose::Bool=true) where {model1 <: AbstractGeophyModel,
-                                                model2 <: AbstractGeophyModel,
-                                                response <: AbstractGeophyResponse}
+        respₖ₊₁::response, # to store the response for mₖ₊₁, for error calculation and anything
+        vars::Union{AbstractVector{Float32}, AbstractVector{Float64}}, # to compute the forward model
+        χ2::Union{Float64, Float32}, # threshold chi-squared error that needs to be met
+        μgrid::Vector{Float64}, # contains end points of the bounds for the lagrange multiplier
+        lin_utils::linear_utils, # contains the mₖ, Jₖ, Fₖ associate with the current iteration
+        inv_utils::inverse_utils, # contains D= ∂(n), W and dobs
+        trans_utils::transform_utils, # to  transform to and from the computational domain
+        linsolve_prob::LinearSolve.LinearCache; # for faster inverse operations
+        model_fields::Vector{Symbol}=[k for k in fieldnames(typeof(mₖ₊₁))],
+        response_fields::Vector{Symbol}=[k for k in fieldnames(typeof(respₖ₊₁))],
+        verbose::Bool=true) where {
+        model1 <: AbstractGeophyModel, model2 <: AbstractGeophyModel,
+        response <: AbstractGeophyResponse}
     ϕ = (1 + sqrt(5)) / 2
     chi2min = (typeof(χ2))(1e6)
     μ = zero(eltype(μgrid))
     count = 0 # so that iterations do not run forever (will rarely happen, if it will)
 
     function f(x)
-        linsolve!(mₖ₊₁.m, linsolve_prob,
-                  x .* inv_utils.D' * inv_utils.D .+
-                  lin_utils.Jₖ' * inv_utils.W * lin_utils.Jₖ,
-                  lin_utils.Jₖ' *
-                  inv_utils.W *
-                  (inv_utils.dobs + lin_utils.Jₖ * lin_utils.mₖ - lin_utils.Fₖ))
+        linsolve!(mₖ₊₁.m,
+            linsolve_prob,
+            x .* inv_utils.D' * inv_utils.D .+ lin_utils.Jₖ' * inv_utils.W * lin_utils.Jₖ,
+            lin_utils.Jₖ' *
+            inv_utils.W *
+            (inv_utils.dobs + lin_utils.Jₖ * lin_utils.mₖ - lin_utils.Fₖ))
         for k in model_fields # to model domain
             getfield(mₖ₊₁, k) .= 10.0 .^ trans_utils.tf.(getfield(mₖ₊₁, k))
         end
         forward!(respₖ₊₁, mₖ₊₁, vars)
         return χ²(reduce(vcat, [copy(getfield(respₖ₊₁, k)) for k in response_fields]),
-                  inv_utils.dobs; W=inv_utils.W)
+            inv_utils.dobs; W=inv_utils.W)
     end
 
     x₁ = μgrid[1]
@@ -124,11 +123,12 @@ function occam_step!(mₖ₊₁::model1, # to store the next update, which will 
 
     # At the moment mₖ₊₁ contains the update for the last μ, we rewrite it with the best μ found.
 
-    linsolve!(mₖ₊₁.m, linsolve_prob,
-              μ .* inv_utils.D' * inv_utils.D .+ lin_utils.Jₖ' * inv_utils.W * lin_utils.Jₖ,
-              lin_utils.Jₖ' *
-              inv_utils.W *
-              (inv_utils.dobs + lin_utils.Jₖ * lin_utils.mₖ - lin_utils.Fₖ))
+    linsolve!(mₖ₊₁.m,
+        linsolve_prob,
+        μ .* inv_utils.D' * inv_utils.D .+ lin_utils.Jₖ' * inv_utils.W * lin_utils.Jₖ,
+        lin_utils.Jₖ' *
+        inv_utils.W *
+        (inv_utils.dobs + lin_utils.Jₖ * lin_utils.mₖ - lin_utils.Fₖ))
 
     for k in model_fields # to model domain
         getfield(mₖ₊₁, k) .= 10.0 .^ trans_utils.tf.(getfield(mₖ₊₁, k)) # why do we have 10^ here
@@ -137,8 +137,9 @@ function occam_step!(mₖ₊₁::model1, # to store the next update, which will 
     forward!(respₖ₊₁, mₖ₊₁, vars)
 
     verbose && (print("Works golden section search: μ= $μ, χ²= ",
-           χ²(reduce(vcat, [copy(getfield(respₖ₊₁, k)) for k in response_fields]),
-              inv_utils.dobs; W=inv_utils.W), "\n"))
+        χ²(reduce(vcat, [copy(getfield(respₖ₊₁, k)) for k in response_fields]),
+            inv_utils.dobs; W=inv_utils.W),
+        "\n"))
     return μ
 end
 

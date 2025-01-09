@@ -150,7 +150,7 @@ For RTO, we can make a case and we have to actually look into how to best implem
 We'll have the `responseDistribution` and `modelDistribution` but these will be converted into `NamedTuple` before going through the mcmc sampler
 
 
-Like we have `model_utils` to conviniently see if we want to infer on some of the model fields or all of them, a `resp_utils` won't make a lot of sense because 
+Like we have `model_utils` to conveniently see if we want to infer on some of the model fields or all of them, a `resp_utils` won't make a lot of sense because 
 * If you have the data, why not use it, and make it fix
 * If you don't want to use that data, say `ϕ` for MT, simply exclude it in the `resp_fields`
 * Now, whenever you want to have something like this, you always need to provide a `struct` containing all the fields for the response variable but you can fill the unwanted field with anything. Simple!

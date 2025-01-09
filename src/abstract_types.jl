@@ -16,7 +16,6 @@ Abstract model type that is the supertype of all rock models in the package.
 """
 abstract type AbstractRockphyModel <: AbstractModel end
 
-
 # responses
 
 """

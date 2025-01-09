@@ -8,7 +8,7 @@ using Statistics
 # using ConcreteStructs
 using UnPack
 using ProgressMeter
-import Base:show
+import Base: show
 
 include("abstract_types.jl")
 include("probabilistic/init_distributions.jl")

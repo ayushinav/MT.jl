@@ -45,7 +45,7 @@ This is a slightly specific function which will allocate the matrices for only t
 """
 function jacobian_mt(resp_fields, var_eltype)
     eltypes = [var_eltype for k in resp_fields]
-    empty_mats = [[;;] for k in resp_fields]
+    empty_mats = [[] for k in resp_fields]
     return jacobian_mt{var_eltype}(empty_mats...)
 end
 
@@ -62,17 +62,13 @@ end
 overwrites a `jacobian_mt` cache to calculate the jacobian of a `model`. Need to pass `mt_jacobian_cache` for performance.
 If no `model_fields` or `response_fields` are passed, all the fields of `model` and the `response` (defined in `jacobian`) will be used.
 """
-function jacobian!(J::jacobian_mt, m::model, vars::Vector{T}, mtjc::mt_jacobian_cache;
-                   model_fields::Vector{Symbol}=[k for k in fieldnames(typeof(m))],
-                   response_fields::Vector{Symbol}=[k for k in fieldnames(typeof(J))]) where {
-                                                                                              T <:
-                                                                                              Union{
-                                                                                                    Float64,
-                                                                                                    Float32
-                                                                                                    },
-                                                                                              model <:
-                                                                                              AbstractModel
-                                                                                              }
+function jacobian!(J::jacobian_mt,
+        m::model,
+        vars::Vector{T},
+        mtjc::mt_jacobian_cache;
+        model_fields::Vector{Symbol}=[k for k in fieldnames(typeof(m))],
+        response_fields::Vector{Symbol}=[k for k in fieldnames(typeof(J))]) where {
+        T <: Union{Float64, Float32}, model <: AbstractModel}
     nl = 0
     @inbounds for k in model_fields
         ϵ = sqrt(eps(eltype(getfield(m, k))))

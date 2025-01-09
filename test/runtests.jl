@@ -1,11 +1,29 @@
-using MT
-using LinearAlgebra
-using Test
-using BenchmarkTools
+using ReTestItems, InteractiveUtils, Hwloc
 
-@testset "MT.jl" begin
-    include("forward_test.jl")
-    include("type_test.jl")
-    include("inverse_test.jl")
-    include("mcmc_test.jl")
-end
+@info sprint(versioninfo)
+
+const GROUP = lowercase(get(ENV, "GROUP", "all"))
+
+const RETESTITEMS_NWORKERS =
+    parse(Int, get(ENV, "RETESTITEMS_NWORKERS", string(min(Hwloc.num_physical_cores(), 4))))
+const RETESTITEMS_NWORKER_THREADS = parse(
+    Int,
+    get(
+        ENV,
+        "RETESTITEMS_NWORKER_THREADS",
+        string(max(Hwloc.num_virtual_cores() ÷ RETESTITEMS_NWORKERS, 1)),
+    ),
+)
+
+using MT
+
+@info "Running tests with $(RETESTITEMS_NWORKERS) workers and \
+       $(RETESTITEMS_NWORKER_THREADS) threads for group $(GROUP)"
+
+ReTestItems.runtests(
+    MT;
+    tags = (GROUP == "all" ? nothing : [Symbol(GROUP)]),
+    nworkers = RETESTITEMS_NWORKERS,
+    nworker_threads = RETESTITEMS_NWORKER_THREADS,
+    testitem_timeout = 3600,
+)

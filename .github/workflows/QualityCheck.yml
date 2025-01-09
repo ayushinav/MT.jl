@@ -1,6 +1,7 @@
 name: Code Quality Check
 
-on: [pull_request]
+on: 
+  push:
 
 jobs:
   code-style:

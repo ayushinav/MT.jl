@@ -115,7 +115,7 @@ function plot_response(plts::Vector{Any}; kwargs...)
         size=(400, 400 * length(plts)), margin=3Plots.mm, kwargs...)
 end
 
-# for any other survey, we will almost always have two options, either a layer model or model defined at differnt points. Our function does it on a layer model, for a model defined at points, one can simply interpolate and choose small grid spacing for the interpolator, converting the point model into a layer model
+# for any other survey, we will almost always have two options, either a layer model or model defined at different points. Our function does it on a layer model, for a model defined at points, one can simply interpolate and choose small grid spacing for the interpolator, converting the point model into a layer model
 """
     plot_model(m::MTModel; max_depth= m.h[end]*5, kwargs...)
 
