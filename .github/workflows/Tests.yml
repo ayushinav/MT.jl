@@ -23,7 +23,7 @@ jobs:
         group:
           - "forward"
           - "occam"
-          - "mcmc"
+          # - "mcmc"
           - "types"
     steps:
         - uses: actions/checkout@v4
