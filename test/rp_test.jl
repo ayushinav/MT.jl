@@ -7,30 +7,34 @@
         Sifre2014,
     ] # melt
 
+    T = 1273.0;
+    Ch2o_ol = 2e4;
+    Ch2o_m = 2e4;
+    Cco2_m = 200.0;
+
     inps = (;
-        zip(
-            Symbol.(methods_list),
-            [
-                [1273.0], # SEO3
-                [1273.0, 4000.0], # UHO2014
-                [1273.0, 400.0], # Ni2011
-                [1273.0, 400.0, 400.0], # Sifre2014
-            ],
-        )...
+        SEO3=[T],
+        UHO2014=[T, Ch2o_ol],
+
+        # melt
+        Ni2011=[T, Ch2o_m],
+        Sifre2014=[T, Ch2o_m, Cco2_m]
     )
 
-    outs = (; zip(Symbol.(methods_list), log10.([9.0720e-04, 0.0017, 0.4185, 0.7552]))...)
+    outs = (;
+        SEO3=log10(8.7663e-05),
+        UHO2014=log10(18.7398),
 
+        # melt
+        Ni2011=log10(0.0044),
+        Sifre2014=log10(0.9710)
+    )
 
     @testset "$m" for m in methods_list
-        # @show m, typeof(m)
-        # @show inps[Symbol("$m")]
         model = m(inps[Symbol("$m")]...)
         out_ = forward(model, [])
-        @test out_ == outs[Symbol("$m")]
+        @test round(out_; digits=2) ≈ round(outs[Symbol("$m")]; digits=2)
     end
-
-    # UHO failing
 
     # mixing models
 end

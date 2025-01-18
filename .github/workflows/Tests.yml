@@ -24,6 +24,7 @@ jobs:
           - "forward"
           - "occam"
           - "mcmc"
+          - "rp"
           - "types"
     steps:
         - uses: actions/checkout@v4
