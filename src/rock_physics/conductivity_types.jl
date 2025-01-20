@@ -49,13 +49,33 @@ mutable struct UHO2014{F1, F2} <: AbstractMineralModel
     Ch2o_ol::F2
 end
 
+mutable struct Jones2012{F1, F2} <: AbstractMineralModel
+    T::F1
+    Ch2o_ol::F2
+end
+
+mutable struct Poe2010{F1, F2} <: AbstractMineralModel
+    T::F1
+    Ch2o_ol::F2
+end
+
+mutable struct Wang2006{F1, F2} <: AbstractMineralModel
+    T::F1
+    Ch2o_ol::F2
+end
+
+mutable struct Yoshino2009{F1, F2} <: AbstractMineralModel
+    T::F1
+    Ch2o_ol::F2
+end
+
 mutable struct const_matrix{F} <: AbstractMineralModel
     σ::F
 end
 
 # melts
 """
-    Ni201(T, Ch2o_m)
+    Ni2011(T, Ch2o_m)
 
 Laboratory derived relation from electrical conductivity studies of hydrous and anhydrous basaltic melts.
 
@@ -97,6 +117,10 @@ mutable struct Sifre2014{F1, F2, F3} <: AbstractMeltModel
     T::F1
     Ch2o_m::F2
     Cco2_m::F3
+end
+
+mutable struct Gail2008{F1} <: AbstractMeltModel
+    T::F1
 end
 
 # ====== mixing laws =====
