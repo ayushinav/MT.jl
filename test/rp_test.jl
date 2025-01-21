@@ -47,11 +47,56 @@
         Gail2008=log10(168.8759)
     )
 
-    @testset "$m" for m in methods_list
-        model = m(inps[Symbol("$m")]...)
+    @testset "$(methods_list[i])" for i in eachindex(methods_list)
+        m = keys(outs)[i]
+        model = methods_list[i](inps[m]...)
         out_ = forward(model, [])
-        @test round(out_; digits=2) ≈ round(outs[Symbol("$m")]; digits=2)
+        @test round(out_; digits=2) ≈ round(outs[m]; digits=2)
     end
 
     # mixing models
 end
+
+
+#=
+VBRC outputs (We only check esig)
+
+disp(vbr_abhinav.out.electric.SEO3_ol);
+disp(vbr_abhinav.out.electric.UHO2014_ol);
+disp(vbr_abhinav.out.electric.jones2012_ol);
+disp(vbr_abhinav.out.electric.yosh2009_ol);
+disp(vbr_abhinav.out.electric.wang2006_ol);
+disp(vbr_abhinav.out.electric.poe2010_ol);
+
+
+    esig: 8.7663e-05
+    units: [1×1 struct]
+
+    esig_i: 1.8316e-05
+    esig_h: 2.6982e-04
+    esig_p: 18.7396
+      esig: 18.7398
+     units: [1×1 struct]
+
+    esig_A: 8.7663e-05
+    esig_H: 1.4289
+      esig: 1.4290
+     units: [1×1 struct]
+
+    esig_i: 3.8407e-05
+    esig_h: 1.6214e-04
+    esig_p: 0.2274
+      esig: 0.2276
+     units: [1×1 struct]
+
+    esig_A: 1.2043e-04
+    esig_H: 0.4137
+      esig: 0.4138
+     units: [1×1 struct]
+
+    esig_H: 2.8011e+03
+    esig_A: 6.0137e-04
+      esig: 2.8011e+03
+     units: [1×1 struct]
+
+=#
