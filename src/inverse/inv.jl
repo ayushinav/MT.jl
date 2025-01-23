@@ -45,7 +45,8 @@ function inverse!(mₖ::model1,
         response_fields::Vector{Symbol}=[k for k in fieldnames(typeof(robs))],
         model_fields::Vector{Symbol}=[k for k in fieldnames(typeof(mₖ))], # this will not be used but for the sake of generality for all inverse algs
         trans_utils::transform_utils=sigmoid_tf,
-        verbose::Bool=true) where {
+        verbose::Bool=true,
+        mᵣ=nothing) where {
         model1 <: AbstractGeophyModel, response <: AbstractGeophyResponse}
     prec = eltype(mₖ.m)
     model_fields = [:m]
@@ -85,6 +86,12 @@ function inverse!(mₖ::model1,
     itr = 1
     chi2 = prec(1e6)
 
+    if mᵣ !== nothing
+        for k in model_fields # to computational domain
+            getfield(mᵣ, k) .= trans_utils.itf.(log10.(getfield(mᵣ, k)))
+        end
+    end
+
     μ_last = 0.0
     while itr <= max_iters
         verbose && (print("$itr: "))
@@ -105,7 +112,7 @@ function inverse!(mₖ::model1,
             trans_utils, # to  transform to and from the computational domain
             linsolve_prob; # for faster inverse operations
             model_fields=model_fields,
-            response_fields=response_fields, verbose=verbose)
+            response_fields=response_fields, verbose=verbose, mᵣ=mᵣ)
 
         for k in model_fields # copying things to mₖ
             getfield(mₖ, k) .= getfield(mₖ₊₁, k)
@@ -117,6 +124,12 @@ function inverse!(mₖ::model1,
             break
         end
         itr += 1
+    end
+
+    if mᵣ !== nothing
+        for k in model_fields # back to model domain
+            getfield(mᵣ, k) .= 10.0 .^ trans_utils.tf.((getfield(mᵣ, k)))
+        end
     end
 
     return return_code(chi2 <= χ2, (μ=μ_last,), mₖ, χ2, chi2)

@@ -14,7 +14,7 @@ function stochastic_inverse(r_obs::resp1,
         err_resp::resp2,
         vars,
         alg_cache::rto_cache;
-        trans_utils::NamedTuple=(m=log_tf, h=lin_tf)) where {
+        trans_utils::NamedTuple=(m=sigmoid_tf, h=lin_tf)) where {
         resp1 <: AbstractGeophyResponse, resp2 <: AbstractGeophyResponse}
 
     # first an occam iteration to get the first model
@@ -28,8 +28,10 @@ function stochastic_inverse(r_obs::resp1,
     # alg_cache.m₀ is in model domain, not computational domain
 
     @show retcode.misfit_achieved
+
+    @show alg_cache.m₀.m
     pert_model = copy(alg_cache.m₀)
-    pert_m = zero(alg_cache.m₀.m)
+    ξ = zero(alg_cache.m₀.m)
 
     pert_resp = copy(r_obs)
 
@@ -37,18 +39,22 @@ function stochastic_inverse(r_obs::resp1,
     L = ∂(n)
 
     # check this L'L
-    lin_prob = LinearProblem(L'L, pert_m)
+    lin_prob = LinearProblem(L'L, ξ)
     linsolve_prob = init(lin_prob; assumptions=LinearSolve.OperatorAssumptions(true)) #; condition=LinearSolve.OperatorCondition.WellConditioned))
 
     μ = 1.0
+    resp_ = copy(r_obs)
+    ϕ = (1 + sqrt(5)) / 2
 
     m_chains = zeros(n, alg_cache.n_samples)
+    μ_chains = zeros(1, alg_cache.n_samples)
 
     # @show alg_cache.m₀.m
 
     @showprogress for i in 1:(alg_cache.n_samples)
+        @show i
 
-        ## RTO step
+        ## Step 1
 
         # perturbed response
         for k in fieldnames(typeof(r_obs))
@@ -59,23 +65,31 @@ function stochastic_inverse(r_obs::resp1,
         # perturbed model : the one we regularize against
         # we first draw a perturbation in the computational domain
 
-        pert_m .= rand(MultivariateNormal(
-            zero(pert_m), Diagonal(ones(n) .|> eltype(pert_m)))) # sample ξ
+        ξ .= rand(MultivariateNormal(zero(ξ), Diagonal(ones(n) .|> eltype(ξ)))) # sample ξ
 
-        rmul!(pert_m, inv(sqrt(μ)))
-        linsolve!(pert_model.m, linsolve_prob, L, pert_m)
+        rmul!(ξ, inv(sqrt(μ)))
+        linsolve!(pert_model.m, linsolve_prob, L, ξ)
 
-        # next steps are strictly making things geophysical here
         # pulling everything from computational domain
 
-        broadcast!(trans_utils[:m].tf, pert_model.m, pert_model.m) # we put everything to computational domain in inv.jl
+        broadcast!((x) -> (10.0^trans_utils[:m].tf(x)), pert_model.m, pert_model.m) # moving to model domain, we put everything to computational domain in inv.jl
+        # 10.0 .^ trans_utils.tf.(getfield(mₖ₊₁, k))
+        fill!(alg_cache.m₀.m, 100.0)
+
+        # @show alg_cache.m₀.m
+        # @show pert_model.m
 
         ret_code = inverse!(alg_cache.m₀, r_obs, vars, occam_cache([μ, μ]); W=W,
             χ2=alg_cache.χ2, max_iters=alg_cache.max_iters_occam,
             response_fields=alg_cache.response_fields,
             verbose=alg_cache.verbose, mᵣ=pert_model)
 
-        ## TKO step
+        m_chains[:, i] .= alg_cache.m₀.m
+
+        # @show μ
+        # @show alg_cache.m₀.m
+
+        ## Step 2
 
         # perturbed response
         for k in fieldnames(typeof(r_obs))
@@ -83,10 +97,31 @@ function stochastic_inverse(r_obs::resp1,
                 getfield(r_obs, k), Diagonal(getfield(err_resp, k))))
         end
 
-        function f(x) end
+        broadcast!((x) -> (trans_utils[:m].itf(log10.(x))), alg_cache.m₀.m, alg_cache.m₀.m) # to computational domain
+        rmul!(alg_cache.m₀.m, sqrt(μ)) # current μ
 
-        x₁ = μgrid[1]
-        x₃ = μgrid[end]
+        function f(x)
+            rmul!(alg_cache.m₀.m, sqrt(inv(x)))
+
+            # broadcast!(trans_utils[:m].itf, alg_cache.m₀.m, alg_cache.m₀.m) # to model domain
+            broadcast!((x) -> (10.0^trans_utils[:m].tf(x)), alg_cache.m₀.m, alg_cache.m₀.m) #  to model domain
+
+            forward!(resp_, alg_cache.m₀, vars)
+            chi2_err = χ²(
+                reduce(vcat, [copy(getfield(resp_, k)) for k in alg_cache.response_fields]),
+                reduce(vcat, [copy(getfield(r_obs, k)) for k in alg_cache.response_fields]);
+                W=W)
+
+            # broadcast!(trans_utils[:m].tf, alg_cache.m₀.m, alg_cache.m₀.m) # to computational domain
+            broadcast!(
+                (x) -> (trans_utils[:m].itf(log10.(x))), alg_cache.m₀.m, alg_cache.m₀.m) # to computational domain
+            rmul!(alg_cache.m₀.m, sqrt(x))
+
+            return chi2_err
+        end
+
+        x₁ = alg_cache.μgrid[1]
+        x₃ = alg_cache.μgrid[end]
         x₂ = 10.0^((log10(x₃) + ϕ * log10(x₁)) / (1 + ϕ))
         x₄ = 10.0^((log10(x₁) + ϕ * log10(x₃)) / (1 + ϕ))
 
@@ -120,27 +155,14 @@ function stochastic_inverse(r_obs::resp1,
         end
         μ = sqrt(x₁ * x₃)
 
-        # At the moment mₖ₊₁ contains the update for the last μ, we rewrite it with the best μ found.
+        # copyto!(alg_cache.m₀.m, m_chains[:, i])
+        μ_chains[1, i] = μ
 
-        # the next occam function needs m to be a function of μ and DOES NOT INCLUDE ANY REGULARIZATION
-        # perturbed response
-        for k in fieldnames(typeof(r_obs))
-            getfield(pert_resp, k) .= rand(MultivariateNormal(
-                getfield(r_obs, k), Diagonal(getfield(err_resp, k))))
-        end
-
-        ret_code = inverse!(copy(alg_cache.m₀), r_obs, vars, # 23 use copy(m₀) because we don't want to perturb m₀
-            occam_cache(alg_cache.μgrid);
-            W=W, χ2=alg_cache.χ2, max_iters=1,
-            response_fields=alg_cache.response_fields, verbose=alg_cache.verbose)
-
-        μ = ret_code.parameters[:μ]
-
-        m_chains[:, i] .= alg_cache.m₀.m
+        # @show μ
+        # @show m_chains[:, i]
     end
 
-    return Turing.Chains(
-        broadcast(trans_utils[:m].itf, m_chains)', [Symbol("ρ[$i]") for i in 1:n])
+    return Turing.Chains(vcat(m_chains, μ_chains)', [Symbol("m[$i]") for i in 1:(n + 1)])
 end
 
 # mutable struct RTO_MTModel <: AbstractGeophyModel
@@ -148,10 +170,3 @@ end
 #     h
 #     μ
 # end
-
-#= RTO issue
-We know about observed data d_obs, the errors associated in C\_
-
-We first use Occam to get m⁰
-
-=#
