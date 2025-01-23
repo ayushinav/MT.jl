@@ -2,6 +2,9 @@
 
 fO2(T) = 10.0f0^(-24441.9f0 * inv(T) + 13.296f0)
 
+arrh_dry(S, H, k, T) = S * exp(-H * inv(k * T))
+arrh_wet(S, H, k, T, w, a, r) = S * (w^r) * exp(-(H - a * (w^inv(3.0f0))) * inv(k * T))
+
 # minerals
 
 function forward(m::SEO3, p)
@@ -9,10 +12,10 @@ function forward(m::SEO3, p)
     fO₂ = fO2(m.T)
 
     # sT 
-    bfe = S_bfe * exp(-H_bfe * inv(boltz_k * m.T))
-    bmg = S_bmg * exp(-H_bmg * inv(boltz_k * m.T))
-    ufe = S_ufe * exp(-H_ufe * inv(boltz_k * m.T))
-    umg = S_umg * exp(-H_umg * inv(boltz_k * m.T))
+    bfe = arrh_dry(S_bfe, H_bfe, boltz_k, m.T)
+    bmg = arrh_dry(S_bmg, H_bmg, boltz_k, m.T)
+    ufe = arrh_dry(S_ufe, H_ufe, boltz_k, m.T)
+    umg = arrh_dry(S_umg, H_umg, boltz_k, m.T)
     concFe = bfe + 3.33f24 * exp(-0.02f0 * inv(boltz_k * m.T)) * fO₂^(1 / 6)
     concMg = bmg + 6.21f30 * exp(-1.83f0 * inv(boltz_k * m.T)) * fO₂^(1 / 6)
     σ = concFe * ufe * charge_e + 2.0f0 * concMg * umg * charge_e
@@ -21,14 +24,13 @@ function forward(m::SEO3, p)
 end
 
 function forward(m::UHO2014, p)
+
+    # Va = 0 so no dependence on pressure
     @unpack H_v, S_v, H_p, S_p, H_h, S_h, a_h, r_h = params_UHO2014
 
-    σ_v = S_v * exp(-H_v * inv(gas_R * m.T))
-    σ_p = S_p * exp(-H_p * inv(gas_R * m.T))
-
-    H_wet = H_h - a_h * (m.Ch2o_ol^inv(3.0f0))
-    S_wet = S_h * (m.Ch2o_ol^r_h)
-    σ_h = S_wet * exp(-H_wet * inv(gas_R * m.T))
+    σ_v = arrh_dry(S_v, H_v, gas_R, m.T)
+    σ_p = arrh_dry(S_p, H_p, gas_R, m.T)
+    σ_h = arrh_wet(S_h, H_h, gas_R, m.T, m.Ch2o_ol, a_h, r_h)
 
     σ = σ_v + σ_p + σ_h
 
@@ -36,6 +38,80 @@ function forward(m::UHO2014, p)
 end
 
 forward(m::const_matrix, p) = log10(m.σ)
+
+function forward(m::Jones2012, p)
+    @unpack S, r, H, a = params_Jones2012
+
+    @unpack S_bfe, H_bfe, S_bmg, H_bmg, S_ufe, H_ufe, S_umg, H_umg = params_SEO3
+
+    # hydrous
+    σ_H = arrh_wet(S, H, boltz_k, m.T, m.Ch2o_ol / 1.0f4, a, r)
+    fO₂ = fO2(m.T)
+
+    # anhydrous
+
+    bfe = arrh_dry(S_bfe, H_bfe, boltz_k, m.T)
+    bmg = arrh_dry(S_bmg, H_bmg, boltz_k, m.T)
+    ufe = arrh_dry(S_ufe, H_ufe, boltz_k, m.T)
+    umg = arrh_dry(S_umg, H_umg, boltz_k, m.T)
+    concFe = bfe + 3.33f24 * exp(-0.02f0 * inv(boltz_k * m.T)) * fO₂^(1 / 6)
+    concMg = bmg + 6.21f30 * exp(-1.83f0 * inv(boltz_k * m.T)) * fO₂^(1 / 6)
+    σ_A = concFe * ufe * charge_e + 2.0f0 * concMg * umg * charge_e
+
+    σ = σ_H + σ_A
+
+    return log10(σ)
+end
+
+function forward(m::Poe2010, p)
+    @unpack S_H100, H_H100, a_H100, r_H100, S_H010, H_H010, a_H010, r_H010, S_H001, H_H001, a_H001, r_H001, S_A100, H_A100, S_A010, H_A010, S_A001, H_A001 = params_Poe2010
+
+    # Anhydrous
+    σ_A100 = arrh_dry(S_A100, H_A100, boltz_k, m.T)
+    σ_A010 = arrh_dry(S_A010, H_A010, boltz_k, m.T)
+    σ_A001 = arrh_dry(S_A001, H_A001, boltz_k, m.T)
+    σ_A = (σ_A001 .* σ_A010 * σ_A100)
+
+    # Hydrous
+    σ_H100 = arrh_wet(S_H100, H_H100, boltz_k, m.T, m.Ch2o_ol * 1.0f-4, a_H100, r_H100)
+    σ_H010 = arrh_wet(S_H010, H_H010, boltz_k, m.T, m.Ch2o_ol * 1.0f-4, a_H010, r_H010)
+    σ_H001 = arrh_wet(S_H001, H_H001, boltz_k, m.T, m.Ch2o_ol * 1.0f-4, a_H001, r_H001)
+    σ_H = cbrt(σ_H001 * σ_H010 * σ_H100)
+
+    σ = σ_H + σ_A
+
+    return log10(σ)
+end
+
+function forward(m::Yoshino2009, p)
+    @unpack S_i, H_i, S_h, H_h, S_p, H_p, a_p, r_p = params_Yoshino2009
+
+    # ionic conduction
+    σ_i = arrh_dry(S_i, H_i, boltz_k, m.T)
+
+    # polaron hopping
+    σ_h = arrh_dry(S_h, H_h, boltz_k, m.T)
+
+    # proton conduction
+    σ_p = arrh_wet(S_p, H_p, boltz_k, m.T, m.Ch2o_ol * 1.0f-4, a_p, r_p)
+
+    σ = σ_i + σ_h + σ_p
+
+    return log10(σ)
+end
+
+function forward(m::Wang2006, p)
+    @unpack S_H, H_H, a_H, r_H, S_A, H_A = params_Wang2006
+
+    # anhydrous
+
+    σ_A = arrh_dry(S_A, H_A, gas_R, m.T)
+    σ_H = arrh_wet(S_H, H_H, gas_R, m.T, m.Ch2o_ol * 1.0f-4, a_H, r_H)
+
+    σ = σ_H + σ_A
+
+    return log10(σ)
+end
 
 # melt
 
@@ -65,5 +141,11 @@ function forward(m::Sifre2014, p)
     # summation of conduction mechanisms
     σ = melt_co2 + melt_h2o
 
+    return log10(σ)
+end
+
+function forward(m::Gail2008, p)
+    @unpack S, H = params_Gail2008
+    σ = arrh_dry(S, H, gas_R, m.T)
     return log10(σ)
 end
