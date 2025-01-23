@@ -291,6 +291,7 @@ end
 # TODO? : abstract mixing type?
 """
     HS1962_plus
+
 Hashim-Strikman upper bound for mixing 2 phases
 
 ## Usage
@@ -313,6 +314,7 @@ Geophysics 2010; 75 (6): E247–E265. doi: https://doi.org/10.1190/1.3509781
 mutable struct HS1962_plus end
 """
     HS1962_minus
+
 Hashim-Strikman lower bound for mixing 2 phases
 
 ## Usage
