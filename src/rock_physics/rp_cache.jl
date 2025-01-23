@@ -39,4 +39,4 @@ const params_Sifre2014 = (
     # C2O melt
     a_c2o=789166.0f0, b_c2o=0.1808f0, c_c2o=32820.0f0, d_c2o=5.50f-5, e_c2o=5.7956f0)
 
-const params_Gail2008 = (S=3440.0f0, H=31.9f0)
+const params_Gaillard2008 = (S=3440.0f0, H=31.9f0)

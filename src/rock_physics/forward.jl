@@ -144,8 +144,8 @@ function forward(m::Sifre2014, p)
     return log10(σ)
 end
 
-function forward(m::Gail2008, p)
-    @unpack S, H = params_Gail2008
+function forward(m::Gaillard2008, p)
+    @unpack S, H = params_Gaillard2008
     σ = arrh_dry(S, H, gas_R, m.T)
     return log10(σ)
 end

@@ -88,10 +88,6 @@ function forward(m::model, p) where {model <: mixing_models}
 end
 
 function mix_models(σs, ϕ, ::HS1962_plus)
-    # σ_max = maximum(σs);
-
-    # σ_plus = inv(sum(ϕ .* inv.(σ_max .+ σs))) - σ_max
-    # return σ_plus
 
     σ_max = 10.0f0^maximum(σs)
     σ_min = 10.0f0^minimum(σs)
@@ -106,19 +102,13 @@ end
 
 function mix_models(σs, ϕ, mal::MAL)
 
-    # σ_fluid = 10f0 ^ maximum(σs)
-    # σ_matrix = 10f0 ^ minimum(σs)
-
     σ_fluid = 10.0f0^(σs[2])
     σ_matrix = 10.0f0^(σs[1])
-
-    # @show σ_fluid, σ_matrix, σs, 10 .^ σs
 
     phi = first(ϕ)
     sig = σ_fluid
 
     if phi < 1
-        # [MAL(0.2)]
         p = log10(1 - phi^mal.m) * inv(log10(1 - phi))
         sig = σ_fluid * phi^mal.m + σ_matrix * (1 - phi)^p
     end
@@ -127,10 +117,16 @@ function mix_models(σs, ϕ, mal::MAL)
 end
 
 function mix_models(σs, ϕ, ::HS1962_minus)
-    σ_min = minimum(σs)
+    
+    σ_max = 10.0f0^maximum(σs)
+    σ_min = 10.0f0^minimum(σs)
+    phi = first(ϕ)
 
-    σ_minus = inv(sum(ϕ .* inv.(σ_max .+ σs))) - σ_min
-    return σ_minus
+    num = 3 * (phi) * (σ_max - σ_min) # numerator
+    den = 3 * σ_min +(1 - phi) * (σ_max - σ_min) # denominator
+    esig = σ_min * (1 + (num / den))
+
+    return log10(esig)
 end
 
 function mix_models(σs, ϕ, ::single_phase)
