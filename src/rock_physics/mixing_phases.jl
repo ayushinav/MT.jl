@@ -19,9 +19,10 @@ returns a `mixing_models` type containing all the variables for rock physics mod
       + `single_phase` : no mixing, when there's only a single phase
       + `HS1962_plus` : mixing two phases to get the Hashim Strikman upper bound
       + `HS1962_minus` : mixing two phases to get the Hashim Strikman lower bound
+      + `MAL` : mixing the two phases using the Modified Archie's Law
 """
 function construct_mixing_models(
-        params::Vector, p_names::Vector, ϕ::Vector, model_list::Vector, mixing_type::Vector) # TODO : make mixing type vector?
+        params::Vector, p_names::Vector, ϕ::Vector, model_list::Vector, mixing_type::Vector)
     var_list = vcat([[fieldnames(ir)...] for ir in model_list]...)
     unique!(var_list)
     f_ = reduce(&, [ir ∈ p_names for ir in var_list])
@@ -99,6 +100,18 @@ function mix_models(σs, ϕ, ::HS1962_plus)
     return log10(esig)
 end
 
+function mix_models(σs, ϕ, ::HS1962_minus)
+    σ_max = 10.0f0^maximum(σs)
+    σ_min = 10.0f0^minimum(σs)
+    phi = first(ϕ)
+
+    num = 3 * (phi) * (σ_max - σ_min) # numerator
+    den = 3 * σ_min + (1 - phi) * (σ_max - σ_min) # denominator
+    esig = σ_min * (1 + (num / den))
+
+    return log10(esig)
+end
+
 function mix_models(σs, ϕ, mal::MAL)
     σ_fluid = 10.0f0^(σs[2])
     σ_matrix = 10.0f0^(σs[1])
@@ -112,18 +125,6 @@ function mix_models(σs, ϕ, mal::MAL)
     end
 
     return log10(sig)
-end
-
-function mix_models(σs, ϕ, ::HS1962_minus)
-    σ_max = 10.0f0^maximum(σs)
-    σ_min = 10.0f0^minimum(σs)
-    phi = first(ϕ)
-
-    num = 3 * (phi) * (σ_max - σ_min) # numerator
-    den = 3 * σ_min + (1 - phi) * (σ_max - σ_min) # denominator
-    esig = σ_min * (1 + (num / den))
-
-    return log10(esig)
 end
 
 function mix_models(σs, ϕ, ::single_phase)

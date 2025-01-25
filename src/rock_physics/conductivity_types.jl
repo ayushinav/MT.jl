@@ -47,16 +47,17 @@ For further reading look at the references below.
   - `T` : Temperature of olivine (in K)
   - `Ch2o_ol` : water concentration in olivine (in ppm)
 
-## Usage
-
-julia> model = UHO2014(1000 + 273., 2e4)
-
-julia> log_cond = forward(model, [])
-
 ## References
 
 Gardés, E., F. Gaillard, and P. Tarits (2014), "Toward a unified hydrous olivine electrical conductivity law",
 Geochem. Geophys. Geosyst., 15, 4984–5000, doi:10.1002/2014GC005496.
+
+## Usage
+```
+julia> model = UHO2014(1000 + 273., 2e4)
+
+julia> log_cond = forward(model, [])
+```
 """
 mutable struct UHO2014{F1, F2} <: AbstractMineralModel
     T::F1
@@ -181,11 +182,11 @@ end
 """
     const_matrix(σ)
 
-Fixed electrical conductivity model for a solid matrix.
+Fixed electrical conductivity model for the phase.
 
 ## Arguments
 
-  - `σ` : Conductivity of the solid matrix
+  - `σ` : Conductivity of the phase
 
 ## Usage
 
@@ -196,6 +197,8 @@ julia> log_cond = forward(model, [])
 mutable struct const_matrix{F} <: AbstractMineralModel
     σ::F
 end
+
+# ========================================================================================================== 
 
 # melts
 """
@@ -364,6 +367,12 @@ mutable struct MAL
 end
 mutable struct HSn_plus end
 mutable struct HSn_minus end
+
+"""
+    single_phase
+Single phase only conductivity. Assumes the rock matrix is composed of a single phase only.
+
+"""
 mutable struct single_phase end
 
 # == response

@@ -66,6 +66,6 @@
             [mixing_list[i]])
 
         out_ = forward(model, [])
-        @test round(out_; digits=2) ≈ round(mixing_outs[i]; digits=2)
+        @test round(first(out_.σ); digits=2) ≈ round(mixing_outs[i]; digits=2)
     end
 end
