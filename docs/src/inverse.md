@@ -1,4 +1,4 @@
-<!-- # Inversion
+# Inversion
 
 ## Brief introduction
 Inverse problems in geophysics are notoriously ill-posed with non-unique solutions. MT inversion is no different. Occam inversion is one of the most popular inversion algorithms to approach MT problems, and it comes with its own challenges. Not much to argue when dealing with compiling fortran codes and even less when one realizes that the Occam code doesn't work very well on Mac chips (not sure about AMD ones). Here we have the Occam inversion code on a test synthetic dataset, as easy as it can be. 
@@ -75,8 +75,7 @@ nothing # hide
 
 Finally, the `inverse!` returns a `retcode` that might be beneficial while building customized codes for those specific cases.
 ```@example inverse_demo
-retcode = inverse!(m_test, resp, ω, Occam(), max_iters= 10)
-nothing # hide
+retcode = inverse!(m_test, resp, ω, Occam(), max_iters= 10; verbose = false)
 ```
 
- That easy and that fast! -->
+ That easy and that fast!

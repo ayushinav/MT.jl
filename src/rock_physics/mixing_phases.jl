@@ -19,9 +19,10 @@ returns a `mixing_models` type containing all the variables for rock physics mod
       + `single_phase` : no mixing, when there's only a single phase
       + `HS1962_plus` : mixing two phases to get the Hashim Strikman upper bound
       + `HS1962_minus` : mixing two phases to get the Hashim Strikman lower bound
+      + `MAL` : mixing the two phases using the Modified Archie's Law
 """
 function construct_mixing_models(
-        params::Vector, p_names::Vector, ϕ::Vector, model_list::Vector, mixing_type::Vector) # TODO : make mixing type vector?
+        params::Vector, p_names::Vector, ϕ::Vector, model_list::Vector, mixing_type::Vector)
     var_list = vcat([[fieldnames(ir)...] for ir in model_list]...)
     unique!(var_list)
     f_ = reduce(&, [ir ∈ p_names for ir in var_list])
@@ -88,11 +89,6 @@ function forward(m::model, p) where {model <: mixing_models}
 end
 
 function mix_models(σs, ϕ, ::HS1962_plus)
-    # σ_max = maximum(σs);
-
-    # σ_plus = inv(sum(ϕ .* inv.(σ_max .+ σs))) - σ_max
-    # return σ_plus
-
     σ_max = 10.0f0^maximum(σs)
     σ_min = 10.0f0^minimum(σs)
     phi = first(ϕ)
@@ -104,33 +100,31 @@ function mix_models(σs, ϕ, ::HS1962_plus)
     return log10(esig)
 end
 
+function mix_models(σs, ϕ, ::HS1962_minus)
+    σ_max = 10.0f0^maximum(σs)
+    σ_min = 10.0f0^minimum(σs)
+    phi = first(ϕ)
+
+    num = 3 * (phi) * (σ_max - σ_min) # numerator
+    den = 3 * σ_min + (1 - phi) * (σ_max - σ_min) # denominator
+    esig = σ_min * (1 + (num / den))
+
+    return log10(esig)
+end
+
 function mix_models(σs, ϕ, mal::MAL)
-
-    # σ_fluid = 10f0 ^ maximum(σs)
-    # σ_matrix = 10f0 ^ minimum(σs)
-
     σ_fluid = 10.0f0^(σs[2])
     σ_matrix = 10.0f0^(σs[1])
-
-    # @show σ_fluid, σ_matrix, σs, 10 .^ σs
 
     phi = first(ϕ)
     sig = σ_fluid
 
     if phi < 1
-        # [MAL(0.2)]
         p = log10(1 - phi^mal.m) * inv(log10(1 - phi))
         sig = σ_fluid * phi^mal.m + σ_matrix * (1 - phi)^p
     end
 
     return log10(sig)
-end
-
-function mix_models(σs, ϕ, ::HS1962_minus)
-    σ_min = minimum(σs)
-
-    σ_minus = inv(sum(ϕ .* inv.(σ_max .+ σs))) - σ_min
-    return σ_minus
 end
 
 function mix_models(σs, ϕ, ::single_phase)

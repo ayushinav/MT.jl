@@ -25,6 +25,7 @@ Check out the implementation details:
 * [inverse](inverse.md)
 <!-- * [probabilistic_inverse](probabilisitc_inverse.md) -->
 * [interface_guide](interface_guide.md)
+* [rock physics](rock_physics.md)
 
 <!-- ```@meta
 CurrentModule = MT
