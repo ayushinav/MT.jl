@@ -53,6 +53,7 @@ Gardés, E., F. Gaillard, and P. Tarits (2014), "Toward a unified hydrous olivin
 Geochem. Geophys. Geosyst., 15, 4984–5000, doi:10.1002/2014GC005496.
 
 ## Usage
+
 ```
 julia> model = UHO2014(1000 + 273., 2e4)
 
@@ -370,8 +371,8 @@ mutable struct HSn_minus end
 
 """
     single_phase
-Single phase only conductivity. Assumes the rock matrix is composed of a single phase only.
 
+Single phase only conductivity. Assumes the rock matrix is composed of a single phase only.
 """
 mutable struct single_phase end
 

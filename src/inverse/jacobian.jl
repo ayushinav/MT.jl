@@ -28,7 +28,7 @@ This is a more general function which will allocate the matrices for only the re
 Useful while testing for different fields of `model` and `response`.
 """
 function jacobian_mt(resp_fields, var_eltype, mod, mod_fields)
-    empty_mats = [[;;] for k in resp_fields]
+    empty_mats = [Matrix{Any}(nothing, 0, 0) for k in resp_fields]
     j = jacobian_mt{var_eltype}(empty_mats...)
 
     n = sum([length(getfield(mod, k)) for k in mod_fields])
@@ -45,7 +45,7 @@ This is a slightly specific function which will allocate the matrices for only t
 """
 function jacobian_mt(resp_fields, var_eltype)
     eltypes = [var_eltype for k in resp_fields]
-    empty_mats = [[;;] for k in resp_fields]
+    empty_mats = [Matrix{Any}(nothing, 0, 0) for k in resp_fields]
     return jacobian_mt{var_eltype}(empty_mats...)
 end
 

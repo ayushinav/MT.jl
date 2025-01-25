@@ -38,15 +38,17 @@ end
         ϕ::T2 # phase ratios
         model_list::Vector{<:Type}
         mixing_type::Vector
-Initializes a placeholder for all the variables to be initialized for use in the `stochastic_inverse`(@ref stochastic_inverse). 
+
+Initializes a placeholder for all the variables to be initialized for use in the `stochastic_inverse`(@ref stochastic_inverse).
 Has the same structure as `construct_mixing_models`(@ref construct_mixing_models) but instead inputs distributions, and therefore respects the same form.
 
 ## Arguments
-- `params` : A distribution from `Distributions.jl` to sample the rock physics parameters.
-- `p_names` : The `params` vector contains the distributions for the parameters specified by the vector of symbols called `p_names`
-- `ϕ` : Vol. fraction of different phases (can be a distribution or a vector)
-- `model_list` : list of models to be used in mixing
-- `mixing_type` : Type of mixing model to be used
+
+  - `params` : A distribution from `Distributions.jl` to sample the rock physics parameters.
+  - `p_names` : The `params` vector contains the distributions for the parameters specified by the vector of symbols called `p_names`
+  - `ϕ` : Vol. fraction of different phases (can be a distribution or a vector)
+  - `model_list` : list of models to be used in mixing
+  - `mixing_type` : Type of mixing model to be used
 """
 mutable struct RockphyModelDistribution{
     T1 <: Union{Distribution, AbstractArray}, T2 <: Union{Distribution, AbstractArray}} <:

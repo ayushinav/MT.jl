@@ -1,13 +1,13 @@
 @testitem "rock-physics tests" tags = [:rp] begin
     using MT
     methods_list = [
-        # mineral
         SEO3,
         UHO2014,
         Jones2012,
         Yoshino2009,
         Wang2006,
         Poe2010,
+
         # melt
         Ni2011,
         Sifre2014,
