@@ -86,11 +86,11 @@ function inverse!(mₖ::model1,
     itr = 1
     chi2 = prec(1e6)
 
-    if mᵣ !== nothing
-        for k in model_fields # to computational domain
-            getfield(mᵣ, k) .= trans_utils.itf.(log10.(getfield(mᵣ, k)))
-        end
-    end
+    # if mᵣ !== nothing
+    #     for k in model_fields # to computational domain
+    #         getfield(mᵣ, k) .= trans_utils.itf.(log10.(getfield(mᵣ, k)))
+    #     end
+    # end
 
     μ_last = 0.0
     while itr <= max_iters
@@ -126,11 +126,11 @@ function inverse!(mₖ::model1,
         itr += 1
     end
 
-    if mᵣ !== nothing
-        for k in model_fields # back to model domain
-            getfield(mᵣ, k) .= 10.0 .^ trans_utils.tf.((getfield(mᵣ, k)))
-        end
-    end
+    # if mᵣ !== nothing
+    #     for k in model_fields # back to model domain
+    #         getfield(mᵣ, k) .= 10.0 .^ trans_utils.tf.((getfield(mᵣ, k)))
+    #     end
+    # end
 
     return return_code(chi2 <= χ2, (μ=μ_last,), mₖ, χ2, chi2)
 end

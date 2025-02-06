@@ -7,6 +7,7 @@ function ∂(n)
     for i in 2:n
         D[i, i - 1] = -1
     end
+    D[1,1] = 0.;
     return D
 end
 """

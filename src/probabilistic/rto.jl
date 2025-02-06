@@ -30,6 +30,7 @@ function stochastic_inverse(r_obs::resp1,
     @show retcode.misfit_achieved
 
     @show alg_cache.m₀.m
+
     pert_model = copy(alg_cache.m₀)
     ξ = zero(alg_cache.m₀.m)
 
@@ -39,8 +40,8 @@ function stochastic_inverse(r_obs::resp1,
     L = ∂(n)
 
     # check this L'L
-    lin_prob = LinearProblem(L'L, ξ)
-    linsolve_prob = init(lin_prob; assumptions=LinearSolve.OperatorAssumptions(true)) #; condition=LinearSolve.OperatorCondition.WellConditioned))
+    # lin_prob = LinearProblem(L'L, ξ)
+    # linsolve_prob = init(lin_prob; assumptions=LinearSolve.OperatorAssumptions(true)) #; condition=LinearSolve.OperatorCondition.WellConditioned))
 
     μ = 1.0
     resp_ = copy(r_obs)
@@ -52,27 +53,31 @@ function stochastic_inverse(r_obs::resp1,
     # @show alg_cache.m₀.m
 
     @showprogress for i in 1:(alg_cache.n_samples)
-        @show i
+        (i% 5 == 0) && (@show i)
 
         ## Step 1
 
         # perturbed response
         for k in fieldnames(typeof(r_obs))
-            getfield(pert_resp, k) .= rand(MultivariateNormal(
-                getfield(r_obs, k), Diagonal(getfield(err_resp, k))))
+            getfield(pert_resp, k) .= getfield(r_obs, k) .+ randn(size(getfield(err_resp, k))) .* getfield(err_resp, k)
+                ## TODO
         end
 
         # perturbed model : the one we regularize against
         # we first draw a perturbation in the computational domain
 
-        ξ .= rand(MultivariateNormal(zero(ξ), Diagonal(ones(n) .|> eltype(ξ)))) # sample ξ
+        ξ .= randn(eltype(ξ), size(ξ)) # sample ξ
 
-        rmul!(ξ, inv(sqrt(μ)))
-        linsolve!(pert_model.m, linsolve_prob, L, ξ)
+        # rmul!(ξ, inv(sqrt(μ)))
+        # linsolve!(pert_model.m, linsolve_prob, L, ξ)
+
+        pert_model.m .= sqrt(μ) .* L * ξ
+
+        # pert_model.m = ξ .* inv(sqrt(μ)) # L * ξ is in computational domain 
 
         # pulling everything from computational domain
 
-        broadcast!((x) -> (10.0^trans_utils[:m].tf(x)), pert_model.m, pert_model.m) # moving to model domain, we put everything to computational domain in inv.jl
+        # broadcast!((x) -> (10.0^trans_utils[:m].tf(x)), pert_model.m, pert_model.m) # moving to model domain, we put everything to computational domain in inv.jl
         # 10.0 .^ trans_utils.tf.(getfield(mₖ₊₁, k))
         fill!(alg_cache.m₀.m, 100.0)
 
@@ -82,7 +87,7 @@ function stochastic_inverse(r_obs::resp1,
         ret_code = inverse!(alg_cache.m₀, r_obs, vars, occam_cache([μ, μ]); W=W,
             χ2=alg_cache.χ2, max_iters=alg_cache.max_iters_occam,
             response_fields=alg_cache.response_fields,
-            verbose=alg_cache.verbose, mᵣ=pert_model)
+            verbose=alg_cache.verbose, mᵣ=pert_model, trans_utils = trans_utils[:m])
 
         m_chains[:, i] .= alg_cache.m₀.m
 
@@ -93,8 +98,7 @@ function stochastic_inverse(r_obs::resp1,
 
         # perturbed response
         for k in fieldnames(typeof(r_obs))
-            getfield(pert_resp, k) .= rand(MultivariateNormal(
-                getfield(r_obs, k), Diagonal(getfield(err_resp, k))))
+            getfield(pert_resp, k) .= getfield(r_obs, k) .+ randn(size(getfield(err_resp, k))) .* getfield(err_resp, k)
         end
 
         broadcast!((x) -> (trans_utils[:m].itf(log10.(x))), alg_cache.m₀.m, alg_cache.m₀.m) # to computational domain

@@ -49,8 +49,9 @@ function pre_image(mDist::mdist,
         return (m=pred, h=[mDist.h..., sum(mDist.h)]), grid, trans_utils, mDist
     else
         m2 = zeros(eltype(grid[:h]), size(pred, 1), length(grid[:h]))
+        z_ = cumsum(grid[:h])
         for i in 1:size(pred, 1)
-            m2[i, :] .= get_ρ_at_z(pred[i, :], grid[:h])
+            m2[i, :] .= get_ρ_at_z(pred[i, :], z_)
         end
         return (m=m2, h=grid[:h]), grid, trans_utils, mDist
     end

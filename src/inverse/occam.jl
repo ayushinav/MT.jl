@@ -93,8 +93,7 @@ function occam_step!(mₖ₊₁::model1, # to store the next update, which will 
             x .* inv_utils.D' * inv_utils.D .+ lin_utils.Jₖ' * inv_utils.W * lin_utils.Jₖ,
             lin_utils.Jₖ' *
             inv_utils.W *
-            (inv_utils.dobs + lin_utils.Jₖ * lin_utils.mₖ - lin_utils.Fₖ) +
-            μ .* inv_utils.D' * inv_utils.D * mᵣ.m)
+            (inv_utils.dobs + lin_utils.Jₖ * lin_utils.mₖ - lin_utils.Fₖ) + mᵣ.m)
         for k in model_fields # to model domain
             getfield(mₖ₊₁, k) .= 10.0 .^ trans_utils.tf.(getfield(mₖ₊₁, k))
         end
