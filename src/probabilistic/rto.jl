@@ -21,27 +21,18 @@ function stochastic_inverse(r_obs::resp1,
     W = Diagonal(vcat([inv.(getfield(err_resp, k)) .^ 2
                        for k in fieldnames(typeof(err_resp))]...))
 
-    retcode = inverse!(alg_cache.m₀, r_obs, vars, occam_cache(alg_cache.μgrid);
-        W=W, χ2=alg_cache.χ2, max_iters=alg_cache.max_iters_occam,
-        response_fields=alg_cache.response_fields, verbose=alg_cache.verbose)
+    # retcode = inverse!(alg_cache.m₀, r_obs, vars, occam_cache(alg_cache.μgrid);
+    #     W=W, χ2=alg_cache.χ2, max_iters=alg_cache.max_iters_occam,
+    #     response_fields=alg_cache.response_fields, verbose=alg_cache.verbose)
 
-    # alg_cache.m₀ is in model domain, not computational domain
-
-    @show retcode.misfit_achieved
-
-    @show alg_cache.m₀.m
+    # @show retcode.misfit_achieved
 
     pert_model = copy(alg_cache.m₀)
-    ξ = zero(alg_cache.m₀.m)
 
     pert_resp = copy(r_obs)
 
     n = length(alg_cache.m₀.m)
     L = ∂(n)
-
-    # check this L'L
-    # lin_prob = LinearProblem(L'L, ξ)
-    # linsolve_prob = init(lin_prob; assumptions=LinearSolve.OperatorAssumptions(true)) #; condition=LinearSolve.OperatorCondition.WellConditioned))
 
     μ = 1.0
     resp_ = copy(r_obs)
@@ -50,30 +41,24 @@ function stochastic_inverse(r_obs::resp1,
     m_chains = zeros(n, alg_cache.n_samples)
     μ_chains = zeros(1, alg_cache.n_samples)
 
-    # @show alg_cache.m₀.m
-
-    @showprogress for i in 1:(alg_cache.n_samples)
-        (i% 5 == 0) && (@show i)
+    for i in 1:(alg_cache.n_samples)
+        (i % 5 == 0) && (@show i)
 
         ## Step 1
 
         # perturbed response
         for k in fieldnames(typeof(r_obs))
-            getfield(pert_resp, k) .= getfield(r_obs, k) .+ randn(size(getfield(err_resp, k))) .* getfield(err_resp, k)
-                ## TODO
+            getfield(pert_resp, k) .= getfield(r_obs, k) .+
+                                      randn(size(getfield(err_resp, k))) .*
+                                      getfield(err_resp, k)
         end
 
         # perturbed model : the one we regularize against
         # we first draw a perturbation in the computational domain
 
-        ξ .= randn(eltype(ξ), size(ξ)) # sample ξ
-
-        # rmul!(ξ, inv(sqrt(μ)))
-        # linsolve!(pert_model.m, linsolve_prob, L, ξ)
-
-        pert_model.m .= sqrt(μ) .* L * ξ
-
-        # pert_model.m = ξ .* inv(sqrt(μ)) # L * ξ is in computational domain 
+         #reg term
+        mul!(pert_model.m, L, randn(eltype(pert_model.m), size(pert_model.m))) # L * ξ
+        rmul!(pert_model.m, sqrt(μ)) # sqrt(μ) * L * ξ 
 
         # pulling everything from computational domain
 
@@ -83,11 +68,10 @@ function stochastic_inverse(r_obs::resp1,
 
         # @show alg_cache.m₀.m
         # @show pert_model.m
-
-        ret_code = inverse!(alg_cache.m₀, r_obs, vars, occam_cache([μ, μ]); W=W,
-            χ2=alg_cache.χ2, max_iters=alg_cache.max_iters_occam,
-            response_fields=alg_cache.response_fields,
-            verbose=alg_cache.verbose, mᵣ=pert_model, trans_utils = trans_utils[:m])
+        ret_code = inverse!(
+            alg_cache.m₀, r_obs, vars, occam_cache([μ, μ]); W=W, χ2=alg_cache.χ2,
+            max_iters=alg_cache.max_iters_occam, response_fields=alg_cache.response_fields,
+            verbose=alg_cache.verbose, mᵣ=pert_model, trans_utils=trans_utils[:m])
 
         m_chains[:, i] .= alg_cache.m₀.m
 
@@ -98,27 +82,32 @@ function stochastic_inverse(r_obs::resp1,
 
         # perturbed response
         for k in fieldnames(typeof(r_obs))
-            getfield(pert_resp, k) .= getfield(r_obs, k) .+ randn(size(getfield(err_resp, k))) .* getfield(err_resp, k)
+            getfield(pert_resp, k) .= getfield(r_obs, k) .+
+                                      randn(size(getfield(err_resp, k))) .*
+                                      getfield(err_resp, k)
         end
 
         broadcast!((x) -> (trans_utils[:m].itf(log10.(x))), alg_cache.m₀.m, alg_cache.m₀.m) # to computational domain
         rmul!(alg_cache.m₀.m, sqrt(μ)) # current μ
 
-        function f(x)
+        function g(x) #, alg_cache, trans_utils, resp_, vars)
             rmul!(alg_cache.m₀.m, sqrt(inv(x)))
 
             # broadcast!(trans_utils[:m].itf, alg_cache.m₀.m, alg_cache.m₀.m) # to model domain
-            broadcast!((x) -> (10.0^trans_utils[:m].tf(x)), alg_cache.m₀.m, alg_cache.m₀.m) #  to model domain
+            # broadcast!((x) -> (10.0^trans_utils[:m].tf(x)), alg_cache.m₀.m, alg_cache.m₀.m) #  to model domain
+            alg_cache.m₀.m .= 10 .^ trans_utils[:m].tf.(alg_cache.m₀.m)
 
             forward!(resp_, alg_cache.m₀, vars)
+            # @show "chi2_err"
             chi2_err = χ²(
-                reduce(vcat, [copy(getfield(resp_, k)) for k in alg_cache.response_fields]),
-                reduce(vcat, [copy(getfield(r_obs, k)) for k in alg_cache.response_fields]);
+                reduce(vcat, [getfield(resp_, k) for k in alg_cache.response_fields]),
+                reduce(vcat, [getfield(r_obs, k) for k in alg_cache.response_fields]);
                 W=W)
 
             # broadcast!(trans_utils[:m].tf, alg_cache.m₀.m, alg_cache.m₀.m) # to computational domain
-            broadcast!(
-                (x) -> (trans_utils[:m].itf(log10.(x))), alg_cache.m₀.m, alg_cache.m₀.m) # to computational domain
+            alg_cache.m₀.m .= trans_utils[:m].itf.(log10.(alg_cache.m₀.m))
+            # broadcast!(
+            #     (x) -> (trans_utils[:m].itf(log10.(x))), alg_cache.m₀.m, alg_cache.m₀.m) # to computational domain
             rmul!(alg_cache.m₀.m, sqrt(x))
 
             return chi2_err
@@ -131,15 +120,15 @@ function stochastic_inverse(r_obs::resp1,
 
         # fx₁ = f(x₁)
         # fx₃ = f(x₃)
-        fx₂ = f(x₂)
-        fx₄ = f(x₄)
+        fx₂ = g(x₂)
+        fx₄ = g(x₄)
 
         tol = 1e-5
         count = 0
         while (x₃ - x₁) >= tol
             count += 1
             if count > 100
-                verbose && (print("100 golden section iterations done. \t"))
+                print("100 golden section iterations done. \t")
                 break
             end
             if fx₄ > fx₂
@@ -147,14 +136,14 @@ function stochastic_inverse(r_obs::resp1,
                 x₄ = x₂
                 fx₄ = fx₂
                 x₂ = 10.0^((log10(x₃) + ϕ * log10(x₁)) / (1 + ϕ))
-                fx₂ = f(x₂)
+                fx₂ = g(x₂)
 
             else
                 x₁ = x₂
                 x₂ = x₄
                 fx₂ = fx₄
                 x₄ = 10.0^((log10(x₁) + ϕ * log10(x₃)) / (1 + ϕ))
-                fx₄ = f(x₄)
+                fx₄ = g(x₄)
             end
         end
         μ = sqrt(x₁ * x₃)

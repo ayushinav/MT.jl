@@ -39,8 +39,8 @@ function inverse!(mₖ::model1,
         robs::response,
         vars::Vector{Float64},
         alg_cache::occam_cache;
-        W=nothing, # Weight matrix
-        max_iters=20,
+        W=nothing,
+        max_iters=30,
         χ2=1.0,
         response_fields::Vector{Symbol}=[k for k in fieldnames(typeof(robs))],
         model_fields::Vector{Symbol}=[k for k in fieldnames(typeof(mₖ))], # this will not be used but for the sake of generality for all inverse algs
@@ -60,21 +60,19 @@ function inverse!(mₖ::model1,
     lin_utils = linear_utils(
         view(mₖ.m, :), zeros(prec, n_resp), zeros(prec, n_resp, n_model))
 
-    respₖ = zero_abstract(robs) # MTResponse{AbstractVector{prec}}([zero(vars) for k in fieldnames(typeof(robs))]...)
-    jₖ = jacobian_mt(fieldnames(typeof(robs)), eltype(vars))
+    respₖ = zero_abstract(robs)
+    jc = jacobian_cache(response_fields, robs, mₖ, model_fields)
 
     for (i, k) in enumerate(response_fields)
-        setfield!(jₖ, k, view(lin_utils.Jₖ, ((i - 1) * n_vars + 1):(i * n_vars), :))
+        setfield!(jc.j, k, view(lin_utils.Jₖ, ((i - 1) * n_vars + 1):(i * n_vars), :))
         setfield!(respₖ, k, view(lin_utils.Fₖ, ((i - 1) * n_vars + 1):(i * n_vars)))
     end
-
-    mtjc = mt_jacobian_cache(vars)
 
     inv_utils = inverse_utils(
         ∂(n_model), W, reduce(vcat, [copy(getfield(robs, k)) for k in response_fields]))
 
-    mₖ₊₁ = copy(mₖ) # MTModel([copy(getfield(mₖ, k)) for k ∈ fieldnames(typeof(mₖ))]...)
-    respₖ₊₁ = copy(respₖ) # MTResponse([copy(getfield(respₖ, k)) for k ∈ fieldnames(typeof(respₖ))]...)
+    mₖ₊₁ = copy(mₖ)
+    respₖ₊₁ = copy(respₖ)
 
     lin_prob = LinearProblem(inv_utils.D'inv_utils.D,
         lin_utils.Jₖ' * (inv_utils.dobs + lin_utils.Jₖ * lin_utils.mₖ - lin_utils.Fₖ))
@@ -95,8 +93,7 @@ function inverse!(mₖ::model1,
     μ_last = 0.0
     while itr <= max_iters
         verbose && (print("$itr: "))
-        jacobian!(
-            jₖ, mₖ, vars, mtjc; model_fields=model_fields, response_fields=response_fields)
+        jacobian!(mₖ, vars, jc; model_fields=model_fields, response_fields=response_fields)
         copyto!(lin_utils.Jₖ, lin_utils.Jₖ .* lin_utils.mₖ' .* log(10))
         for k in model_fields # to computational domain
             getfield(mₖ, k) .= trans_utils.itf.(log10.(getfield(mₖ, k)))

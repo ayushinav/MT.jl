@@ -72,7 +72,7 @@ function occam_step!(mₖ₊₁::model1, # to store the next update, which will 
     μ = zero(eltype(μgrid))
     count = 0 # so that iterations do not run forever (will rarely happen, if it will)
 
-    function f(x, ::Nothing)
+    function f(x, mᵣ::Nothing) #, linsolve_prob, lin_utils, inv_utils, respₖ₊₁, mₖ₊₁, vars)
         linsolve!(mₖ₊₁.m,
             linsolve_prob,
             x .* inv_utils.D' * inv_utils.D .+ lin_utils.Jₖ' * inv_utils.W * lin_utils.Jₖ,
@@ -83,11 +83,11 @@ function occam_step!(mₖ₊₁::model1, # to store the next update, which will 
             getfield(mₖ₊₁, k) .= 10.0 .^ trans_utils.tf.(getfield(mₖ₊₁, k))
         end
         forward!(respₖ₊₁, mₖ₊₁, vars)
-        return χ²(reduce(vcat, [copy(getfield(respₖ₊₁, k)) for k in response_fields]),
+        return χ²(reduce(vcat, [getfield(respₖ₊₁, k) for k in response_fields]),
             inv_utils.dobs; W=inv_utils.W)
     end
 
-    function f(x, mᵣ) # change here
+    function f(x, mᵣ) #, linsolve_prob, lin_utils, inv_utils, respₖ₊₁, mₖ₊₁, vars) # change here
         linsolve!(mₖ₊₁.m,
             linsolve_prob,
             x .* inv_utils.D' * inv_utils.D .+ lin_utils.Jₖ' * inv_utils.W * lin_utils.Jₖ,
@@ -95,12 +95,14 @@ function occam_step!(mₖ₊₁::model1, # to store the next update, which will 
             inv_utils.W *
             (inv_utils.dobs + lin_utils.Jₖ * lin_utils.mₖ - lin_utils.Fₖ) + mᵣ.m)
         for k in model_fields # to model domain
-            getfield(mₖ₊₁, k) .= 10.0 .^ trans_utils.tf.(getfield(mₖ₊₁, k))
+            getfield(mₖ₊₁, k) .= 10 .^ trans_utils.tf.(getfield(mₖ₊₁, k))
         end
         forward!(respₖ₊₁, mₖ₊₁, vars)
-        return χ²(reduce(vcat, [copy(getfield(respₖ₊₁, k)) for k in response_fields]),
+        return χ²(reduce(vcat, [getfield(respₖ₊₁, k) for k in response_fields]),
             inv_utils.dobs; W=inv_utils.W)
     end
+
+    # f(x, mᵣ) = ff(x, mᵣ, linsolve_prob, lin_utils, inv_utils, respₖ₊₁, mₖ₊₁, vars)
 
     x₁ = μgrid[1]
     x₃ = μgrid[end]
@@ -135,6 +137,7 @@ function occam_step!(mₖ₊₁::model1, # to store the next update, which will 
             fx₄ = f(x₄, mᵣ)
         end
     end
+    # @show count
     μ = sqrt(x₁ * x₃)
 
     # At the moment mₖ₊₁ contains the update for the last μ, we rewrite it with the best μ found.
