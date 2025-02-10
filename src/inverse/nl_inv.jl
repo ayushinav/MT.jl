@@ -71,6 +71,7 @@ function inverse!(mₖ::model1,
     model_fields = [:m]
 
     (W === nothing) && (W = prec.(I(n_resp)))
+    (W === nothing) && (W = prec.(∂(length(mₖ.m))))
 
     model_type = typeof(mₖ).name.wrapper
 
@@ -80,7 +81,7 @@ function inverse!(mₖ::model1,
         model_trans_utils = model_trans_utils, 
         vars = vars, 
         response_fields = response_fields, W = W, μ = alg_cache.μ,
-        r_obs = robs, L = ∂(length(mₖ.m))
+        r_obs = robs, L = L
     )
 
     # construct_cost_function(mₖ.m, p)
@@ -117,7 +118,7 @@ end
 
 # focussing on geophysical models for now
 # Not performant at the moment
-function construct_cost_function(m, p) #model, r_obs, W, model_fields, response_fields, vars)
+function construct_cost_function(m, p) 
     @unpack model_type, h, model_trans_utils, vars, response_fields, W, μ, r_obs, L = p
     # model = model_type(model_trans_utils.tf.(m), h)
     model = model_type(broadcast(model_trans_utils.tf, m), h)
