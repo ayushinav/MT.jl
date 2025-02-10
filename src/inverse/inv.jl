@@ -43,8 +43,8 @@ function inverse!(mₖ::model1,
         max_iters=30,
         χ2=1.0,
         response_fields::Vector{Symbol}=[k for k in fieldnames(typeof(robs))],
-        model_fields::Vector{Symbol}=[k for k in fieldnames(typeof(mₖ))], # this will not be used but for the sake of generality for all inverse algs
-        trans_utils::transform_utils=sigmoid_tf,
+        # model_fields::Vector{Symbol}=[k for k in fieldnames(typeof(mₖ))], # this will not be used but for the sake of generality for all inverse algs
+        trans_utils::transform_utils=pow_sigmoid_tf,
         verbose::Bool=true,
         mᵣ=nothing) where {
         model1 <: AbstractGeophyModel, response <: AbstractGeophyResponse}
@@ -86,7 +86,7 @@ function inverse!(mₖ::model1,
 
     # if mᵣ !== nothing
     #     for k in model_fields # to computational domain
-    #         getfield(mᵣ, k) .= trans_utils.itf.(log10.(getfield(mᵣ, k)))
+    #         getfield(mᵣ, k) .= trans_utils.itf.((getfield(mᵣ, k))
     #     end
     # end
 
@@ -94,9 +94,9 @@ function inverse!(mₖ::model1,
     while itr <= max_iters
         verbose && (print("$itr: "))
         jacobian!(mₖ, vars, jc; model_fields=model_fields, response_fields=response_fields)
-        copyto!(lin_utils.Jₖ, lin_utils.Jₖ .* lin_utils.mₖ' .* log(10))
+        copyto!(lin_utils.Jₖ, lin_utils.Jₖ .* lin_utils.mₖ' .* log(10))  # why this?
         for k in model_fields # to computational domain
-            getfield(mₖ, k) .= trans_utils.itf.(log10.(getfield(mₖ, k)))
+            getfield(mₖ, k) .= trans_utils.itf.(getfield(mₖ, k))
         end
 
         μ_last = occam_step!(mₖ₊₁, # to store the next update, which will eventually be copied to mₖ
@@ -125,7 +125,7 @@ function inverse!(mₖ::model1,
 
     # if mᵣ !== nothing
     #     for k in model_fields # back to model domain
-    #         getfield(mᵣ, k) .= 10.0 .^ trans_utils.tf.((getfield(mᵣ, k)))
+    #         getfield(mᵣ, k) .= trans_utils.tf.((getfield(mᵣ, k)))
     #     end
     # end
 

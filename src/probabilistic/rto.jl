@@ -56,7 +56,7 @@ function stochastic_inverse(r_obs::resp1,
         # perturbed model : the one we regularize against
         # we first draw a perturbation in the computational domain
 
-         #reg term
+        #reg term
         mul!(pert_model.m, L, randn(eltype(pert_model.m), size(pert_model.m))) # L * ξ
         rmul!(pert_model.m, sqrt(μ)) # sqrt(μ) * L * ξ 
 
@@ -101,8 +101,7 @@ function stochastic_inverse(r_obs::resp1,
             # @show "chi2_err"
             chi2_err = χ²(
                 reduce(vcat, [getfield(resp_, k) for k in alg_cache.response_fields]),
-                reduce(vcat, [getfield(r_obs, k) for k in alg_cache.response_fields]);
-                W=W)
+                reduce(vcat, [getfield(r_obs, k) for k in alg_cache.response_fields]); W=W)
 
             # broadcast!(trans_utils[:m].tf, alg_cache.m₀.m, alg_cache.m₀.m) # to computational domain
             alg_cache.m₀.m .= trans_utils[:m].itf.(log10.(alg_cache.m₀.m))

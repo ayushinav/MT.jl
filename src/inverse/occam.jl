@@ -80,7 +80,7 @@ function occam_step!(mₖ₊₁::model1, # to store the next update, which will 
             inv_utils.W *
             (inv_utils.dobs + lin_utils.Jₖ * lin_utils.mₖ - lin_utils.Fₖ))
         for k in model_fields # to model domain
-            getfield(mₖ₊₁, k) .= 10.0 .^ trans_utils.tf.(getfield(mₖ₊₁, k))
+            getfield(mₖ₊₁, k) .= trans_utils.tf.(getfield(mₖ₊₁, k))
         end
         forward!(respₖ₊₁, mₖ₊₁, vars)
         return χ²(reduce(vcat, [getfield(respₖ₊₁, k) for k in response_fields]),
@@ -95,7 +95,7 @@ function occam_step!(mₖ₊₁::model1, # to store the next update, which will 
             inv_utils.W *
             (inv_utils.dobs + lin_utils.Jₖ * lin_utils.mₖ - lin_utils.Fₖ) + mᵣ.m)
         for k in model_fields # to model domain
-            getfield(mₖ₊₁, k) .= 10 .^ trans_utils.tf.(getfield(mₖ₊₁, k))
+            getfield(mₖ₊₁, k) .= trans_utils.tf.(getfield(mₖ₊₁, k))
         end
         forward!(respₖ₊₁, mₖ₊₁, vars)
         return χ²(reduce(vcat, [getfield(respₖ₊₁, k) for k in response_fields]),
@@ -160,7 +160,7 @@ function occam_step!(mₖ₊₁::model1, # to store the next update, which will 
     end
 
     for k in model_fields # to model domain
-        getfield(mₖ₊₁, k) .= 10.0 .^ trans_utils.tf.(getfield(mₖ₊₁, k)) # why do we have 10^ here
+        getfield(mₖ₊₁, k) .= trans_utils.tf.(getfield(mₖ₊₁, k)) # why do we have 10^ here
     end
 
     forward!(respₖ₊₁, mₖ₊₁, vars)
