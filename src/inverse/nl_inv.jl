@@ -4,44 +4,56 @@
 mutable struct nl_cache{T1, T2}
     alg::T1
     μ::T2
-    kwargs::NamedTuple
 end
+"""
+    NonlinearAlg(; alg = LevenbergMarquardt, μ = 1.0, kwargs...)
 
-mutable struct NonlinearAlg{T1, T2}
-    alg::T1
-    μ::T2
-    kwargs::NamedTuple
+returns `nl_cache` that specifies which non linear solver to use for the inverse problem
+
+## Keyword Arguments
+
+  - `alg`: `NonlinearSolve`[@ref] alogrithm to be used, defaults to LevenbergMarquardt
+  - `μ` : regularization weight
+"""
+function NonlinearAlg(; alg=LevenbergMarquardt, μ=1.0)
+    return nl_cache(alg, μ)
 end
 
 # ===== NonlinearSolve.jl =========
 
 """
-    function inverse!(mₖ::model,
+    function inverse!(mₖ::model1,
             robs::response,
             vars::Vector{Float64},
             alg_cache::nl_cache;
-            W= nothing, # Weight matrix
-            max_iters= 20, χ2=1.,
-            response_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(robs))],
-            model_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(m₀))], # this will not be used but for the sake of generality for all inverse algs
-            trans_utils::transform_utils= log_sigmoid_tf,
-            verbose= true
-        ):
+            W=nothing,
+            L=nothing,
+            max_iters=30,
+            χ2=1.0,
+            response_fields::Vector{Symbol}=[k for k in fieldnames(typeof(robs))],
+            # model_fields::Vector{Symbol}=[k for k in fieldnames(typeof(mₖ))], # this will not be used but for the sake of generality for all inverse algs
+            model_trans_utils::transform_utils=pow_sigmoid_tf,
+            response_trans_utils::transform_utils=log_tf,
+            verbose::Bool=true,
+            mᵣ=nothing) where {
+            model1 <: AbstractGeophyModel, response <: AbstractGeophyResponse}
 
 updates `mₖ` using occam iteration to fit `robs` within a misfit of `χ2`, by default set to 1.0.
 
 ### Variables:
 
-  - `mₖ::model`: Initial model guess, will be updated during the inverse process
-  - `robs::response`: response to invert for
-  - `vars::Vector{Float64}`: variables required for forward modeling, eg., `ω` for MT
+  - `mₖ`: Initial model guess, will be updated during the inverse process
+  - `robs`: response to invert for
+  - `vars`: variables required for forward modeling, eg., `ω` for MT
   - `alg_cache::occam_cache`: deterimines the algorithm to be performed for inversion
-  - `W= nothing`: Weight matrix, will be `I` if nothing is provided
-  - `max_iters= 20`: maximum number of iterations
-  - `χ2=1.`: threshold misfit
-  - `response_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(robs))]`: choose data of response to perform inversion on, eg., ρₐ for MT, by default chooses all the data (ρₐ and ϕ)
-  - `model_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(m₀))]`: will generally be fixed, see docs for details
-  - `trans_utils::transform_utils= sigmoid_tf`: for bounds transformation,
+  - `W`: Weight matrix, will be `I` if nothing is provided
+  - `L`: Regularization matrix, defaults to derivative matrix, given by `∂`[@ref]
+  - `max_iters`: maximum number of iterations, defaults to 30
+  - `χ2`: threshold misfit, defaults to 1.0
+  - `response_fields`: choose data of response to perform inversion on, eg., ρₐ for MT, by default chooses all the data (ρₐ and ϕ)
+  - `model_fields`: will generally be fixed, see docs for details
+  - `model_trans_utils`: conversion to and from computational domain,
+  - `response_trans_utils`: for scaling the response parameters,
   - `verbose`: whether to print updates after each iteration, defaults to true
 
 ### Returns:
@@ -55,15 +67,14 @@ return message in the form of `return_code` and updates `mₖ` in-place.
 function inverse!(mₖ::model1,
         robs::response,
         vars::Vector{Float64},
-        alg_cache::NonlinearAlg;
+        alg_cache::nl_cache;
         W=nothing,
         L=nothing,
         max_iters=30,
         χ2=1.0,
         response_fields::Vector{Symbol}=[k for k in fieldnames(typeof(robs))],
-        # model_fields::Vector{Symbol}=[k for k in fieldnames(typeof(mₖ))], # this will not be used but for the sake of generality for all inverse algs
-        model_trans_utils::transform_utils=pow_sigmoid_tf,
-        response_trans_utils::transform_utils=log_tf,
+        model_trans_utils::transform_utils=sigmoid_tf,
+        response_trans_utils::NamedTuple=(; ρₐ=lin_tf, ϕ=lin_tf),
         verbose::Bool=true,
         mᵣ=nothing) where {
         model1 <: AbstractGeophyModel, response <: AbstractGeophyResponse}
@@ -71,44 +82,35 @@ function inverse!(mₖ::model1,
     model_fields = [:m]
 
     (W === nothing) && (W = prec.(I(n_resp)))
-    (W === nothing) && (W = prec.(∂(length(mₖ.m))))
+    (L === nothing) && (L = prec.(∂(length(mₖ.m))))
 
     model_type = typeof(mₖ).name.wrapper
 
-    p = (
-        model_type = model_type, 
-        h = mₖ.h, 
-        model_trans_utils = model_trans_utils, 
-        vars = vars, 
-        response_fields = response_fields, W = W, μ = alg_cache.μ,
-        r_obs = robs, L = L
-    )
+    p = (model_type=model_type, h=mₖ.h, model_trans_utils=model_trans_utils,
+        response_trans_utils=response_trans_utils, vars=vars,
+        response_fields=response_fields, W=W, μ=alg_cache.μ, r_obs=robs, L=L)
 
-    # construct_cost_function(mₖ.m, p)
-
-    prob = SciMLBase.NonlinearLeastSquaresProblem(construct_cost_function, model_trans_utils.itf.(mₖ.m), p)
-    nlcache = init(prob, alg_cache.alg(); alg_cache.kwargs...)
+    prob = SciMLBase.NonlinearLeastSquaresProblem(
+        construct_cost_function, model_trans_utils.itf.(mₖ.m), p)
+    nlcache = init(prob, alg_cache.alg())
     iters = 1
     chi2 = 1e6
 
-    @show nlcache.u
+    resp_ = copy(robs)
 
     while iters <= max_iters
-
-        # check misfit condition
         model = model_type(model_trans_utils.tf.(nlcache.u), mₖ.h)
-        resp_ = forward(model, vars)
+        forward!(resp_, model, vars; trans_utils=response_trans_utils)
         chi2 = χ²(reduce(vcat, [getfield(resp_, k) for k in response_fields]),
-        reduce(vcat, [getfield(robs, k) for k in response_fields]); W=W)
-        @show iters, chi2
-        if chi2 <= χ2
-            break;
+            reduce(vcat, [getfield(robs, k) for k in response_fields]); W=W)
+        (verbose == true) && println("iteration = $iters => data misfit => $chi2")
+
+        if chi2 <= χ2 # check misfit condition
+            break
         end
 
         step!(nlcache)
-        # @show nlcache.u
-
-        iters += 1 
+        iters += 1
     end
 
     mₖ.m .= model_trans_utils.tf.(nlcache.u)
@@ -116,18 +118,20 @@ function inverse!(mₖ::model1,
     return return_code(chi2 <= χ2, (μ=alg_cache.μ,), mₖ, χ2, chi2)
 end
 
-# focussing on geophysical models for now
+# focussing on just geophysical models for now
 # Not performant at the moment
-function construct_cost_function(m, p) 
-    @unpack model_type, h, model_trans_utils, vars, response_fields, W, μ, r_obs, L = p
+function construct_cost_function(m, p)
+    @unpack model_type, h, model_trans_utils, response_trans_utils, vars, response_fields, W, μ, r_obs, L = p
     # model = model_type(model_trans_utils.tf.(m), h)
     model = model_type(broadcast(model_trans_utils.tf, m), h)
-    resp_ = forward(model, vars)
+    resp_ = forward(model, vars; trans_utils=response_trans_utils)
 
     L1 = χ²(reduce(vcat, [getfield(resp_, k) for k in response_fields]),
-    reduce(vcat, [getfield(r_obs, k) for k in response_fields]); W=W)
-    L2 = μ * sqrt(norm(L * m))
-    @show L1, L2
+        reduce(vcat, [getfield(r_obs, k) for k in response_fields]); W=W) * sqrt(size(W, 1))
+    L2 = μ * norm(L * model.m)
+    # @show L1, L2
 
-    return [L1 + L2]
+    return [L1^2 + L2]
 end
+
+# ======================== using Optimization.jl ===============================

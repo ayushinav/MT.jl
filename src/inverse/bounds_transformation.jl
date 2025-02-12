@@ -12,9 +12,10 @@ function sigmoid(m, bounds) #m, bounds) #m::T1, bounds::Vector{T})::T where {T <
 end
 
 function pow_sigmoid(m, bounds) #m::T1, bounds::Vector{T})::T where {T <: Union{Float32, Float64}, T1}
-    return 10^ sigmoid(m, bounds)
+    return 10^sigmoid(m, bounds)
 end
 
+scale_fn(m, scale) = m / scale
 """
 `d_sigmoid(m)`:
 gradient for the transformation from optimization domain to model domain. Used for estimating jacobians, but is also useful in analysing sensitivities.
@@ -26,8 +27,10 @@ function d_sigmoid(m, bounds) #m::T1, bounds::Vector{T})::T where {T <: Union{Fl
 end
 
 function d_pow_sigmoid(m, bounds) #m::T1, bounds::Vector{T})::T where {T <: Union{Float32, Float64}, T1}
-    return 10^ sigmoid(m, bounds) * d_sigmoid(m, bounds)
+    return 10^sigmoid(m, bounds) * d_sigmoid(m, bounds)
 end
+
+d_scale_fn(m, scale) = inv(scale)
 
 """
 `inverse_sigmoid()`: get back to the optimization domain from model domain
@@ -43,6 +46,8 @@ end
 function inverse_pow_sigmoid(m, bounds) #m::T1, bounds::Vector{T})::T where {T <: Union{Float32, Float64}, T1}
     return inverse_sigmoid(log10(m), bounds)
 end
+
+inverse_scale_fn(x, scale) = x * scale
 
 mutable struct transform_utils{T}
     p::Vector{T} # parameters of the transformation function
@@ -63,5 +68,7 @@ end
 sigmoid_tf = transform_utils([-3.0, 6.0], sigmoid, inverse_sigmoid, d_sigmoid);
 pow_tf = transform_utils([], (x) -> 10^x, log10, (x) -> (10^x * log(10)));
 log_tf = transform_utils([], log10, (x) -> 10^x, (x) -> inv(x * log(10)));
-pow_sigmoid_tf = transform_utils([-3.0, 6.0], pow_sigmoid, inverse_pow_sigmoid, d_pow_sigmoid);
+pow_sigmoid_tf = transform_utils(
+    [-3.0, 6.0], pow_sigmoid, inverse_pow_sigmoid, d_pow_sigmoid);
 lin_tf = transform_utils([], (x) -> x, (x) -> x, (x) -> 1.0);
+phi_scale_tf = transform_utils([90], scale_fn, inverse_scale_fn, d_scale_fn)

@@ -139,7 +139,7 @@ function plot_model(m::MTModel; max_depth=5 * sum(m.h), kwargs...) # add depth l
         max_depth = 5 * h2[end]
     end
 
-    Plots.plot(10 .^[m.m[1], m.m...], [1, h2..., max_depth]; scale=:log10,
+    Plots.plot(10 .^ [m.m[1], m.m...], [1, h2..., max_depth]; scale=:log10,
         linetype=:steppost, yflip=true, xlabel=xlabel, ylabel=ylabel, kwargs...)
 end
 
@@ -157,6 +157,6 @@ function plot_model!(plt, m::MTModel; max_depth=5 * sum(m.h), kwargs...)
         max_depth = 2 * h2[end]
     end
 
-    Plots.plot!(plt, 10 .^[m.m[1], m.m...], [1, h2..., max_depth];
+    Plots.plot!(plt, 10 .^ [m.m[1], m.m...], [1, h2..., max_depth];
         scale=:log10, linetype=:steppost, yflip=true, kwargs...)
 end

@@ -59,7 +59,8 @@ makes a `Turing.jl` model to perform MCMC sampling
         rDist::rdist;
         response_fields::Vector{Symbol}=[k for k in fieldnames(typeof(rDist))],
         model_fields::Vector{Symbol}=[k for k in fieldnames(typeof(mDist))],
-        trans_utils::NamedTuple=(m=log_tf, h=lin_tf)) where {
+        model_trans_utils::NamedTuple=(m=lin_tf, h=lin_tf),
+        response_trans_utils::NamedTuple=(ρₐ=lin_tf, ϕ=lin_tf)) where {
         model <: AbstractModel, response <: AbstractResponse,
         mdist <: AbstractModelDistribution, rdist <: AbstractResponseDistribution}
     m0 = (; zip([propertynames(mDist)...], const_data)...)
@@ -76,7 +77,7 @@ makes a `Turing.jl` model to perform MCMC sampling
                                  for k in propertynames(mDist)]...)
     # works with mDist being a NamedTuple
 
-    r_sample = forward(m_sample, vars)
+    r_sample = forward(m_sample, vars; trans_utils=response_trans_utils)
     # @show r_sample
     # @show r_obs
     # @show m_sample

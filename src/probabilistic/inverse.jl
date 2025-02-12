@@ -4,7 +4,7 @@
         err_resp::response,
         vars,
         alg_cache::mcmc_cache;
-        trans_utils::NamedTuple = (m = log_tf, h = lin_tf)
+        trans_utils::NamedTuple = (m = lin_tf, h = lin_tf)
         )
 
 function to perform sampling
@@ -23,7 +23,8 @@ function to perform sampling
   - `trans_utils`: A named tuple containing `transform_utils` for the fields of model that need to be scaled/modified. If not provided for any `model` field, the field won't be modified.
 """
 function stochastic_inverse(r_obs::resp1, err_resp::resp2, vars, alg_cache::mcmc_cache;
-        trans_utils::NamedTuple=(m=log_tf, h=lin_tf), # need to take care of this
+        model_trans_utils::NamedTuple=(m=lin_tf, h=lin_tf), # need to take care of this
+        response_trans_utils::NamedTuple=(; ρₐ=lin_tf, ϕ=lin_tf),
         kwargs...) where {resp1 <: AbstractResponse, resp2 <: AbstractResponse}
     model_fields = []
     modelD = []
@@ -45,9 +46,7 @@ function stochastic_inverse(r_obs::resp1, err_resp::resp2, vars, alg_cache::mcmc
     for k in fieldnames(typeof(alg_cache.likelihood)) # similarly, here it will be propertynames for likelihood being a NamedTuple
         if typeof(getfield(alg_cache.likelihood, k)) <: Function
             push!(response_fields, k)
-            # @show k
         end
-        # @show k, typeof(k)
     end
 
     # putting trans_utils together for all the fields
@@ -78,8 +77,8 @@ function stochastic_inverse(r_obs::resp1, err_resp::resp2, vars, alg_cache::mcmc
         err_resp, # ::response
         alg_cache.apriori, # ::NamedTuple
         alg_cache.likelihood; # ::responseDistribution
-        response_fields=Symbol.(response_fields),
-        model_fields=Symbol.(model_fields), trans_utils=transf_utils)
+        response_fields=Symbol.(response_fields), model_fields=Symbol.(model_fields),
+        model_trans_utils=model_transf_utils, response_trans_utils=response_trans_utils)
 
     # print("MODEL WORKS?")
     # @show typeof(sampler) <: Turing.AdvancedVI.VariationalInference

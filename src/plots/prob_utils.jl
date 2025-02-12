@@ -1,6 +1,6 @@
 
 """
-pre_image(mDist::mdist, chains; trans_utils = (m = log_tf, h = lin_tf,),
+pre_image(mDist::mdist, chains; trans_utils = (m = pow_tf, h = lin_tf,),
 grid = (m = collect(-1:0.1:5), h = collect(10 .^ (0:0.1:6)))
 ) where {mdist <: AbstractGeophyModelDistribution}
 returns the variables required to plot the PDF image of stochastic inversion
@@ -17,7 +17,7 @@ returns the variables required to plot the PDF image of stochastic inversion
 """
 function pre_image(mDist::mdist,
         chains::chain;
-        trans_utils=(m=log_tf, h=lin_tf),
+        trans_utils=(m=lin_tf, h=lin_tf),
         grid=(m=collect(-1:0.1:5), h=collect(10 .^ (0:0.1:6)))) where {
         mdist <: AbstractGeophyModelDistribution, chain <: Chains}
     # we know that geophy model will have `m` and `h`
