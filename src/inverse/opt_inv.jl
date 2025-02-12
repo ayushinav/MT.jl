@@ -1,7 +1,7 @@
 """
 `nl_cache`: specifies the inverse algorithm while having a cache.
 """
-mutable struct nl_cache{T1, T2}
+mutable struct opt_cache{T1, T2}
     alg::T1
     μ::T2
 end
@@ -15,17 +15,16 @@ returns `nl_cache` that specifies which non linear solver to use for the inverse
   - `alg`: `NonlinearSolve`[@ref] algorithm to be used, defaults to LevenbergMarquardt
   - `μ` : regularization weight
 """
-function NonlinearAlg(; alg=LevenbergMarquardt, μ=1.0)
-    return nl_cache(alg, μ)
+function OptAlg(; alg=BFGS, μ=1.0)
+    return opt_cache(alg, μ)
 end
-
-# ===== NonlinearSolve.jl =========
+# ======================== using Optimization.jl ===============================
 
 """
     function inverse!(mₖ::model1,
             robs::response,
             vars::Vector{Float64},
-            alg_cache::nl_cache;
+            alg_cache::opt_cache;
             W=nothing,
             L=nothing,
             max_iters=30,
@@ -67,7 +66,7 @@ return message in the form of `return_code` and updates `mₖ` in-place.
 function inverse!(mₖ::model1,
         robs::response,
         vars::Vector{Float64},
-        alg_cache::nl_cache;
+        alg_cache::opt_cache;
         W=nothing,
         L=nothing,
         max_iters=30,
@@ -90,30 +89,17 @@ function inverse!(mₖ::model1,
         response_trans_utils=response_trans_utils, vars=vars,
         response_fields=response_fields, W=W, μ=alg_cache.μ, r_obs=robs, L=L)
 
-    prob = SciMLBase.NonlinearLeastSquaresProblem(
-        construct_cost_function, model_trans_utils.itf.(mₖ.m), p)
-    nlcache = init(prob, alg_cache.alg())
-    iters = 1
-    chi2 = 1e6
+    optfn = OptimizationFunction(construct_cost_function, Optimization.AutoForwardDiff())
+    prob = OptimizationProblem(optfn, model_trans_utils.itf.(mₖ.m), p)
 
-    resp_ = copy(robs)
+    cb(state, l) = cb_(state, l, verbose, L, alg_cache.μ, model_trans_utils)
+    sol = solve(prob, alg_cache.alg(); callback=cb, maxiters=max_iters)
 
-    while iters <= max_iters
-        model = model_type(model_trans_utils.tf.(nlcache.u), mₖ.h)
-        forward!(resp_, model, vars; trans_utils=response_trans_utils)
-        chi2 = χ²(reduce(vcat, [getfield(resp_, k) for k in response_fields]),
-            reduce(vcat, [getfield(robs, k) for k in response_fields]); W=W)
-        (verbose == true) && println("iteration = $iters => data misfit => $chi2")
+    mₖ.m .= model_trans_utils.tf.(sol.u)
 
-        if chi2 <= χ2 # check misfit condition
-            break
-        end
-
-        step!(nlcache)
-        iters += 1
-    end
-
-    mₖ.m .= model_trans_utils.tf.(nlcache.u)
+    resp_ = forward(mₖ, vars; trans_utils=response_trans_utils)
+    chi2 = χ²(reduce(vcat, [getfield(resp_, k) for k in response_fields]),
+        reduce(vcat, [getfield(robs, k) for k in response_fields]); W=W)
 
     return return_code(chi2 <= χ2, (μ=alg_cache.μ,), mₖ, χ2, chi2)
 end
@@ -133,3 +119,28 @@ function construct_cost_function(m, p)
 
     return [L1^2 + L2]
 end
+
+function cb_(state, l, verbose, L, μ, model_trans_utils)
+    chi2 = sqrt(l - μ * norm(L * model_trans_utils.tf.(state.u)))
+    (verbose == true) && println("iteration = $(state.iter) => data misfit => $chi2")
+
+    return false
+end
+
+# function cb3(state, l, verbose, p)
+
+#     @unpack model_type, h, model_trans_utils, response_trans_utils, vars, response_fields, W, μ, r_obs, L = p
+#     @show size(state.u), size(L)
+#     chi2 = l - μ * norm(L * model_trans_utils.tf.(state.u))
+#     (verbose == true) && println("iteration = $(state.iter) => data misfit => $chi2")
+
+#     model = model_type(broadcast(model_trans_utils.tf, state.u), h)
+#     resp_ = forward(model, vars; trans_utils=response_trans_utils)
+
+#     L1 = χ²(reduce(vcat, [getfield(resp_, k) for k in response_fields]),
+#         reduce(vcat, [getfield(r_obs, k) for k in response_fields]); W=W) * sqrt(size(W, 1))
+
+#     (verbose == true) && println("iteration = $(state.iter) => data misfit => $(L1^2)")
+
+#     return false
+# end

@@ -5,18 +5,24 @@ const global μ = 4π * 1.0f-7; # Float32 will promote to Float64 without a prob
 
 returns a tuple of ρₐ and ϕ, given arrays of resistivity `ρ` and thickness `h` for the angular frequenciy `ω`.
 """
+
+pow10(x) = 10^x
 function get_Z(ρ::T1, h::T2,
         ω::T) where {T1 <: AbstractVector{<:Any}, T2 <: AbstractVector{<:Any}, T}
     Z = complex(zero(eltype(ρ)))
-    k = sqrt(im * ω * μ / 10^ρ[end])
+    broadcast!(pow10, ρ, ρ)
+    # ρ .= 10 .^ ρ
+    k = sqrt(im * ω * μ / ρ[end])
     Z = ω * μ / k
 
     j = length(h)
     @inbounds while j >= 1
-        k = sqrt(im * ω * μ / 10^ρ[j])
+        k = sqrt(im * ω * μ / ρ[j])
         Z = ω * μ / k * coth(-im * k * h[j] + acoth(Z / (ω * μ / k)))
         j -= 1
     end
+
+    broadcast!(log10, ρ, ρ)
     Z = conj(Z)
     return get_appres(Z, ω), get_phase(Z)
 end
@@ -63,8 +69,8 @@ function forward!(
         r.ρₐ[i], r.ϕ[i] = get_Z(m.m, m.h, ω[i])
         i += 1
     end
-    broadcast!(trans_utils[:ρₐ].tf, r.ρₐ, r.ρₐ)
-    broadcast!(trans_utils[:ϕ].tf, r.ϕ, r.ϕ)
+    broadcast!(trans_utils.ρₐ.tf, r.ρₐ, r.ρₐ)
+    broadcast!(trans_utils.ϕ.tf, r.ϕ, r.ϕ)
     nothing
 end
 

@@ -1,5 +1,5 @@
 @testitem "fixed discretization" tags = [:mcmc] begin
-    using Distributions, Turing
+    using Distributions, Turing, LinearAlgebra
 
     m_test = MTModel(log10.([100.0, 10.0, 1000.0]), [1e3, 1e3])
     f = 10 .^ range(-4, stop = 1, length = 25)
@@ -56,7 +56,7 @@
 end
 
 @testitem "variable discretization" tags = [:mcmc] begin
-    using Distributions, Turing
+    using Distributions, Turing, LinearAlgebra
 
     m_test = MTModel(log10.([100.0, 10.0, 1000.0]), [1e3, 1e3])
     f = 10 .^ range(-4, stop = 1, length = 25)

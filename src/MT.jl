@@ -3,6 +3,7 @@ using LinearAlgebra
 using Plots
 using LinearSolve
 using NonlinearSolve
+using Optimization, OptimizationOptimJL
 using Turing
 using Distributions
 using Statistics
@@ -27,6 +28,7 @@ include("inverse/jacobian.jl")
 include("inverse/occam.jl")
 include("inverse/inv.jl")
 include("inverse/nl_inv.jl")
+include("inverse/opt_inv.jl")
 include("probabilistic/respDistribution.jl")
 include("probabilistic/utils.jl")
 include("probabilistic/inverse.jl")

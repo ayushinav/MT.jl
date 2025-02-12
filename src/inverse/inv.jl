@@ -4,6 +4,7 @@
             vars::Vector{Float64},
             alg_cache::occam_cache;
             W= nothing,
+            L= nothing,
             max_iters= 30, χ2=1.,
             response_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(robs))],
             model_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(m₀))], # this will not be used but for the sake of generality for all inverse algs
@@ -20,6 +21,7 @@ updates `mₖ` using occam iteration to fit `robs` within a misfit of `χ2`, by 
   - `vars`: variables required for forward modeling, eg., `ω` for MT
   - `alg_cache`: deterimines the algorithm to be performed for inversion
   - `W= nothing`: Weight matrix, defaults to identity matrix `I`
+  - `L`
   - `max_iters= 30`: maximum number of iterations
   - `χ2=1.`: target misfit
   - `response_fields: choose data of response to perform inversion on, eg., ρₐ for MT, by default chooses all the data (ρₐ and ϕ)
@@ -42,6 +44,7 @@ function inverse!(mₖ::model1,
         vars::Vector{Float64},
         alg_cache::occam_cache;
         W=nothing,
+        L=nothing,
         max_iters=30,
         χ2=1.0,
         response_fields::Vector{Symbol}=[k for k in fieldnames(typeof(robs))],
@@ -59,6 +62,7 @@ function inverse!(mₖ::model1,
     n_resp = length(response_fields) * n_vars
 
     (W === nothing) && (W = prec.(I(n_resp)))
+    (L === nothing) && (L = prec.(∂(n_model)))
 
     lin_utils = linear_utils(
         view(mₖ.m, :), zeros(prec, n_resp), zeros(prec, n_resp, n_model))
@@ -72,7 +76,7 @@ function inverse!(mₖ::model1,
     end
 
     inv_utils = inverse_utils(
-        ∂(n_model), W, reduce(vcat, [copy(getfield(robs, k)) for k in response_fields]))
+        L, W, reduce(vcat, [copy(getfield(robs, k)) for k in response_fields]))
 
     mₖ₊₁ = copy(mₖ)
     respₖ₊₁ = copy(respₖ)
