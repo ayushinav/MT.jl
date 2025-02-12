@@ -8,12 +8,12 @@ returns a tuple of ρₐ and ϕ, given arrays of resistivity `ρ` and thickness 
 function get_Z(ρ::T1, h::T2,
         ω::T) where {T1 <: AbstractVector{<:Any}, T2 <: AbstractVector{<:Any}, T}
     Z = complex(zero(eltype(ρ)))
-    k = sqrt(im * ω * μ / ρ[end])
+    k = sqrt(im * ω * μ / 10 ^ ρ[end])
     Z = ω * μ / k
 
     j = length(h)
     @inbounds while j >= 1
-        k = sqrt(im * ω * μ / ρ[j])
+        k = sqrt(im * ω * μ / 10 ^ ρ[j])
         Z = ω * μ / k * coth(-im * k * h[j] + acoth(Z / (ω * μ / k)))
         j -= 1
     end
@@ -28,7 +28,7 @@ end
 returns a  `response` for the given model `m` at the frequencies  `ω`
 """
 function forward(m::MTModel{<:AbstractVector{<:Any}, <:AbstractVector{<:Any}},
-        ω::AbstractVector{<:Any}) # ω will always be a vector, until will find an exception
+        ω::AbstractVector{<:Any}; trans_utils = (ρₐ = lin_tf, ϕ = lin_tf)) # ω will always be a vector, until will find an exception
     # the following line check is why we do not use the same fn name here, so that the checks happen just once for all the frequencies.
     if !(length(m.h) == length(m.m) - 1)
         error("number of model layers should be 1 less than the number of model parameters")
@@ -41,7 +41,7 @@ function forward(m::MTModel{<:AbstractVector{<:Any}, <:AbstractVector{<:Any}},
         ρₐ[i], ϕ[i] = get_Z(m.m, m.h, ω[i])
         i += 1
     end
-    return MTResponse(ρₐ, ϕ)
+    return MTResponse(trans_utils[:ρₐ].tf(ρₐ), trans_utils[:ϕ].tf(ϕ))
 end
 
 # dispatch on forward! for 1d model
@@ -53,7 +53,7 @@ updates response `r` type for the given model `m` at the frequencies  `ω`
 """
 function forward!(
         r::MTResponse, m::MTModel{<:AbstractVector{<:Any}, <:AbstractVector{<:Any}},
-        ω::AbstractVector{<:Any})
+        ω::AbstractVector{<:Any}; trans_utils = (ρₐ = lin_tf, ϕ = lin_tf))
     if !(length(m.h) == length(m.m) - 1)
         error("number of model layers should be 1 less than the number of model parameters")
     end
@@ -63,6 +63,8 @@ function forward!(
         r.ρₐ[i], r.ϕ[i] = get_Z(m.m, m.h, ω[i])
         i += 1
     end
+    broadcast!(trans_utils[:ρₐ].tf, r.ρₐ, r.ρₐ)
+    broadcast!(trans_utils[:ϕ].tf, r.ϕ, r.ϕ)
     nothing
 end
 

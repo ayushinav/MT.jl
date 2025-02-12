@@ -1,7 +1,7 @@
 @testitem "forward tests" tags = [:forward] begin
     using BenchmarkTools
     h = [100.0, 1000.0] # m
-    ρ = [100.0, 10.0, 1000.0] # Ωm
+    ρ = log10.([100.0, 10.0, 1000.0]) # Ωm
     m = MTModel(ρ, h)
     T = 10 .^ (range(-3, 5, length = 57))
     ω = 2π ./ T
