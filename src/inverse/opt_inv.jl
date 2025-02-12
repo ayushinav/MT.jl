@@ -126,21 +126,3 @@ function cb_(state, l, verbose, L, μ, model_trans_utils)
 
     return false
 end
-
-# function cb3(state, l, verbose, p)
-
-#     @unpack model_type, h, model_trans_utils, response_trans_utils, vars, response_fields, W, μ, r_obs, L = p
-#     @show size(state.u), size(L)
-#     chi2 = l - μ * norm(L * model_trans_utils.tf.(state.u))
-#     (verbose == true) && println("iteration = $(state.iter) => data misfit => $chi2")
-
-#     model = model_type(broadcast(model_trans_utils.tf, state.u), h)
-#     resp_ = forward(model, vars; trans_utils=response_trans_utils)
-
-#     L1 = χ²(reduce(vcat, [getfield(resp_, k) for k in response_fields]),
-#         reduce(vcat, [getfield(r_obs, k) for k in response_fields]); W=W) * sqrt(size(W, 1))
-
-#     (verbose == true) && println("iteration = $(state.iter) => data misfit => $(L1^2)")
-
-#     return false
-# end

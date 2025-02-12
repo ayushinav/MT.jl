@@ -69,8 +69,8 @@ function forward!(
         r.ρₐ[i], r.ϕ[i] = get_Z(m.m, m.h, ω[i])
         i += 1
     end
-    broadcast!(trans_utils.ρₐ.tf, r.ρₐ, r.ρₐ)
-    broadcast!(trans_utils.ϕ.tf, r.ϕ, r.ϕ)
+    broadcast!(trans_utils[:ρₐ].tf, r.ρₐ, r.ρₐ)
+    broadcast!(trans_utils[:ϕ].tf, r.ϕ, r.ϕ)
     nothing
 end
 
