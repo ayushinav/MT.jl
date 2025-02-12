@@ -1,7 +1,7 @@
 @testitem "fixed discretization" tags = [:mcmc] begin
     using Distributions, Turing
 
-    m_test = MTModel([100.0, 10.0, 1000.0], [1e3, 1e3])
+    m_test = MTModel(log10.([100.0, 10.0, 1000.0]), [1e3, 1e3])
     f = 10 .^ range(-4, stop = 1, length = 25)
     ω = vec(2π .* f)
 
@@ -26,33 +26,39 @@
     )
 
 
-    n_samples = 20
+    n_samples = 50
     mcache = mcmc_cache(modelD, respD, n_samples, NUTS())
 
-    log_tf2 = transform_utils([], log10, (x) -> 10^x, (x) -> inv(x * log(10)))
-
-    mcmc_chain = stochastic_inverse(r_obs, err_resp, ω, mcache, trans_utils = (m = log_tf,))
+    mcmc_chain = stochastic_inverse(
+        r_obs,
+        err_resp,
+        ω,
+        mcache,
+        model_trans_utils = (; m = MT.lin_tf),
+    )
 
     model_list = get_model_list(mcmc_chain, modelD)
 
-    rho_err = 0.0
-    ph_err = 0.0
-    for idx = 1:n_samples
+    err = 0.0
+    for idx = n_samples-20:n_samples
         m_model = model_list[idx]
         resp_model = forward(m_model, ω)
 
-        rho_err += sum(abs.(resp_model.ρₐ .- r_obs.ρₐ))
-        ph_err += sum(abs.(resp_model.ϕ .- r_obs.ϕ))
+        err += sqrt(
+            norm(
+                ([resp_model.ρₐ..., resp_model.ϕ...] .- [r_obs.ρₐ..., r_obs.ϕ...]) ./
+                [err_resp.ρₐ..., err_resp.ϕ...],
+            ),
+        )
     end
 
-    @test sqrt(rho_err) / n_samples .<= sum(err_resp.ρₐ)
-    @test sqrt(ph_err) / n_samples .<= sum(err_resp.ϕ)
+    @test err / n_samples <= 1
 end
 
 @testitem "variable discretization" tags = [:mcmc] begin
     using Distributions, Turing
 
-    m_test = MTModel([100.0, 10.0, 1000.0], [1e3, 1e3])
+    m_test = MTModel(log10.([100.0, 10.0, 1000.0]), [1e3, 1e3])
     f = 10 .^ range(-4, stop = 1, length = 25)
     ω = vec(2π .* f)
 
@@ -76,28 +82,27 @@ end
         product_distribution([Uniform(ih_bounds...) for ih_bounds in h_bounds]),
     )
 
-
-    n_samples = 20
+    n_samples = 50
     mcache = mcmc_cache(modelD, respD, n_samples, NUTS())
 
-    log_tf2 = transform_utils([], log10, (x) -> 10^x, (x) -> inv(x * log(10)))
-
-    mcmc_chain = stochastic_inverse(r_obs, err_resp, ω, mcache, trans_utils = (m = log_tf,))
+    mcmc_chain = stochastic_inverse(r_obs, err_resp, ω, mcache)
 
     model_list = get_model_list(mcmc_chain, modelD)
 
-    rho_err = 0.0
-    ph_err = 0.0
-    for idx = 1:n_samples
+    err = 0.0
+    for idx = n_samples-20:n_samples
         m_model = model_list[idx]
         resp_model = forward(m_model, ω)
 
-        rho_err += sum(abs.(resp_model.ρₐ .- r_obs.ρₐ))
-        ph_err += sum(abs.(resp_model.ϕ .- r_obs.ϕ))
+        err += sqrt(
+            norm(
+                ([resp_model.ρₐ..., resp_model.ϕ...] .- [r_obs.ρₐ..., r_obs.ϕ...]) ./
+                [err_resp.ρₐ..., err_resp.ϕ...],
+            ),
+        )
     end
 
-    @test sqrt(rho_err) / n_samples .<= sum(err_resp.ρₐ)
-    @test sqrt(ph_err) / n_samples .<= sum(err_resp.ϕ)
+    @test err / n_samples <= 1
 end
 
 ## TODO: Add RTO tests

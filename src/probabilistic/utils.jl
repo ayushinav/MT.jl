@@ -73,7 +73,7 @@ makes a `Turing.jl` model to perform MCMC sampling
         end
     end
 
-    m_sample = typeof(m_sample)([broadcast(getproperty(trans_utils[k], :tf), m0[k])
+    m_sample = typeof(m_sample)([broadcast(getproperty(model_trans_utils[k], :tf), m0[k])
                                  for k in propertynames(mDist)]...)
     # works with mDist being a NamedTuple
 
@@ -84,7 +84,7 @@ makes a `Turing.jl` model to perform MCMC sampling
     # print("\n")
 
     for k in response_fields
-        r_obs[k] ~ getfield(rDist, k)(getfield(r_sample, k), getfield(err_resp, k))
+        r_obs[k] ~ getfield(rDist, k)(getfield(r_sample, k), getfield(err_resp, k) .^ 2)
         # works with rDist being a NamedTuple
     end
 end

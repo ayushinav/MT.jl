@@ -53,8 +53,8 @@ function stochastic_inverse(r_obs::resp1, err_resp::resp2, vars, alg_cache::mcmc
 
     trans_utils_arr = []
     for k in fieldnames(typeof(alg_cache.apriori))
-        if k in keys(trans_utils)
-            push!(trans_utils_arr, trans_utils[k])
+        if k in keys(model_trans_utils)
+            push!(trans_utils_arr, model_trans_utils[k])
         else
             push!(trans_utils_arr, lin_tf)
         end
@@ -78,10 +78,8 @@ function stochastic_inverse(r_obs::resp1, err_resp::resp2, vars, alg_cache::mcmc
         alg_cache.apriori, # ::NamedTuple
         alg_cache.likelihood; # ::responseDistribution
         response_fields=Symbol.(response_fields), model_fields=Symbol.(model_fields),
-        model_trans_utils=model_transf_utils, response_trans_utils=response_trans_utils)
+        model_trans_utils=transf_utils, response_trans_utils=response_trans_utils)
 
-    # print("MODEL WORKS?")
-    # @show typeof(sampler) <: Turing.AdvancedVI.VariationalInference
     @show kwargs
 
     if typeof(alg_cache.sampler) <: Turing.AdvancedVI.VariationalInference

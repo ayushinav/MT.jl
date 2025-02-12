@@ -12,7 +12,7 @@ returns `nl_cache` that specifies which non linear solver to use for the inverse
 
 ## Keyword Arguments
 
-  - `alg`: `NonlinearSolve`[@ref] alogrithm to be used, defaults to LevenbergMarquardt
+  - `alg`: `NonlinearSolve`[@ref] algorithm to be used, defaults to LevenbergMarquardt
   - `μ` : regularization weight
 """
 function NonlinearAlg(; alg=LevenbergMarquardt, μ=1.0)
