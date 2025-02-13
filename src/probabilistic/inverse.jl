@@ -4,7 +4,7 @@
         err_resp::response,
         vars,
         alg_cache::mcmc_cache;
-        trans_utils::NamedTuple = (m = lin_tf, h = lin_tf)
+        model_trans_utils::NamedTuple = (m = lin_tf, h = lin_tf)
         )
 
 function to perform sampling
@@ -20,7 +20,7 @@ function to perform sampling
   - `err_resp`: `response` variable containing the errors associated with observed response
   - `vars`: variables that need to be passed into the `forward` function along with `model` to generate a `response`
   - `alg_cache`: to tell the compiler what type of stochastic inversion method is to be used
-  - `trans_utils`: A named tuple containing `transform_utils` for the fields of model that need to be scaled/modified. If not provided for any `model` field, the field won't be modified.
+  - `model_trans_utils`: A named tuple containing `transform_utils` for the fields of model that need to be scaled/modified. If not provided for any `model` field, the field won't be modified.
 """
 function stochastic_inverse(r_obs::resp1, err_resp::resp2, vars, alg_cache::mcmc_cache;
         model_trans_utils::NamedTuple=(m=lin_tf, h=lin_tf), # need to take care of this
@@ -28,7 +28,7 @@ function stochastic_inverse(r_obs::resp1, err_resp::resp2, vars, alg_cache::mcmc
         kwargs...) where {resp1 <: AbstractResponse, resp2 <: AbstractResponse}
     model_fields = []
     modelD = []
-    const_data = [] #model([], []);
+    const_data = []
 
     # segregate the constants and the Distribution parts of the alg_cache
 
@@ -61,11 +61,6 @@ function stochastic_inverse(r_obs::resp1, err_resp::resp2, vars, alg_cache::mcmc
     end
 
     transf_utils = (; zip([fieldnames(typeof(alg_cache.apriori))...], trans_utils_arr)...) # NamedTuple for trans_utils and defaults
-
-    # make model and modelDistribution
-    # @show const_data
-    # @show MT.inverse(r_obs, abstract = true)
-    # @show response_fields
 
     m_sample = MT.inverse(r_obs; abstract=true)(const_data...)
 

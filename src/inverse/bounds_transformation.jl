@@ -64,11 +64,11 @@ function transform_utils(p::Vector{T}, tf::Function, itf::Function,
         p, (x) -> tf(x, p), (x) -> itf(x, p), (x) -> dtf(x, p))
 end
 
-# should generally be good for most MT inversions
+# should generally be good for most inversions
 sigmoid_tf = transform_utils([-3.0, 6.0], sigmoid, inverse_sigmoid, d_sigmoid);
 pow_tf = transform_utils([], (x) -> 10^x, log10, (x) -> (10^x * log(10)));
 log_tf = transform_utils([], log10, (x) -> 10^x, (x) -> inv(x * log(10)));
 pow_sigmoid_tf = transform_utils(
     [-3.0, 6.0], pow_sigmoid, inverse_pow_sigmoid, d_pow_sigmoid);
 lin_tf = transform_utils([], (x) -> x, (x) -> x, (x) -> 1.0);
-phi_scale_tf = transform_utils([90], scale_fn, inverse_scale_fn, d_scale_fn)
+phi_scale_tf = transform_utils([90], (x) -> scale_fn(x, 90), (x) -> inverse_scale_fn(x, 90), d_scale_fn)

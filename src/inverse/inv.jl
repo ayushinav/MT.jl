@@ -20,8 +20,8 @@ updates `mₖ` using occam iteration to fit `robs` within a misfit of `χ2`, by 
   - `robs`: response to invert for
   - `vars`: variables required for forward modeling, eg., `ω` for MT
   - `alg_cache`: deterimines the algorithm to be performed for inversion
-  - `W= nothing`: Weight matrix, defaults to identity matrix `I`
-  - `L`
+  - `W`: Weight matrix, defaults to identity matrix `I`
+  - `L`: Regularization matrix, defaults to derivative matrix, given by `∂`(@ref)
   - `max_iters= 30`: maximum number of iterations
   - `χ2=1.`: target misfit
   - `response_fields: choose data of response to perform inversion on, eg., ρₐ for MT, by default chooses all the data (ρₐ and ϕ)

@@ -64,27 +64,19 @@ makes a `Turing.jl` model to perform MCMC sampling
         model <: AbstractModel, response <: AbstractResponse,
         mdist <: AbstractModelDistribution, rdist <: AbstractResponseDistribution}
     m0 = (; zip([propertynames(mDist)...], const_data)...)
-    # works with mDist being a NamedTuple
 
     for k in propertynames(mDist)
         if k in model_fields
             m0[k] ~ getproperty(mDist, k)
-            # works with mDist being a NamedTuple
         end
     end
 
     m_sample = typeof(m_sample)([broadcast(getproperty(model_trans_utils[k], :tf), m0[k])
                                  for k in propertynames(mDist)]...)
-    # works with mDist being a NamedTuple
 
     r_sample = forward(m_sample, vars; trans_utils=response_trans_utils)
-    # @show r_sample
-    # @show r_obs
-    # @show m_sample
-    # print("\n")
 
     for k in response_fields
         r_obs[k] ~ getfield(rDist, k)(getfield(r_sample, k), getfield(err_resp, k) .^ 2)
-        # works with rDist being a NamedTuple
     end
 end

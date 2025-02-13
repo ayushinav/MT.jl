@@ -104,22 +104,6 @@ function inverse!(mₖ::model1,
     return return_code(chi2 <= χ2, (μ=alg_cache.μ,), mₖ, χ2, chi2)
 end
 
-# focussing on just geophysical models for now
-# Not performant at the moment
-function construct_cost_function(m, p)
-    @unpack model_type, h, model_trans_utils, response_trans_utils, vars, response_fields, W, μ, r_obs, L = p
-    # model = model_type(model_trans_utils.tf.(m), h)
-    model = model_type(broadcast(model_trans_utils.tf, m), h)
-    resp_ = forward(model, vars; trans_utils=response_trans_utils)
-
-    L1 = χ²(reduce(vcat, [getfield(resp_, k) for k in response_fields]),
-        reduce(vcat, [getfield(r_obs, k) for k in response_fields]); W=W) * sqrt(size(W, 1))
-    L2 = μ * norm(L * model.m)
-    # @show L1, L2
-
-    return [L1^2 + L2]
-end
-
 function cb_(state, l, verbose, L, μ, model_trans_utils)
     chi2 = sqrt(l - μ * norm(L * model_trans_utils.tf.(state.u)))
     (verbose == true) && println("iteration = $(state.iter) => data misfit => $chi2")
