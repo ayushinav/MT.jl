@@ -14,7 +14,6 @@ returns `rto_cache` that specifies the algorithm to be used for stochastic inver
   - `response_fields`: choose data of response to perform inversion on, eg., ρₐ for MT, by default chooses all the data (ρₐ and ϕ)
   - `L`: Regularization matrix, defaults to discretized derivative matrix given by ∂(@ref)
   - `verbose`: to print results or not
-
 """
 struct rto_cache{model <: AbstractGeophyModel, T1 <: AbstractVector{<:Any},
     T2 <: Union{Float64, Float32}, A <: Union{occam_cache, nl_cache}, T3}
@@ -67,7 +66,6 @@ function stochastic_inverse(r_obs::resp1,
         model_trans_utils::NamedTuple=(m=sigmoid_tf, h=lin_tf),
         response_trans_utils::NamedTuple=(ρₐ=lin_tf, ϕ=lin_tf)) where {
         resp1 <: AbstractGeophyResponse, resp2 <: AbstractGeophyResponse}
-
     W = Diagonal(vcat([inv.(getfield(err_resp, k)) .^ 2
                        for k in fieldnames(typeof(err_resp))]...))
 
@@ -197,9 +195,10 @@ function stochastic_inverse(r_obs::resp1,
         i += 1
     end
 
-    idcs = broadcast(!isnan, view(m_chains, 1, :));
+    idcs = broadcast(!isnan, view(m_chains, 1, :))
 
-    return Turing.Chains(vcat(m_chains[:, idcs], μ_chains[:, idcs])', [Symbol("m[$i]") for i in 1:(n + 1)])
+    return Turing.Chains(
+        vcat(m_chains[:, idcs], μ_chains[:, idcs])', [Symbol("m[$i]") for i in 1:(n + 1)])
 end
 
 # mutable struct RTO_MTModel <: AbstractGeophyModel
