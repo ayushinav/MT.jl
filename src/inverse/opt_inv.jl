@@ -6,16 +6,16 @@ mutable struct opt_cache{T1, T2}
     μ::T2
 end
 """
-    NonlinearAlg(; alg = LevenbergMarquardt, μ = 1.0, kwargs...)
+    OptAlg(; alg = LBFGS, μ = 1.0, kwargs...)
 
 returns `nl_cache` that specifies which non linear solver to use for the inverse problem
 
 ## Keyword Arguments
 
-  - `alg`: `NonlinearSolve`[@ref] algorithm to be used, defaults to LevenbergMarquardt
+  - `alg`: `NonlinearSolve`[@ref] algorithm to be used, defaults to LBFGS
   - `μ` : regularization weight
 """
-function OptAlg(; alg=BFGS, μ=1.0)
+function OptAlg(; alg=LBFGS, μ=1.0)
     return opt_cache(alg, μ)
 end
 # ======================== using Optimization.jl ===============================
@@ -54,6 +54,7 @@ updates `mₖ` using occam iteration to fit `robs` within a misfit of `χ2`, by 
   - `model_trans_utils`: conversion to and from computational domain,
   - `response_trans_utils`: for scaling the response parameters,
   - `verbose`: whether to print updates after each iteration, defaults to true
+  - `mᵣ`: model in physical domain to be regularized against
 
 ### Returns:
 
@@ -61,7 +62,7 @@ return message in the form of `return_code` and updates `mₖ` in-place.
 
 ### Example:
 
-`inverse!(m_occam, r_obs, Occam([1e-2, 1e6]))`
+`inverse!(m_occam, r_obs, ω, NonlinearAlg(; alg = LBFGS, μ = 1.0))`
 """
 function inverse!(mₖ::model1,
         robs::response,
@@ -80,33 +81,37 @@ function inverse!(mₖ::model1,
     prec = eltype(mₖ.m)
     model_fields = [:m]
 
+    n_vars = length(vars)
+    n_resp = length(response_fields) * n_vars
+
     (W === nothing) && (W = prec.(I(n_resp)))
     (L === nothing) && (L = prec.(∂(length(mₖ.m))))
 
     model_type = typeof(mₖ).name.wrapper
+    (mᵣ === nothing) && (mᵣ = model_type(zero(mₖ.m), mₖ.h))
 
     p = (model_type=model_type, h=mₖ.h, model_trans_utils=model_trans_utils,
         response_trans_utils=response_trans_utils, vars=vars,
-        response_fields=response_fields, W=W, μ=alg_cache.μ, r_obs=robs, L=L)
+        response_fields=response_fields, W=W, μ=alg_cache.μ, r_obs=robs, L=L, mᵣ=mᵣ)
 
     optfn = OptimizationFunction(construct_cost_function, Optimization.AutoForwardDiff())
     prob = OptimizationProblem(optfn, model_trans_utils.itf.(mₖ.m), p)
 
-    cb(state, l) = cb_(state, l, verbose, L, alg_cache.μ, model_trans_utils)
+    cb(state, l) = cb_(state, l, verbose, L, alg_cache.μ, model_trans_utils, χ2)
     sol = solve(prob, alg_cache.alg(); callback=cb, maxiters=max_iters)
 
     mₖ.m .= model_trans_utils.tf.(sol.u)
 
-    resp_ = forward(mₖ, vars; trans_utils=response_trans_utils)
+    resp_ = forward(mₖ, vars; response_trans_utils=response_trans_utils)
     chi2 = χ²(reduce(vcat, [getfield(resp_, k) for k in response_fields]),
         reduce(vcat, [getfield(robs, k) for k in response_fields]); W=W)
 
     return return_code(chi2 <= χ2, (μ=alg_cache.μ,), mₖ, χ2, chi2)
 end
 
-function cb_(state, l, verbose, L, μ, model_trans_utils)
+function cb_(state, l, verbose, L, μ, model_trans_utils, χ2)
     chi2 = sqrt(l - μ * norm(L * model_trans_utils.tf.(state.u)))
     (verbose == true) && println("iteration = $(state.iter) => data misfit => $chi2")
 
-    return false
+    return (chi2 < χ2)
 end

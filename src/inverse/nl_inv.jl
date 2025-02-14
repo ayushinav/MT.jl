@@ -6,7 +6,7 @@ mutable struct nl_cache{T1, T2}
     μ::T2
 end
 """
-    NonlinearAlg(; alg = LevenbergMarquardt, μ = 1.0, kwargs...)
+    NonlinearAlg(; alg = LevenbergMarquardt, μ = 1.0)
 
 returns `nl_cache` that specifies which non linear solver to use for the inverse problem
 
@@ -55,6 +55,7 @@ updates `mₖ` using occam iteration to fit `robs` within a misfit of `χ2`, by 
   - `model_trans_utils`: conversion to and from computational domain,
   - `response_trans_utils`: for scaling the response parameters,
   - `verbose`: whether to print updates after each iteration, defaults to true
+  - `mᵣ`: model in physical domain to be regularized against
 
 ### Returns:
 
@@ -62,7 +63,7 @@ return message in the form of `return_code` and updates `mₖ` in-place.
 
 ### Example:
 
-`inverse!(m_occam, r_obs, Occam([1e-2, 1e6]))`
+`inverse!(m_occam, r_obs, ω, NonlinearAlg(; alg = LevenbergMarquardt, μ = 1.0))`
 """
 function inverse!(mₖ::model1,
         robs::response,
@@ -81,14 +82,18 @@ function inverse!(mₖ::model1,
     prec = eltype(mₖ.m)
     model_fields = [:m]
 
+    n_vars = length(vars)
+    n_resp = length(response_fields) * n_vars
+
     (W === nothing) && (W = prec.(I(n_resp)))
     (L === nothing) && (L = prec.(∂(length(mₖ.m))))
 
     model_type = typeof(mₖ).name.wrapper
+    (mᵣ === nothing) && (mᵣ = model_type(zero(mₖ.m), mₖ.h))
 
     p = (model_type=model_type, h=mₖ.h, model_trans_utils=model_trans_utils,
         response_trans_utils=response_trans_utils, vars=vars,
-        response_fields=response_fields, W=W, μ=alg_cache.μ, r_obs=robs, L=L)
+        response_fields=response_fields, W=W, μ=alg_cache.μ, r_obs=robs, L=L, mᵣ=mᵣ)
 
     prob = SciMLBase.NonlinearLeastSquaresProblem(
         construct_cost_function, model_trans_utils.itf.(mₖ.m), p)
@@ -100,7 +105,7 @@ function inverse!(mₖ::model1,
 
     while iters <= max_iters
         model = model_type(model_trans_utils.tf.(nlcache.u), mₖ.h)
-        forward!(resp_, model, vars; trans_utils=response_trans_utils)
+        forward!(resp_, model, vars; response_trans_utils=response_trans_utils)
         chi2 = χ²(reduce(vcat, [getfield(resp_, k) for k in response_fields]),
             reduce(vcat, [getfield(robs, k) for k in response_fields]); W=W)
         (verbose == true) && println("iteration = $iters => data misfit => $chi2")
@@ -121,14 +126,14 @@ end
 # focussing on just geophysical models for now
 # Not performant at the moment
 function construct_cost_function(m, p)
-    @unpack model_type, h, model_trans_utils, response_trans_utils, vars, response_fields, W, μ, r_obs, L = p
+    @unpack model_type, h, model_trans_utils, response_trans_utils, vars, response_fields, W, μ, r_obs, L, mᵣ = p
     # model = model_type(model_trans_utils.tf.(m), h)
     model = model_type(broadcast(model_trans_utils.tf, m), h)
-    resp_ = forward(model, vars; trans_utils=response_trans_utils)
+    resp_ = forward(model, vars; response_trans_utils=response_trans_utils)
 
     L1 = χ²(reduce(vcat, [getfield(resp_, k) for k in response_fields]),
         reduce(vcat, [getfield(r_obs, k) for k in response_fields]); W=W) * sqrt(size(W, 1))
-    L2 = μ * norm(L * model.m)
+    L2 = μ * norm(L * (model.m .- mᵣ.m))
     # @show L1, L2
 
     return [L1^2 + L2]

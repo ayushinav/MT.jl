@@ -87,7 +87,7 @@ function inverse!(mₖ::model1,
         assumptions=LinearSolve.OperatorAssumptions(
             true; condition=LinearSolve.OperatorCondition.WellConditioned))
 
-    forward!(respₖ, mₖ, vars; trans_utils=response_trans_utils) # for the first iteration
+    forward!(respₖ, mₖ, vars; response_trans_utils=response_trans_utils) # for the first iteration
     itr = 1
     chi2 = prec(1e6)
 
@@ -125,7 +125,7 @@ function inverse!(mₖ::model1,
         for k in model_fields # copying things to mₖ
             getfield(mₖ, k) .= getfield(mₖ₊₁, k)
         end
-        forward!(respₖ, mₖ, vars; trans_utils=response_trans_utils)
+        forward!(respₖ, mₖ, vars; response_trans_utils=response_trans_utils)
         chi2 = χ²(reduce(vcat, [copy(getfield(respₖ, k)) for k in response_fields]),
             inv_utils.dobs; W=inv_utils.W)
         if chi2 < χ2

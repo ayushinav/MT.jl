@@ -26,6 +26,7 @@ end
         jc::jacobian_cache;
         model_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(m))], 
         response_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(J))], 
+        response_trans_utils::NamedTuple=(; ρₐ=lin_tf, ϕ=lin_tf)
         ) where T <: Union{Float64, Float32}
 
 overwrites a `jacobian_cache` cache to calculate the jacobian of a `model`.
@@ -35,7 +36,8 @@ function jacobian!(m::model,
         vars::Vector{T},
         jc::jacobian_cache;
         model_fields::Vector{Symbol}=[k for k in fieldnames(typeof(m))],
-        response_fields::Vector{Symbol}=[k for k in fieldnames(typeof(J))]) where {
+        response_fields::Vector{Symbol}=[k for k in fieldnames(typeof(J))],
+        response_trans_utils::NamedTuple=(; ρₐ=lin_tf, ϕ=lin_tf)) where {
         T <: Union{Float64, Float32}, model <: AbstractModel}
     nl = 0
     @inbounds for k in model_fields
@@ -43,10 +45,10 @@ function jacobian!(m::model,
 
         @inbounds for i in eachindex(getfield(m, k))
             getfield(m, k)[i] = getfield(m, k)[i] + ϵ
-            forward!(jc.r1, m, vars)
+            forward!(jc.r1, m, vars; response_trans_utils=response_trans_utils)
 
             getfield(m, k)[i] = getfield(m, k)[i] - 2ϵ
-            forward!(jc.r2, m, vars)
+            forward!(jc.r2, m, vars; response_trans_utils=response_trans_utils)
 
             @inbounds for l in response_fields
                 view(getfield(jc.j, l), :, i) .= getfield(jc.r1, l) .- getfield(jc.r2, l)

@@ -74,7 +74,7 @@ makes a `Turing.jl` model to perform MCMC sampling
     m_sample = typeof(m_sample)([broadcast(getproperty(model_trans_utils[k], :tf), m0[k])
                                  for k in propertynames(mDist)]...)
 
-    r_sample = forward(m_sample, vars; trans_utils=response_trans_utils)
+    r_sample = forward(m_sample, vars; response_trans_utils=response_trans_utils)
 
     for k in response_fields
         r_obs[k] ~ getfield(rDist, k)(getfield(r_sample, k), getfield(err_resp, k) .^ 2)

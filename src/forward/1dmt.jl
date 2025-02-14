@@ -34,7 +34,7 @@ end
 returns a  `response` for the given model `m` at the frequencies  `ω`
 """
 function forward(m::MTModel{<:AbstractVector{<:Any}, <:AbstractVector{<:Any}},
-        ω::AbstractVector{<:Any}; trans_utils=(ρₐ=lin_tf, ϕ=lin_tf)) # ω will always be a vector, until will find an exception
+        ω::AbstractVector{<:Any}; response_trans_utils=(ρₐ=lin_tf, ϕ=lin_tf)) # ω will always be a vector, until will find an exception
     # the following line check is why we do not use the same fn name here, so that the checks happen just once for all the frequencies.
     if !(length(m.h) == length(m.m) - 1)
         error("number of model layers should be 1 less than the number of model parameters")
@@ -47,7 +47,7 @@ function forward(m::MTModel{<:AbstractVector{<:Any}, <:AbstractVector{<:Any}},
         ρₐ[i], ϕ[i] = get_Z(m.m, m.h, ω[i])
         i += 1
     end
-    return MTResponse(trans_utils[:ρₐ].tf.(ρₐ), trans_utils[:ϕ].tf.(ϕ))
+    return MTResponse(response_trans_utils[:ρₐ].tf.(ρₐ), response_trans_utils[:ϕ].tf.(ϕ))
 end
 
 # dispatch on forward! for 1d model
@@ -59,7 +59,7 @@ updates response `r` type for the given model `m` at the frequencies  `ω`
 """
 function forward!(
         r::MTResponse, m::MTModel{<:AbstractVector{<:Any}, <:AbstractVector{<:Any}},
-        ω::AbstractVector{<:Any}; trans_utils=(ρₐ=lin_tf, ϕ=lin_tf))
+        ω::AbstractVector{<:Any}; response_trans_utils=(ρₐ=lin_tf, ϕ=lin_tf))
     if !(length(m.h) == length(m.m) - 1)
         error("number of model layers should be 1 less than the number of model parameters")
     end
@@ -69,8 +69,8 @@ function forward!(
         r.ρₐ[i], r.ϕ[i] = get_Z(m.m, m.h, ω[i])
         i += 1
     end
-    broadcast!(trans_utils[:ρₐ].tf, r.ρₐ, r.ρₐ)
-    broadcast!(trans_utils[:ϕ].tf, r.ϕ, r.ϕ)
+    broadcast!(response_trans_utils[:ρₐ].tf, r.ρₐ, r.ρₐ)
+    broadcast!(response_trans_utils[:ϕ].tf, r.ϕ, r.ϕ)
     nothing
 end
 

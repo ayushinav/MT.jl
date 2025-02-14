@@ -50,7 +50,7 @@ export get_Z, get_appres, get_phase, forward!, forward
 # export zero, copy
 export plot_response, prepare_plot, prepare_plot!
 export plot_model, plot_model!
-export sigmoid, d_sigmoid, inverse_sigmoid, transform_utils, default_tf, log_tf
+export sigmoid, d_sigmoid, inverse_sigmoid, transform_utils, default_tf, log_tf, lin_tf
 export mt_jacobian_cache, jacobian_mt, jacobian!
 export occam_cache, Occam, nl_cache, NonlinearAlg, opt_cache, OptAlg, linsolve!, occam_step!
 export inverse!

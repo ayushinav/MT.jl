@@ -87,7 +87,7 @@ function occam_step!(mₖ₊₁::model1, # to store the next update, which will 
         for k in model_fields # to model domain
             getfield(mₖ₊₁, k) .= model_trans_utils.tf.(getfield(mₖ₊₁, k))
         end
-        forward!(respₖ₊₁, mₖ₊₁, vars; trans_utils=response_trans_utils)
+        forward!(respₖ₊₁, mₖ₊₁, vars; response_trans_utils=response_trans_utils)
         return χ²(reduce(vcat, [getfield(respₖ₊₁, k) for k in response_fields]),
             inv_utils.dobs; W=inv_utils.W)
     end
@@ -103,7 +103,7 @@ function occam_step!(mₖ₊₁::model1, # to store the next update, which will 
         for k in model_fields # to model domain
             getfield(mₖ₊₁, k) .= model_trans_utils.tf.(getfield(mₖ₊₁, k))
         end
-        forward!(respₖ₊₁, mₖ₊₁, vars; trans_utils=response_trans_utils)
+        forward!(respₖ₊₁, mₖ₊₁, vars; response_trans_utils=response_trans_utils)
         return χ²(reduce(vcat, [getfield(respₖ₊₁, k) for k in response_fields]),
             inv_utils.dobs; W=inv_utils.W)
     end
@@ -167,7 +167,7 @@ function occam_step!(mₖ₊₁::model1, # to store the next update, which will 
         getfield(mₖ₊₁, k) .= model_trans_utils.tf.(getfield(mₖ₊₁, k))
     end
 
-    forward!(respₖ₊₁, mₖ₊₁, vars; trans_utils=response_trans_utils)
+    forward!(respₖ₊₁, mₖ₊₁, vars; response_trans_utils=response_trans_utils)
 
     verbose && (print("Works golden section search: μ= $μ, χ²= ",
         χ²(reduce(vcat, [copy(getfield(respₖ₊₁, k)) for k in response_fields]),
