@@ -141,7 +141,7 @@ function stochastic_inverse(r_obs::resp1,
             # broadcast!((x) -> (10.0^model_trans_utils[:m].tf(x)), alg_cache.m₀.m, alg_cache.m₀.m) #  to model domain
             # alg_cache.m₀.m .= model_trans_utils[:m].tf.(alg_cache.m₀.m) # to model domain
 
-            forward!(resp_, alg_cache.m₀, vars; trans_utils=response_trans_utils)
+            forward!(resp_, alg_cache.m₀, vars; response_trans_utils=response_trans_utils)
             # @show "chi2_err"
             chi2_err = χ²(
                 reduce(vcat, [getfield(resp_, k) for k in alg_cache.response_fields]),
