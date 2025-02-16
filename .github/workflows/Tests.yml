@@ -25,6 +25,7 @@ jobs:
           - "occam"
           - "mcmc"
           - "rp"
+          - "rto"
           - "types"
     steps:
       - uses: actions/checkout@v4
