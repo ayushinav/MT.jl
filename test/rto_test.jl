@@ -44,18 +44,14 @@
 
     model_list = get_model_list(mt_chain, modelD)
 
-    err = 0.0
-    for idx = n_samples-20:n_samples
-        m_model = model_list[idx]
-        resp_model = forward(m_model, ω)
+    m_model = model_list[end]
+    resp_model = forward(m_model, ω)
 
-        err += sqrt(
-            norm(
-                ([resp_model.ρₐ..., resp_model.ϕ...] .- [r_obs.ρₐ..., r_obs.ϕ...]) ./
-                [err_resp.ρₐ..., err_resp.ϕ...],
-            ),
+    err = sqrt(
+        norm(inv(2* length(ω)) *
+            ([resp_model.ρₐ..., resp_model.ϕ...] .- [r_obs.ρₐ..., r_obs.ϕ...]) ./
+            [err_resp.ρₐ..., err_resp.ϕ...], 2)
         )
-    end
-
-    @test err / n_samples <= 1
+    
+    @test err <= 1
 end

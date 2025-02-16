@@ -39,20 +39,22 @@
 
     model_list = get_model_list(mcmc_chain, modelD)
 
-    err = 0.0
-    for idx = n_samples-20:n_samples
+    err = zeros(n_samples)
+    for idx = 1:n_samples
         m_model = model_list[idx]
         resp_model = forward(m_model, ω)
 
-        err += sqrt(
-            norm(
+        err[i] = sqrt(
+            norm(inv(2* length(ω)) *
                 ([resp_model.ρₐ..., resp_model.ϕ...] .- [r_obs.ρₐ..., r_obs.ϕ...]) ./
                 [err_resp.ρₐ..., err_resp.ϕ...],
             ),
         )
     end
 
-    @test err / n_samples <= 1
+    @show sum(err)
+
+    @test err[n_samples - 20+1:end] / 20 <= 1
 end
 
 @testitem "variable discretization" tags = [:mcmc] begin
@@ -89,18 +91,20 @@ end
 
     model_list = get_model_list(mcmc_chain, modelD)
 
-    err = 0.0
-    for idx = n_samples-20:n_samples
+    err = zeros(n_samples)
+    for idx = 1:n_samples
         m_model = model_list[idx]
         resp_model = forward(m_model, ω)
 
-        err += sqrt(
-            norm(
+        err[i] = sqrt(
+            norm(inv(2* length(ω)) *
                 ([resp_model.ρₐ..., resp_model.ϕ...] .- [r_obs.ρₐ..., r_obs.ϕ...]) ./
                 [err_resp.ρₐ..., err_resp.ϕ...],
             ),
         )
     end
 
-    @test err / n_samples <= 1
+    @show sum(err)
+
+    @test err[n_samples - 20+1:end] / 20 <= 1
 end
