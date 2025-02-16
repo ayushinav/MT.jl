@@ -104,5 +104,3 @@ end
 
     @test err / n_samples <= 1
 end
-
-## TODO: Add RTO tests
