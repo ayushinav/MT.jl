@@ -61,7 +61,7 @@ export RockphyModelDistribution, RockphyResponseDistribution
 export SEO3, UHO2014, Jones2012, Poe2010, Yoshino2009, Wang2006
 export Ni2011, Sifre2014, Gail2008
 export construct_mixing_models, mixing_models, HS1962_plus, HS1962_minus, single_phase, MAL
-export mcmc_cache
+export mcmc_cache, rto_cache
 export stochastic_inverse, get_model_list
 export pre_image, get_kde_image, get_mean_std_image
 

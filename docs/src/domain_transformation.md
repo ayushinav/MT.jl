@@ -1,7 +1,7 @@
 # Domain transformation
 
 ## Introduction
-Throughout the framework, you will come across `transform_utils`, wether be it deterministic inverse, or probabilistic. Even in simple forward calculations, we have them embedded. 
+Throughout the framework, you will come across `transform_utils`, whether be it deterministic inverse, or probabilistic. Even in simple forward calculations, we have them embedded. 
 
 Firstly, let's understand its structure with the example of `log_tf`. A `transform_utils` type variable, say `trans_util` has 4 parameters, the second of which, referred by `tf` is used to move from one space to another. For consistency, we call this forward transformation, that is, it will move the variables to the log-space (on the base 10). 
 
