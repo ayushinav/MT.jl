@@ -26,6 +26,7 @@
     )
 
     n_samples = 50
+    m_rto = MTModel(2 .* ones(length(z)), vec(h))
     r_cache = rto_cache(m_rto, [1e-6, 1e2], Occam(), 50, n_samples, 1.0, [:ρₐ, :ϕ], false)
 
     rto_chain = stochastic_inverse(

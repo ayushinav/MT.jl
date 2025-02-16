@@ -72,4 +72,4 @@ pow_sigmoid_tf = transform_utils(
     [-3.0, 6.0], pow_sigmoid, inverse_pow_sigmoid, d_pow_sigmoid);
 lin_tf = transform_utils([], (x) -> x, (x) -> x, (x) -> 1.0);
 phi_scale_tf = transform_utils(
-    [90], (x) -> scale_fn(x, 90), (x) -> inverse_scale_fn(x, 90), d_scale_fn)
+    [90], (x) -> scale_fn(x, 90), (x) -> inverse_scale_fn(x, 90), (x) -> d_scale_fn(x, 90))

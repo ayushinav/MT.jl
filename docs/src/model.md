@@ -10,13 +10,12 @@ Specifying a model is easy. Let's say you want to add a resistivity distribution
 Define the model using `model` and you are done.
 ```@example model_demo
 using MT
-ρ= [500., 100., 400., 1000.];
+ρ= log10.([500., 100., 400., 1000.]);
 h= [100., 100., 100.];
 m= MTModel(ρ, h)
 ```
 This `model` can then just be passed into `forward` function to get the `response`.
 
-**Note**: 
 !!! note 
     Always use `Float64` or `Float32` types while defining the vectors for resistivities and thickness. This is done for performance while not imposing any serious constraints since most of the data is generally processed using `Float64` on most CPUs and `Float32` on most GPUs.
 
