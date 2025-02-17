@@ -2,6 +2,8 @@ module MT
 using LinearAlgebra
 using Plots
 using LinearSolve
+using NonlinearSolve
+using Optimization, OptimizationOptimJL
 using Turing
 using Distributions
 using Statistics
@@ -25,6 +27,8 @@ include("inverse/bounds_transformation.jl")
 include("inverse/jacobian.jl")
 include("inverse/occam.jl")
 include("inverse/inv.jl")
+include("inverse/nl_inv.jl")
+include("inverse/opt_inv.jl")
 include("probabilistic/respDistribution.jl")
 include("probabilistic/utils.jl")
 include("probabilistic/inverse.jl")
@@ -47,9 +51,9 @@ export get_Z, get_appres, get_phase, forward!, forward
 # export zero, copy
 export plot_response, prepare_plot, prepare_plot!
 export plot_model, plot_model!
-export sigmoid, d_sigmoid, inverse_sigmoid, transform_utils, default_tf, log_tf
+export sigmoid, d_sigmoid, inverse_sigmoid, transform_utils, default_tf, log_tf, lin_tf
 export mt_jacobian_cache, jacobian_mt, jacobian!
-export occam_cache, Occam, linsolve!, occam_step!
+export occam_cache, Occam, nl_cache, NonlinearAlg, opt_cache, OptAlg, linsolve!, occam_step!
 export inverse!
 export ∂, χ², linear_utils, inverse_utils
 export normal_dist, uniform_dist
@@ -58,7 +62,7 @@ export RockphyModelDistribution, RockphyResponseDistribution
 export SEO3, UHO2014, Jones2012, Poe2010, Yoshino2009, Wang2006, const_matrix
 export Ni2011, Sifre2014, Gaillard2008
 export construct_mixing_models, mixing_models, HS1962_plus, HS1962_minus, single_phase, MAL
-export mcmc_cache
+export mcmc_cache, rto_cache
 export stochastic_inverse, get_model_list
 export pre_image, get_kde_image, get_mean_std_image
 

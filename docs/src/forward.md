@@ -6,7 +6,7 @@ Currently, only the recursion solution for MT forward modeling is supported. Onc
 ```@example forward_demo
 using MT
 using Plots
-ρ= [500., 100., 400., 1000.];
+ρ= log10.([500., 100., 400., 1000.]);
 h= [100., 1000., 10000.];
 m= MTModel(ρ, h)
 
@@ -28,7 +28,7 @@ plot_response(plt, margin= 5Plots.mm)
 Another `MTResponse` can be overlain using:
 ```@example forward_demo
 using MT
-ρ= [100., 10., 400.];
+ρ= log10.([100., 10., 400.]);
 h= [100., 10000.];
 m2= MTModel(ρ, h)
 resp2= forward(m2, ω)
@@ -46,17 +46,21 @@ In-place operations for fast non-allocating computations are also supported. The
 using BenchmarkTools
 @benchmark forward!(resp, m, ω)
 ```
-```
-BenchmarkTools.Trial: 10000 samples with 1 evaluation.
- Range (min … max):  25.875 μs … 119.209 μs  ┊ GC (min … max): 0.00% … 0.00%
- Time  (median):     28.209 μs               ┊ GC (median):    0.00%
- Time  (mean ± σ):   28.593 μs ±   2.166 μs  ┊ GC (mean ± σ):  0.00% ± 0.00%
-
-      ▂▄▅▅▅▆█▇▃▃▅▄▁▁▂▂▁                                        ▂
-  ▂▂▄▆█████████████████▇▇██▇▇▇▇▇█▇█▆▅▆▆▆▅▅▅▄▄▂▃▄▄▄▄▅▅▄▄▅▃▄▄▅▄▅ █
-  25.9 μs       Histogram: log(frequency) by time      38.9 μs <
-
- Memory estimate: 0 bytes, allocs estimate: 0.
-```
 
 The above benchmark was done on Mac M1.
+
+If we want, we can get the data on a different scale ((using domain transformation)[domain_transformation.md]) than is provided by default using `:
+
+```@example forward_demo
+ρ= log10.([500., 100., 400., 1000.]);
+h= [100., 1000., 10000.];
+m= MTModel(ρ, h)
+
+T= 10 .^(range(-1,5,length= 57));
+ω= 2π./T;
+
+resp= forward(m, ω; response_trans_utils = (ρₐ=log_tf, ϕ=lin_tf));
+plt= prepare_plot(resp, ω, label = false)
+plot_response(plt, margin= 5Plots.mm)
+plot!(plt[1], yscale = :identity, ylabel = "log ρₐ")
+```

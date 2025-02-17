@@ -59,31 +59,24 @@ makes a `Turing.jl` model to perform MCMC sampling
         rDist::rdist;
         response_fields::Vector{Symbol}=[k for k in fieldnames(typeof(rDist))],
         model_fields::Vector{Symbol}=[k for k in fieldnames(typeof(mDist))],
-        trans_utils::NamedTuple=(m=log_tf, h=lin_tf)) where {
+        model_trans_utils::NamedTuple=(m=lin_tf, h=lin_tf),
+        response_trans_utils::NamedTuple=(ρₐ=lin_tf, ϕ=lin_tf)) where {
         model <: AbstractModel, response <: AbstractResponse,
         mdist <: AbstractModelDistribution, rdist <: AbstractResponseDistribution}
     m0 = (; zip([propertynames(mDist)...], const_data)...)
-    # works with mDist being a NamedTuple
 
     for k in propertynames(mDist)
         if k in model_fields
             m0[k] ~ getproperty(mDist, k)
-            # works with mDist being a NamedTuple
         end
     end
 
-    m_sample = typeof(m_sample)([broadcast(getproperty(trans_utils[k], :tf), m0[k])
+    m_sample = typeof(m_sample)([broadcast(getproperty(model_trans_utils[k], :tf), m0[k])
                                  for k in propertynames(mDist)]...)
-    # works with mDist being a NamedTuple
 
-    r_sample = forward(m_sample, vars)
-    # @show r_sample
-    # @show r_obs
-    # @show m_sample
-    # print("\n")
+    r_sample = forward(m_sample, vars; response_trans_utils=response_trans_utils)
 
     for k in response_fields
-        r_obs[k] ~ getfield(rDist, k)(getfield(r_sample, k), getfield(err_resp, k))
-        # works with rDist being a NamedTuple
+        r_obs[k] ~ getfield(rDist, k)(getfield(r_sample, k), getfield(err_resp, k) .^ 2)
     end
 end

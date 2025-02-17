@@ -1,73 +1,43 @@
 """
-`mt_jacobian_cache`: cache `struct` to store the values during the estimation of jacobian.
+`jacobian_cache`: cache `struct` to store the values during the estimation of jacobian.
 """
-mutable struct mt_jacobian_cache{T}
-    r1::T
-    r2::T
+mutable struct jacobian_cache{T1, T2, T3}
+    r1::T1
+    r2::T2
+    j::T3
 end
 
-"""
-`mt_jacobian_cache`: cache `struct` to store the values during the estimation of jacobian.
-"""
-function mt_jacobian_cache(vars) #can change this with zero response
-    r1 = forward(MTModel([1.0, 1.0], [1.0]), vars)
-    r2 = forward(MTModel([1.0, 1.0], [1.0]), vars)
-    return mt_jacobian_cache{typeof(r1)}(r1, r2)
-end
-"""
-`jacobian_mt`: a cache `struct` to store the jacobians, of the same type as the `response` or `response fields` passed.
-"""
-mutable struct jacobian_mt{T}
-    ρₐ::AbstractMatrix{T}
-    ϕ::AbstractMatrix{T}
-end
-
-"""
-`jacobian_mt`: a cache `struct` to store the jacobians, of the same type as the `response` or `response fields` passed.
-This is a more general function which will allocate the matrices for only the required fields in both  `model` and `response`.
-Useful while testing for different fields of `model` and `response`.
-"""
-function jacobian_mt(resp_fields, var_eltype, mod, mod_fields)
-    empty_mats = [Matrix{Any}(nothing, 0, 0) for k in resp_fields]
-    j = jacobian_mt{var_eltype}(empty_mats...)
-
-    n = sum([length(getfield(mod, k)) for k in mod_fields])
-
+function jacobian_cache(resp_fields, resp, mod, mod_fields)
+    arr = []
     for k in resp_fields
-        setfield!(j, k, zeros(length(ω), n))
+        for j in mod_fields
+            push!(arr, zeros(length(getfield(resp, k)), length(getfield(mod, j))))
+        end
     end
-    return j
+
+    resp_type = (typeof(resp)).name.wrapper{[AbstractMatrix for k in resp_fields]...}
+
+    return jacobian_cache(zero(resp), zero(resp), resp_type(arr...))
 end
 
 """
-`jacobian_mt`: a cache `struct` to store the jacobians, of the same type as the `response` or `response fields` passed.
-This is a slightly specific function which will allocate the matrices for only the required fields in `response`.
-"""
-function jacobian_mt(resp_fields, var_eltype)
-    eltypes = [var_eltype for k in resp_fields]
-    empty_mats = [Matrix{Any}(nothing, 0, 0) for k in resp_fields]
-    return jacobian_mt{var_eltype}(empty_mats...)
-end
-
-# This does not pass a forward function because the cache is mt specific
-"""
-    jacobian!(J::jacobian_mt,
-        m::model, 
+    jacobian!(m::model, 
         vars::Vector{T},
-        mtjc::mt_jacobian_cache;
+        jc::jacobian_cache;
         model_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(m))], 
         response_fields::Vector{Symbol}= [k for k ∈ fieldnames(typeof(J))], 
+        response_trans_utils::NamedTuple=(; ρₐ=lin_tf, ϕ=lin_tf)
         ) where T <: Union{Float64, Float32}
 
-overwrites a `jacobian_mt` cache to calculate the jacobian of a `model`. Need to pass `mt_jacobian_cache` for performance.
+overwrites a `jacobian_cache` cache to calculate the jacobian of a `model`.
 If no `model_fields` or `response_fields` are passed, all the fields of `model` and the `response` (defined in `jacobian`) will be used.
 """
-function jacobian!(J::jacobian_mt,
-        m::model,
+function jacobian!(m::model,
         vars::Vector{T},
-        mtjc::mt_jacobian_cache;
+        jc::jacobian_cache;
         model_fields::Vector{Symbol}=[k for k in fieldnames(typeof(m))],
-        response_fields::Vector{Symbol}=[k for k in fieldnames(typeof(J))]) where {
+        response_fields::Vector{Symbol}=[k for k in fieldnames(typeof(J))],
+        response_trans_utils::NamedTuple=(; ρₐ=lin_tf, ϕ=lin_tf)) where {
         T <: Union{Float64, Float32}, model <: AbstractModel}
     nl = 0
     @inbounds for k in model_fields
@@ -75,14 +45,14 @@ function jacobian!(J::jacobian_mt,
 
         @inbounds for i in eachindex(getfield(m, k))
             getfield(m, k)[i] = getfield(m, k)[i] + ϵ
-            MT.forward!(mtjc.r1, m, vars)
+            forward!(jc.r1, m, vars; response_trans_utils=response_trans_utils)
 
             getfield(m, k)[i] = getfield(m, k)[i] - 2ϵ
-            forward!(mtjc.r2, m, vars)
+            forward!(jc.r2, m, vars; response_trans_utils=response_trans_utils)
 
             @inbounds for l in response_fields
-                getfield(J, l)[:, i] .= getfield(mtjc.r1, l) .- getfield(mtjc.r2, l)
-                rmul!(view(getfield(J, l), :, i), inv(2ϵ))
+                view(getfield(jc.j, l), :, i) .= getfield(jc.r1, l) .- getfield(jc.r2, l)
+                rmul!(view(getfield(jc.j, l), :, i), inv(2ϵ))
             end
             getfield(m, k)[i] = getfield(m, k)[i] + ϵ
         end

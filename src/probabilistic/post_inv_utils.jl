@@ -1,6 +1,6 @@
 """
     get_model_list(chains::chain, mDist::mdist; 
-        trans_utils = (m = log_tf, h = lin_tf,)) where {mdist <: AbstractModelDistribution, chain <: Chains}
+        trans_utils = (m = pow_tf, h = lin_tf,)) where {mdist <: AbstractModelDistribution, chain <: Chains}
 
 returns a list of models from the `Chains` variable obtained from [`stochastic_inverse`](@ref)
 
@@ -11,7 +11,7 @@ returns a list of models from the `Chains` variable obtained from [`stochastic_i
 """
 function get_model_list(chains::chain,
         mDist::mdist;
-        trans_utils=(m=log_tf, h=lin_tf)) where {
+        trans_utils=(m=lin_tf, h=lin_tf)) where {
         mdist <: AbstractModelDistribution, chain <: Chains}
     model_type = sample(mDist)
 

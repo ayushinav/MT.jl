@@ -7,13 +7,13 @@ function ∂(n)
     for i in 2:n
         D[i, i - 1] = -1
     end
+    D[1, 1] = 0.0
     return D
 end
 """
 `χ²(dcal::T, dobs::T; W)`: returns a chi-squared error between the observed and the calculated data. `W` can optionally be passed to weigh points differently.
 """
-function χ²(dcal::T, dobs::T;
-        W::AbstractMatrix) where {T <: Union{AbstractVector{<:Any}, AbstractVector{<:Any}}}
+function χ²(dcal::T1, dobs::T2; W::AbstractMatrix) where {T1, T2} #{T <: Union{AbstractVector{<:Any}, AbstractVector{<:Any}}}
     sqrt((dcal .- dobs)' * W * (dcal .- dobs) / length(dcal))
 end
 

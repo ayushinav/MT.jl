@@ -4,6 +4,7 @@ Pkg.activate("../MT.jl/docs/.")
 using MT
 using Documenter
 
+include("pages.jl")
 DocMeta.setdocmeta!(MT, :DocTestSetup, :(using MT); recursive = true)
 
 makedocs(;
@@ -18,17 +19,7 @@ makedocs(;
         edit_link = "main",
         assets = String[],
     ),
-    pages = [
-        "Home" => "index.md",
-        "API" => "api.md",
-        "inverse" => "inverse.md",
-        "forward" => "forward.md",
-        "model" => "model.md",
-        "interface guide" => "interface_guide.md",
-        "probabilistic inverse" => "probabilisitc_inverse.md",
-        "mtpy tutorial" => "working_with_mtpy.md",
-        "rock physics" => "rock_physics.md",
-    ],
+    pages = pages,
 )
 
 deploydocs(; repo = "github.com/ayushinav/MT.git", devbranch = "main")
