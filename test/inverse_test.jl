@@ -8,8 +8,9 @@
     nω = length(T)
 
     r_obs = forward(m, ω)
-    m_occam = MTModel(fill(2.0, 50), collect(range(0, 5e3, length = 49)))
-
+    z = collect(range(0, 5e3, length = 50))
+    h = diff(z)
+    m_occam = MTModel(fill(2.0, 50), h)
 
     err_ρ = 0.1 .* r_obs.ρₐ
     err_ϕ = asin(0.01) * 180 / π .* ones(length(ω))

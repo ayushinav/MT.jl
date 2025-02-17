@@ -2,7 +2,7 @@
     using Distributions, Turing, LinearAlgebra
 
     m_test = MTModel(log10.([100.0, 10.0, 1000.0]), [1e3, 1e3])
-    f = 10 .^ range(-4, stop = 1, length = 25)
+    f = 10 .^ range(-2, stop=2, length=25)
     ω = vec(2π .* f)
 
     r_obs = forward(m_test, ω)
@@ -16,7 +16,7 @@
 
     respD = MTResponseDistribution(normal_dist, normal_dist)
 
-    z = 10 .^ collect(range(1, stop = 4, length = 100))
+    z = 10 .^ collect(range(1, stop=4, length=100))
     h = diff(z)
 
 
@@ -26,7 +26,7 @@
     )
 
 
-    n_samples = 50
+    n_samples = 30
     mcache = mcmc_cache(modelD, respD, n_samples, NUTS())
 
     mcmc_chain = stochastic_inverse(
@@ -34,34 +34,30 @@
         err_resp,
         ω,
         mcache,
-        model_trans_utils = (; m = MT.lin_tf),
+        model_trans_utils=(; m=MT.lin_tf),
     )
 
     model_list = get_model_list(mcmc_chain, modelD)
+    W = diagm(inv.([err_resp.ρₐ..., err_resp.ϕ...])) .^ 2
 
     err = zeros(n_samples)
     for idx = 1:n_samples
         m_model = model_list[idx]
         resp_model = forward(m_model, ω)
 
-        err[i] = sqrt(
-            norm(inv(2* length(ω)) *
-                ([resp_model.ρₐ..., resp_model.ϕ...] .- [r_obs.ρₐ..., r_obs.ϕ...]) ./
-                [err_resp.ρₐ..., err_resp.ϕ...],
-            ),
-        )
+        err[idx] = χ²(reduce(vcat, [getfield(resp_model, k) for k in [:ρₐ, :ϕ]]),
+                reduce(vcat, [getfield(r_obs, k) for k in [:ρₐ, :ϕ]]);
+                W= W)
     end
 
-    @show sum(err)
-
-    @test err[n_samples - 20+1:end] / 20 <= 1
+    @test sum(err[n_samples-20+1:end]) / 20 <= 1
 end
 
 @testitem "variable discretization" tags = [:mcmc] begin
     using Distributions, Turing, LinearAlgebra
 
     m_test = MTModel(log10.([100.0, 10.0, 1000.0]), [1e3, 1e3])
-    f = 10 .^ range(-4, stop = 1, length = 25)
+    f = 10 .^ range(-2, stop=2, length=25)
     ω = vec(2π .* f)
 
     r_obs = forward(m_test, ω)
@@ -75,7 +71,7 @@ end
 
     respD = MTResponseDistribution(normal_dist, normal_dist)
 
-    z = 10 .^ collect(range(1, stop = 4, length = 100))
+    z = 10 .^ collect(range(1, stop=4, length=100))
     h = diff(z)
     h_bounds = [[ih / 3, ih * 3] for ih in h]
 
@@ -90,21 +86,17 @@ end
     mcmc_chain = stochastic_inverse(r_obs, err_resp, ω, mcache)
 
     model_list = get_model_list(mcmc_chain, modelD)
+    W = diagm(inv.([err_resp.ρₐ..., err_resp.ϕ...])) .^ 2
 
     err = zeros(n_samples)
     for idx = 1:n_samples
         m_model = model_list[idx]
         resp_model = forward(m_model, ω)
 
-        err[i] = sqrt(
-            norm(inv(2* length(ω)) *
-                ([resp_model.ρₐ..., resp_model.ϕ...] .- [r_obs.ρₐ..., r_obs.ϕ...]) ./
-                [err_resp.ρₐ..., err_resp.ϕ...],
-            ),
-        )
+        err[idx] = χ²(reduce(vcat, [getfield(resp_model, k) for k in [:ρₐ, :ϕ]]),
+                reduce(vcat, [getfield(r_obs, k) for k in [:ρₐ, :ϕ]]);
+                W= W)
     end
 
-    @show sum(err)
-
-    @test err[n_samples - 20+1:end] / 20 <= 1
+    @test sum(err[n_samples-20+1:end]) / 20 <= 1
 end
