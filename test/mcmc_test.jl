@@ -82,7 +82,7 @@ end
         product_distribution([Uniform(ih_bounds...) for ih_bounds in h_bounds]),
     )
 
-    n_samples = 50
+    n_samples = 30
     mcache = mcmc_cache(modelD, respD, n_samples, NUTS())
 
     mcmc_chain = stochastic_inverse(r_obs, err_resp, ω, mcache)
