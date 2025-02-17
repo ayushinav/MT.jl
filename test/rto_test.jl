@@ -1,8 +1,7 @@
-# @testitem "RTO" tags = [:rto] begin
-using Pkg
-Pkg.activate(".")    
-using MT
-using Distributions, Turing, LinearAlgebra
+@testitem "RTO" tags = [:rto] begin
+
+    using MT
+    using Distributions, Turing, LinearAlgebra
 
     m_test = MTModel(log10.([100.0, 10.0, 1000.0]), [1e3, 1e3])
     f = 10 .^ range(-2, stop = 2, length = 57)
@@ -21,7 +20,7 @@ using Distributions, Turing, LinearAlgebra
 
     z = collect(range(0, 5e3, length = 50))
     h = diff(z)
-    
+
     modelD = MTModelDistribution(
         product_distribution([Uniform(-1.0, 5.0) for i in eachindex(z)]),
         vec(h),
@@ -49,28 +48,17 @@ using Distributions, Turing, LinearAlgebra
     m_model = model_list[end]
     resp_model = forward(m_model, ω)
 
-    W = diagm(inv.([err_ρ..., err_ϕ...])) .^ 2;
+    W = diagm(inv.([err_ρ..., err_ϕ...])) .^ 2
 
     err = sqrt(
-        norm(inv(2* length(ω)) *
+        norm(
+            inv(2 * length(ω)) *
             ([resp_model.ρₐ..., resp_model.ϕ...] .- [r_obs.ρₐ..., r_obs.ϕ...]) ./
-            [err_resp.ρₐ..., err_resp.ϕ...], 2)
-        )
-    
-#     @test err <= 1
+            [err_resp.ρₐ..., err_resp.ϕ...],
+            2,
+        ),
+    )
 
-# end
+    @test err <= 1
 
-err = zeros(n_samples)
-    for idx in eachindex(model_list)
-        m_model = model_list[idx]
-        resp_model = forward(m_model, ω)
-
-        err[idx] = χ²(reduce(vcat, [getfield(resp_model, k) for k in [:ρₐ, :ϕ]]),
-                reduce(vcat, [getfield(r_obs, k) for k in [:ρₐ, :ϕ]]);
-                W= W)
-        @show err[idx], e_
-    end
-
-
-sum(err)/length(model_list)
+end

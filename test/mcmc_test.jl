@@ -2,7 +2,7 @@
     using Distributions, Turing, LinearAlgebra
 
     m_test = MTModel(log10.([100.0, 10.0, 1000.0]), [1e3, 1e3])
-    f = 10 .^ range(-2, stop=2, length=25)
+    f = 10 .^ range(-2, stop = 2, length = 25)
     ω = vec(2π .* f)
 
     r_obs = forward(m_test, ω)
@@ -16,7 +16,7 @@
 
     respD = MTResponseDistribution(normal_dist, normal_dist)
 
-    z = 10 .^ collect(range(1, stop=4, length=100))
+    z = 10 .^ collect(range(1, stop = 4, length = 100))
     h = diff(z)
 
 
@@ -34,7 +34,7 @@
         err_resp,
         ω,
         mcache,
-        model_trans_utils=(; m=MT.lin_tf),
+        model_trans_utils = (; m = MT.lin_tf),
     )
 
     model_list = get_model_list(mcmc_chain, modelD)
@@ -45,9 +45,11 @@
         m_model = model_list[idx]
         resp_model = forward(m_model, ω)
 
-        err[idx] = χ²(reduce(vcat, [getfield(resp_model, k) for k in [:ρₐ, :ϕ]]),
-                reduce(vcat, [getfield(r_obs, k) for k in [:ρₐ, :ϕ]]);
-                W= W)
+        err[idx] = χ²(
+            reduce(vcat, [getfield(resp_model, k) for k in [:ρₐ, :ϕ]]),
+            reduce(vcat, [getfield(r_obs, k) for k in [:ρₐ, :ϕ]]);
+            W = W,
+        )
     end
 
     @test sum(err[n_samples-20+1:end]) / 20 <= 1
@@ -57,7 +59,7 @@ end
     using Distributions, Turing, LinearAlgebra
 
     m_test = MTModel(log10.([100.0, 10.0, 1000.0]), [1e3, 1e3])
-    f = 10 .^ range(-2, stop=2, length=25)
+    f = 10 .^ range(-2, stop = 2, length = 25)
     ω = vec(2π .* f)
 
     r_obs = forward(m_test, ω)
@@ -71,7 +73,7 @@ end
 
     respD = MTResponseDistribution(normal_dist, normal_dist)
 
-    z = 10 .^ collect(range(1, stop=4, length=100))
+    z = 10 .^ collect(range(1, stop = 4, length = 100))
     h = diff(z)
     h_bounds = [[ih / 3, ih * 3] for ih in h]
 
@@ -93,9 +95,11 @@ end
         m_model = model_list[idx]
         resp_model = forward(m_model, ω)
 
-        err[idx] = χ²(reduce(vcat, [getfield(resp_model, k) for k in [:ρₐ, :ϕ]]),
-                reduce(vcat, [getfield(r_obs, k) for k in [:ρₐ, :ϕ]]);
-                W= W)
+        err[idx] = χ²(
+            reduce(vcat, [getfield(resp_model, k) for k in [:ρₐ, :ϕ]]),
+            reduce(vcat, [getfield(r_obs, k) for k in [:ρₐ, :ϕ]]);
+            W = W,
+        )
     end
 
     @test sum(err[n_samples-20+1:end]) / 20 <= 1
