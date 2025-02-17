@@ -21,3 +21,5 @@ Probabilistic schemes supported:'
 * MCMC with fixed grids
 * MCMC with flexible grids
 * RTO-TKO
+
+## Rock physics

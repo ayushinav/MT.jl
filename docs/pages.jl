@@ -10,6 +10,7 @@ pages = [
         "MCMC with fixed discretization"=>"tutorials/fixed_discretization.md",
         "MCMC with variable discretization"=>"tutorials/variable_discretization.md",
         "RTO-TKO"=>"tutorials/rto.md",
+        "rock physics" => "rock_physics.md",
     ],
     "API" => "api.md",
     "mtpy tutorial" => "working_with_mtpy.md",
