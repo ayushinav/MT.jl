@@ -1,5 +1,5 @@
 using Pkg
-Pkg.activate("../MT.jl/.")
+Pkg.activate("../MT.jl/docs/.")
 
 using MT
 using Documenter
@@ -12,6 +12,7 @@ makedocs(;
     authors = "Abhinav Pratap Singh",
     repo = "https://github.com/ayushinav/MT", #.jl/blob/{commit}{path}#{line}",
     sitename = "MT.jl",
+    doctest = false,
     format = Documenter.HTML(;
         prettyurls = get(ENV, "CI", "false") == "true",
         canonical = "https://ayushinav.github.io/MT",

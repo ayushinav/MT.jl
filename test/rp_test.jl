@@ -1,17 +1,17 @@
 @testitem "rock-physics tests" tags = [:rp] begin
     using MT
     methods_list = [
-        # mineral
         SEO3,
         UHO2014,
         Jones2012,
         Yoshino2009,
         Wang2006,
         Poe2010,
+
         # melt
         Ni2011,
         Sifre2014,
-        Gail2008,
+        Gaillard2008
     ]
 
     T = 1273.0
@@ -28,9 +28,9 @@
         Poe2010 = [T, Ch2o_ol],
 
         # melt
-        Ni2011 = [T, Ch2o_m],
-        Sifre2014 = [T, Ch2o_m, Cco2_m],
-        Gail2008 = [T],
+        Ni2011=[T, Ch2o_m],
+        Sifre2014=[T, Ch2o_m, Cco2_m],
+        Gaillard2008=[T]
     )
 
     outs = (;
@@ -42,9 +42,9 @@
         Poe2010 = log10(2.8011e3),
 
         # melt
-        Ni2011 = log10(0.0044),
-        Sifre2014 = log10(0.9710),
-        Gail2008 = log10(168.8759),
+        Ni2011=log10(0.0044),
+        Sifre2014=log10(0.9710),
+        Gaillard2008=log10(168.8759)
     )
 
     @testset "$(methods_list[i])" for i in eachindex(methods_list)
@@ -55,4 +55,17 @@
     end
 
     # mixing models
+    mixing_list = [HS1962_plus(), HS1962_minus(), MAL(0.2)]
+    mixing_outs = log10.([3.869f-4, 1.1502f-4, 2.8f-3])
+
+    @testset "$(mixing_list[i])" for i in eachindex(mixing_list)
+        model = construct_mixing_models([1000.0 + 273.0, 2e4],
+            [:T, :Ch2o_m],
+            [0.1],
+            [SEO3, Ni2011],
+            [mixing_list[i]])
+
+        out_ = forward(model, [])
+        @test round(first(out_.σ); digits=2) ≈ round(mixing_outs[i]; digits=2)
+    end
 end
