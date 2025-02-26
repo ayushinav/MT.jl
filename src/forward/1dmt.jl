@@ -6,9 +6,10 @@ const global μ = 4π * 1.0f-7; # Float32 will promote to Float64 without a prob
 returns a tuple of ρₐ and ϕ, given arrays of resistivity `ρ` and thickness `h` for the angular frequenciy `ω`.
 """
 
-pow10(x) = 10^x
-function get_Z(ρ::T1, h::T2,
-        ω::T) where {T1 <: AbstractVector{<:Any}, T2 <: AbstractVector{<:Any}, T}
+pow10(x::T) where {T} = 10^x
+const k4_ = (ρₐ=lin_tf2.tf, ϕ=lin_tf2.tf)
+
+function get_Z(ρ::T1, h::T2, ω::T) where {T1, T2, T}
     Z = complex(zero(eltype(ρ)))
     broadcast!(pow10, ρ, ρ)
     # ρ .= 10 .^ ρ
@@ -33,9 +34,7 @@ end
 
 returns a  `response` for the given model `m` at the frequencies  `ω`
 """
-function forward(m::MTModel{<:AbstractVector{<:Any}, <:AbstractVector{<:Any}},
-        ω::AbstractVector{<:Any}; response_trans_utils=(ρₐ=lin_tf, ϕ=lin_tf)) # ω will always be a vector, until will find an exception
-    # the following line check is why we do not use the same fn name here, so that the checks happen just once for all the frequencies.
+function forward(m::Tm, ω::T3, response_trans_utils::T) where {Tm <: MTModel, T, T3}
     if !(length(m.h) == length(m.m) - 1)
         error("number of model layers should be 1 less than the number of model parameters")
     end
@@ -44,10 +43,16 @@ function forward(m::MTModel{<:AbstractVector{<:Any}, <:AbstractVector{<:Any}},
     ϕ = zeros(eltype(m.m), n)
     i = 1
     @inbounds while i <= n
-        ρₐ[i], ϕ[i] = get_Z(m.m, m.h, ω[i])
+        ρₐ[i], ϕ[i] = get_Z2(m.m, m.h, ω[i])
         i += 1
     end
-    return MTResponse(response_trans_utils[:ρₐ].tf.(ρₐ), response_trans_utils[:ϕ].tf.(ϕ))
+    f1 = response_trans_utils.ρₐ
+    f2 = response_trans_utils.ϕ
+    MTResponse{typeof(ρₐ), typeof(ϕ)}((f1.(ρₐ)), f2.(ϕ))
+end
+
+function forward(m::Tm, ω::T3) where {Tm <: MTModel, T3}
+    return forward(m, ω, k4_)
 end
 
 # dispatch on forward! for 1d model
@@ -57,9 +62,8 @@ end
 
 updates response `r` type for the given model `m` at the frequencies  `ω`
 """
-function forward!(
-        r::MTResponse, m::MTModel{<:AbstractVector{<:Any}, <:AbstractVector{<:Any}},
-        ω::AbstractVector{<:Any}; response_trans_utils=(ρₐ=lin_tf, ϕ=lin_tf))
+function forward!(r::Tr, m::Tm, ω::T3,
+        response_trans_utils::T) where {Tr <: MTResponse, Tm <: MTModel, T, T3}
     if !(length(m.h) == length(m.m) - 1)
         error("number of model layers should be 1 less than the number of model parameters")
     end
@@ -69,8 +73,15 @@ function forward!(
         r.ρₐ[i], r.ϕ[i] = get_Z(m.m, m.h, ω[i])
         i += 1
     end
-    broadcast!(response_trans_utils[:ρₐ].tf, r.ρₐ, r.ρₐ)
-    broadcast!(response_trans_utils[:ϕ].tf, r.ϕ, r.ϕ)
+    f1 = response_trans_utils[:ρₐ]
+    f2 = response_trans_utils[:ϕ]
+    broadcast!(f1, r.ρₐ, r.ρₐ)
+    broadcast!(f2, r.ϕ, r.ϕ)
+    nothing
+end
+
+function forward!(r::Tr, m::Tm, ω::T) where {Tr <: MTResponse, Tm <: MTModel, T}
+    forward!(r, m, ω, k4_)
     nothing
 end
 
