@@ -66,10 +66,10 @@ end
 
 # should generally be good for most inversions
 sigmoid_tf = transform_utils([-3.0, 6.0], sigmoid, inverse_sigmoid, d_sigmoid);
-pow_tf = transform_utils(Vector{Float32}([]), (x) -> 10^x, log10, (x) -> (10^x * log(10)));
-log_tf = transform_utils(Vector{Float32}([]), log10, (x) -> 10^x, (x) -> inv(x * log(10)));
+pow_tf = transform_utils(Vector{Float32}([]), (x,p) -> 10^x, (x,p) -> log10, (x,p) -> (10^x * log(10)));
+log_tf = transform_utils(Vector{Float32}([]), (x,p) -> log10(x), (x,p) -> 10^x, (x,p) -> inv(x * log(10)));
 pow_sigmoid_tf = transform_utils(
     [-3.0, 6.0], pow_sigmoid, inverse_pow_sigmoid, d_pow_sigmoid);
 lin_tf = transform_utils(Vector{Float32}([]), (x,p) -> x, (x,p) -> x, (x,p) -> 1.0);
 phi_scale_tf = transform_utils(
-    [90f0], (x) -> scale_fn(x, 90), (x) -> inverse_scale_fn(x, 90), (x) -> d_scale_fn(x, 90))
+    [90f0], (x,p) -> scale_fn(x, first(p)), (x, p) -> inverse_scale_fn(x, first(p)), (x,p) -> d_scale_fn(x, first(p)))

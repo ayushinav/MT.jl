@@ -7,7 +7,7 @@ returns a tuple of ρₐ and ϕ, given arrays of resistivity `ρ` and thickness 
 """
 
 pow10(x::T) where {T} = 10^x
-const k4_ = (ρₐ=lin_tf2.tf, ϕ=lin_tf2.tf)
+const default_mt_tf_fns = (ρₐ=lin_tf, ϕ=lin_tf)
 
 function get_Z(ρ::T1, h::T2, ω::T) where {T1, T2, T}
     Z = complex(zero(eltype(ρ)))
@@ -34,7 +34,7 @@ end
 
 returns a  `response` for the given model `m` at the frequencies  `ω`
 """
-function forward(m::Tm, ω::T3, response_trans_utils::T) where {Tm <: MTModel, T, T3}
+function forward(m::Tm, ω::T3, response_trans_utils::T = default_mt_tf_fns) where {Tm <: MTModel, T, T3}
     if !(length(m.h) == length(m.m) - 1)
         error("number of model layers should be 1 less than the number of model parameters")
     end
@@ -43,16 +43,12 @@ function forward(m::Tm, ω::T3, response_trans_utils::T) where {Tm <: MTModel, T
     ϕ = zeros(eltype(m.m), n)
     i = 1
     @inbounds while i <= n
-        ρₐ[i], ϕ[i] = get_Z2(m.m, m.h, ω[i])
+        ρₐ[i], ϕ[i] = get_Z(m.m, m.h, ω[i])
         i += 1
     end
-    f1 = response_trans_utils.ρₐ
-    f2 = response_trans_utils.ϕ
+    f1 = response_trans_utils.ρₐ.tf
+    f2 = response_trans_utils.ϕ.tf
     MTResponse{typeof(ρₐ), typeof(ϕ)}((f1.(ρₐ)), f2.(ϕ))
-end
-
-function forward(m::Tm, ω::T3) where {Tm <: MTModel, T3}
-    return forward(m, ω, k4_)
 end
 
 # dispatch on forward! for 1d model
@@ -63,7 +59,7 @@ end
 updates response `r` type for the given model `m` at the frequencies  `ω`
 """
 function forward!(r::Tr, m::Tm, ω::T3,
-        response_trans_utils::T) where {Tr <: MTResponse, Tm <: MTModel, T, T3}
+        response_trans_utils::T = default_mt_tf_fns) where {Tr <: MTResponse, Tm <: MTModel, T, T3}
     if !(length(m.h) == length(m.m) - 1)
         error("number of model layers should be 1 less than the number of model parameters")
     end
@@ -73,15 +69,10 @@ function forward!(r::Tr, m::Tm, ω::T3,
         r.ρₐ[i], r.ϕ[i] = get_Z(m.m, m.h, ω[i])
         i += 1
     end
-    f1 = response_trans_utils[:ρₐ]
-    f2 = response_trans_utils[:ϕ]
+    f1 = response_trans_utils.ρₐ.tf
+    f2 = response_trans_utils.ϕ.tf
     broadcast!(f1, r.ρₐ, r.ρₐ)
     broadcast!(f2, r.ϕ, r.ϕ)
-    nothing
-end
-
-function forward!(r::Tr, m::Tm, ω::T) where {Tr <: MTResponse, Tm <: MTModel, T}
-    forward!(r, m, ω, k4_)
     nothing
 end
 
