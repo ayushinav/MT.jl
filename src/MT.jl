@@ -15,6 +15,7 @@ import Base: show
 
 include("abstract_types.jl")
 include("probabilistic/init_distributions.jl")
+include("inverse/bounds_transformation.jl")
 include("models/mt.jl")
 include("response/1dmt.jl")
 include("forward/1dmt.jl")
@@ -45,7 +46,6 @@ include("rock_physics/pretty_printing.jl")
 
 include("utils.jl")
 include("inverse/utils.jl")
-include("inverse/bounds_transformation.jl")
 include("inverse/jacobian.jl")
 include("inverse/occam.jl")
 include("inverse/inv.jl")
