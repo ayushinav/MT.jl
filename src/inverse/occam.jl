@@ -55,7 +55,7 @@ performs a single step of occam inversion, using golden line search.
   - `reg_term`: (For internals) When model in physical domain does not exist, `reg_term` helps, eg. case of RTO-TKO
   - `verbose`: whether to print updates after each iteration, defaults to true
 """
-function occam_step!(mₖ₊₁::model1, # to store the next update, which will eventually be copied to mₖ
+function occam_step_new!(mₖ₊₁::model1, # to store the next update, which will eventually be copied to mₖ
         respₖ₊₁::response, # to store the response for mₖ₊₁, for error calculation and anything
         vars::Union{AbstractVector{Float32}, AbstractVector{Float64}}, # to compute the forward model
         χ2::Union{Float64, Float32}, # threshold chi-squared error that needs to be met
@@ -77,35 +77,9 @@ function occam_step!(mₖ₊₁::model1, # to store the next update, which will 
     μ = zero(eltype(μgrid))
     count = 0 # so that iterations do not run forever (will rarely happen, if it will)
 
-    function f(x, mᵣ::Nothing)
-        linsolve!(mₖ₊₁.m,
-            linsolve_prob,
-            x .* inv_utils.D' * inv_utils.D .+ lin_utils.Jₖ' * inv_utils.W * lin_utils.Jₖ,
-            lin_utils.Jₖ' *
-            inv_utils.W *
-            (inv_utils.dobs + lin_utils.Jₖ * lin_utils.mₖ - lin_utils.Fₖ) .+ reg_term)
-        for k in model_fields # to model domain
-            getfield(mₖ₊₁, k) .= model_trans_utils.tf.(getfield(mₖ₊₁, k))
-        end
-        forward!(respₖ₊₁, mₖ₊₁, vars; response_trans_utils=response_trans_utils)
-        return χ²(reduce(vcat, [getfield(respₖ₊₁, k) for k in response_fields]),
-            inv_utils.dobs; W=inv_utils.W)
-    end
-
     function f(x, mᵣ)
-        linsolve!(mₖ₊₁.m,
-            linsolve_prob,
-            x .* inv_utils.D' * inv_utils.D .+ lin_utils.Jₖ' * inv_utils.W * lin_utils.Jₖ,
-            lin_utils.Jₖ' *
-            inv_utils.W *
-            (inv_utils.dobs + lin_utils.Jₖ * lin_utils.mₖ - lin_utils.Fₖ) +
-            μ .* inv_utils.D' * inv_utils.D * mᵣ.m .+ reg_term)
-        for k in model_fields # to model domain
-            getfield(mₖ₊₁, k) .= model_trans_utils.tf.(getfield(mₖ₊₁, k))
-        end
-        forward!(respₖ₊₁, mₖ₊₁, vars; response_trans_utils=response_trans_utils)
-        return χ²(reduce(vcat, [getfield(respₖ₊₁, k) for k in response_fields]),
-            inv_utils.dobs; W=inv_utils.W)
+        find_x(x, mₖ₊₁, respₖ₊₁, vars, inv_utils, lin_utils, model_fields, response_fields,
+            model_trans_utils, response_trans_utils, linsolve_prob, reg_term, mᵣ)
     end
 
     x₁ = μgrid[1]
@@ -167,11 +141,48 @@ function occam_step!(mₖ₊₁::model1, # to store the next update, which will 
         getfield(mₖ₊₁, k) .= model_trans_utils.tf.(getfield(mₖ₊₁, k))
     end
 
-    forward!(respₖ₊₁, mₖ₊₁, vars; response_trans_utils=response_trans_utils)
+    forward!(respₖ₊₁, mₖ₊₁, vars, response_trans_utils)
 
-    verbose && (print("Works golden section search: μ= $μ, χ²= ",
+    do_verbose(verbose) && (print("Works golden section search: μ= $μ, χ²= ",
         χ²(reduce(vcat, [copy(getfield(respₖ₊₁, k)) for k in response_fields]),
             inv_utils.dobs; W=inv_utils.W),
         "\n"))
     return μ
+end
+
+function find_x(x::T1, mₖ₊₁::model, respₖ₊₁::response, vars, inv_utils::MT.inverse_utils,
+        lin_utils::MT.linear_utils, model_fields::Vector{Symbol},
+        response_fields::Vector{Symbol}, model_trans_utils::T3, response_trans_utils::T,
+        linsolve_prob, reg_term, mᵣ::Nothing) where {T1, T, T3, model, response}
+    linsolve!(mₖ₊₁.m,
+        linsolve_prob,
+        x .* inv_utils.D' * inv_utils.D .+ lin_utils.Jₖ' * inv_utils.W * lin_utils.Jₖ,
+        lin_utils.Jₖ' *
+        inv_utils.W *
+        (inv_utils.dobs + lin_utils.Jₖ * lin_utils.mₖ - lin_utils.Fₖ) .+ reg_term)
+
+    broadcast!(model_trans_utils.tf, mₖ₊₁.m, mₖ₊₁.m)
+    forward!(respₖ₊₁, mₖ₊₁, vars, response_trans_utils)
+
+    return χ²(reduce(vcat, [getfield(respₖ₊₁, k) for k in response_fields]),
+        inv_utils.dobs; W=inv_utils.W)
+end
+
+function find_x(x::T1, mₖ₊₁::model, respₖ₊₁::response, vars, inv_utils::MT.inverse_utils,
+        lin_utils::MT.linear_utils, model_fields::Vector{Symbol},
+        response_fields::Vector{Symbol}, model_trans_utils::T3, response_trans_utils::T,
+        linsolve_prob, reg_term, mᵣ) where {T1, T, T3, model, response}
+    linsolve!(mₖ₊₁.m,
+        linsolve_prob,
+        x .* inv_utils.D' * inv_utils.D .+ lin_utils.Jₖ' * inv_utils.W * lin_utils.Jₖ,
+        lin_utils.Jₖ' *
+        inv_utils.W *
+        (inv_utils.dobs + lin_utils.Jₖ * lin_utils.mₖ - lin_utils.Fₖ) +
+        μ .* inv_utils.D' * inv_utils.D * mᵣ.m .+ reg_term)
+
+    broadcast!(model_trans_utils.tf, mₖ₊₁.m, mₖ₊₁.m)
+    forward!(respₖ₊₁, mₖ₊₁, vars, response_trans_utils)
+
+    return χ²(reduce(vcat, [getfield(respₖ₊₁, k) for k in response_fields]),
+        inv_utils.dobs; W=inv_utils.W)
 end
