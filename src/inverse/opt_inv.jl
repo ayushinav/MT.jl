@@ -102,7 +102,7 @@ function inverse!(mₖ::model1,
 
     mₖ.m .= model_trans_utils.tf.(sol.u)
 
-    resp_ = forward(mₖ, vars; response_trans_utils=response_trans_utils)
+    resp_ = forward(mₖ, vars, response_trans_utils)
     chi2 = χ²(reduce(vcat, [getfield(resp_, k) for k in response_fields]),
         reduce(vcat, [getfield(robs, k) for k in response_fields]); W=W)
 
@@ -111,7 +111,7 @@ end
 
 function cb_(state, l, verbose, L, μ, model_trans_utils, χ2)
     chi2 = sqrt(l - μ * norm(L * model_trans_utils.tf.(state.u)))
-    (verbose == true) && println("iteration = $(state.iter) => data misfit => $chi2")
+    do_verbose(verbose) && println("iteration = $(state.iter) => data misfit => $chi2")
 
     return (chi2 < χ2)
 end
