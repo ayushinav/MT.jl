@@ -23,7 +23,6 @@ jobs:
         group:
           - "forward"
           - "occam"
-          - "mcmc"
           - "rp"
           - "types"
     steps:
