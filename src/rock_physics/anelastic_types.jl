@@ -358,6 +358,89 @@ function forward(m::premelt_anelastic; params = params_premelt_anelastic)
     )
 end
 
+mutable struct xfit_mxw{T1, T2, T3, T4, T5, T6, T7, T8, T9}
+    T::T1
+    P::T2
+    dg::T3
+    σ::T4
+    ϕ::T5
+    ρ::T6
+    Ch2o::T7
+    T_solidus::T8
+    f::T9
+end
+
+function xfit_mxw_func(τ, α_a, α_b, α_c, α2, β1, β2, α_τn, τ_cutoff)
+    # @unpack fit, α_a, α_b, α_c, α_τn, α2, β1 = params
+    # @unpack β2, τ_cutoff = getfield(params, fit)
+
+    # α = α_a - α_b/(1 + α_c .* (τ_norm ^ α_τn))
+    # β = ones(size(τ_norm)) .* β1
+    # β[τ_norm < τ_cutoff] .= β2
+    # α[τ_norm < τ_cutoff] .= α2
+
+    # return β .* τ_norm.^α
+    # @show τ, α_a, α_b, α_c, α2, β1, β2, α_τn, τ_cutoff
+
+    β = (τ < τ_cutoff) ? β2 : β1
+    α = (τ < τ_cutoff) ? α2 : α_a - α_b/(1 + α_c * (τ ^ α_τn))
+    # @show α
+
+    return β * τ^α
+end
+
+function forward(m::xfit_mxw; params = params_xfit_mxw)
+    @unpack α_a, α_b, α_c, α_τn, α2, β1, melt_alpha, ϕ_c, scaling_method, elastic_type, elastic_params, viscous_type, viscous_params, fit = params
+    
+    resp_elastic = forward(elastic_type([getfield(m, k) for k in fieldnames(elastic_type)]...), params = elastic_params)
+    # resp_elastic = forward(anharmonic(m.T, m.P, m.ρ))
+    @unpack G, K, Vp, Vs = resp_elastic
+
+    Ju = inv(G)
+
+    ω = 2π .* m.f
+    τ = inv.(ω)
+
+    η_diff = get_η_diff(m, Val{viscous_type}(), viscous_params)
+    τ_maxwell = η_diff/G
+
+    τ_norm = τ ./ τ_maxwell
+    f_norm = τ_maxwell .* m.f
+
+    τ_norm_f = inv.(2π .* f_norm)
+    # τ_norm_local = 10 .^ (-30f0, log10(τ_norm_f))
+
+    @unpack β2, τ_cutoff = getfield(params, fit)
+
+    J_int_fn(x, _) = inv(x) * xfit_mxw_func(x, α_a, α_b, α_c, α2, β1, β2, α_τn, τ_cutoff)
+    @show τ_maxwell
+
+    # if typeof(ω) <: AbstractVector
+    #     int1 = reshape([integrate(J_int_fn, ω[i], (l = 10f0 ^(-30f0), h = τ_norm_f[i], N = 1, rule = :quadgk)) for i in eachindex(ω)], size(ω)...)
+    # else
+    #     int1 = integrate(J_int_fn, ω, (l = 10f0 ^(-30f0), h = τ_norm_f, N = 1, rule = :quadgk))
+    # end
+
+    int1 = 0f0
+    @show int1
+    @show J_int_fn.(10f0 ^(-30f0), 0f0)
+    @show J_int_fn.(τ_norm_f, 0f0)
+
+    J1 = Ju .* (1f0 .+ int1)
+    J2 = Ju.*(π/2 .* J_int_fn.(τ_norm_f, 0f0) .+ τ_norm)
+
+    Qinv = J2 .* inv.(J1)
+    Ma = sqrt.(inv.(J1.^2 + J2.^2))
+    Va = sqrt.(Ma ./ m.ρ)
+
+    Vave = sum(Va) * inv(length(m.f))
+
+    return RockPhyAnelastic(
+        J1, J2, Qinv, Ma, Va, Vave
+    )
+
+end
+
 
 m_andrade_psp = andrade_psp(1273f0, 0.2f0, 3.1f0, 10f-3, 0.01f0, 3300f0, 1f0)
 
@@ -367,8 +450,10 @@ m_eburgers_psp = eburgers_psp(1273f0, 0.2f0, 3.1f0, 10f-3, 0.01f0, 3300f0, 0, 10
 # T, P, dg, σ, ϕ, ρ, 0f0, 0f0, f
 forward(m_eburgers_psp)
 
-
 m_premelt_anelastic = premelt_anelastic(1273f0, 0.2f0, 3.1f0, 10f-3, 0.01f0, 3300f0, 0, 1000f0, 1f0)
 # T, P, dg, σ, ϕ, ρ, 0f0, 0f0, f
 forward(m_premelt_anelastic)
 
+m_xfit_mxw = xfit_mxw(1273f0, 0.2f0, 3.1f0, 10f-3, 0.01f0, 3300f0, 1000f0, 0, 1f0)
+# T, P, dg, σ, ϕ, ρ, 0f0, 0f0, f
+forward(m_xfit_mxw)

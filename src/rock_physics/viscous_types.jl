@@ -39,7 +39,7 @@ function sr_flow_law_calculation(T, P, σ, d, ϕ, fH2O, params)
     # (x_phi_c == 0) && (x_ϕ_c = 1f0)
 
     sr = inv(x_ϕ_c) * A * ((σ* 1f3)^ n) * (d^ (-p)) * exp(- (Q + P * V)/(MT.gas_R * T * 1f3)) * (fH2O^r)
-    enhance = melt_ehancement(ϕ, alf, x_ϕ_c, ϕ_c)
+    enhance = get_melt_enhancement(ϕ, alf, x_ϕ_c, ϕ_c)
 
     return sr * enhance
 end

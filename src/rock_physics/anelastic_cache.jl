@@ -153,11 +153,17 @@ params_premelt_anelastic = (
 )
 
 params_xfit_mxw = (
-    β2 = 1853,
-    β2_fit2 = 8.476f0,
+    fit1 = (
+        β2 = 1853,
+        τ_cutoff = 1f-11,
+    ),
+
+    fit2 = (
+        β2_fit2 = 8.476f0,
+        τ_cutoff_fit2 = 5f-6
+    ),
+
     α2 = 0.5f0,
-    τ_cutoff = 1f-11,
-    τ_cutoff_fit2 = 5f-6,
     β1 = 0.32f0,
     α_a = 0.39f0,
     α_b = 0.28f0,
@@ -165,13 +171,12 @@ params_xfit_mxw = (
     α_τn = 1f-1,
     melt_alpha = 25,
     ϕ_c = 1f-5,
-    x_ϕ_c = 5,
-
+    fit = :fit1,
     scaling_method = 1,
 
     elastic_type = anharmonic,
     elastic_params = params_anharmonic.Isaak1992,
 
-    # viscous_premelt_type = xfit_premelt,
-    viscous_premelt_params = params_xfit_premelt
+    viscous_type = xfit_premelt,
+    viscous_params = params_xfit_premelt
 )
