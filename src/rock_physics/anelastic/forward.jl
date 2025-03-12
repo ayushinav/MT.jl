@@ -1,25 +1,4 @@
-mutable struct RockPhyAnelastic{T1, T2, T3, T4, T5, T6}
-    J1::T1
-    J2::T2
-    Qinv::T3
-    M::T4
-    V::T5
-    Vave::T6
-end
-
-mutable struct andrade_psp{T1, T2, T3, T4, T5, T6, T7, T8, T9}
-    T::T1
-    P::T2
-    dg::T3
-    σ::T4
-    ϕ::T5
-    ρ::T6
-    Ch2o::T7
-    T_solidus::T8
-    f::T9
-end
-
-andrade_psp(T, P, dg, σ, ϕ, ρ, f) = andrade_psp(T, P, dg, σ, ϕ, ρ, 0f0, 0f0, f)
+# andrade_psp
 
 function calc_X̃(T, d, P, ϕ, params_anelastic)
     @unpack n, β, τ_MR, E, G_UR, TR, PR, dR, Vstar, M, melt_alpha, ϕ_c , elastic_type, params_elastic, melt_enhancement = params_anelastic
@@ -66,19 +45,8 @@ function forward(m::andrade_psp; params = params_andrade_psp)
 
 end
 
-mutable struct eburgers_psp{T1, T2, T3, T4, T5, T6, T7, T8, T9}
-    T::T1
-    P::T2
-    dg::T3
-    σ::T4
-    ϕ::T5
-    ρ::T6
-    Ch2o::T7
-    T_solidus::T8
-    f::T9
-end
+# eburgers_psp
 
-eburgers_psp(T, P, dg, σ, ϕ, ρ, f) = eburgers_psp(T, P, dg, σ, ϕ, ρ, 0f0, 0f0, f)
 
 function add_melt_effects(ϕ, scale, m_α, ϕ_c, x_ϕ_c)
     return scale * x_ϕ_c / get_melt_enhancement(ϕ, m_α, x_ϕ_c, ϕ_c)
@@ -256,22 +224,7 @@ function forward(m::eburgers_psp; params = params_eburgers_psp)
 
 end
 
-
-
-mutable struct premelt_anelastic{T1, T2, T3, T4, T5, T6, T7, T8, T9}
-    T::T1
-    P::T2
-    dg::T3
-    σ::T4
-    ϕ::T5
-    ρ::T6
-    Ch2o::T7
-    T_solidus::T8
-    f::T9
-end
-
-premelt_anelastic(T, P, dg, σ, ϕ, ρ, f) = premelt_anelastic(T, P, dg, σ, ϕ, ρ, 0f0, 0f0, f) # change into kwargs?
-
+# xfit_premelt aka premelt_anelastic
 
 function calc_ApSigp(Tn, ϕ, params)
     @unpack α_B, A_B, τ_pp, A_p_fac_1, A_p_fac_2, A_p_fac_3, σ_p_fac_1, σ_p_fac_2, σ_p_fac_3, A_p_Tn_pts, σ_p_Tn_pts, include_direct_melt_effect, β, β_B, poro_Λ = params
@@ -358,17 +311,7 @@ function forward(m::premelt_anelastic; params = params_premelt_anelastic)
     )
 end
 
-mutable struct xfit_mxw{T1, T2, T3, T4, T5, T6, T7, T8, T9}
-    T::T1
-    P::T2
-    dg::T3
-    σ::T4
-    ϕ::T5
-    ρ::T6
-    Ch2o::T7
-    T_solidus::T8
-    f::T9
-end
+# xfit_mxw
 
 function xfit_mxw_func(τ, α_a, α_b, α_c, α2, β1, β2, α_τn, τ_cutoff)
     # @unpack fit, α_a, α_b, α_c, α_τn, α2, β1 = params
@@ -415,19 +358,19 @@ function forward(m::xfit_mxw; params = params_xfit_mxw)
     J_int_fn(x, _) = inv(x) * xfit_mxw_func(x, α_a, α_b, α_c, α2, β1, β2, α_τn, τ_cutoff)
     @show τ_maxwell
 
-    # if typeof(ω) <: AbstractVector
-    #     int1 = reshape([integrate(J_int_fn, ω[i], (l = 10f0 ^(-30f0), h = τ_norm_f[i], N = 1, rule = :quadgk)) for i in eachindex(ω)], size(ω)...)
-    # else
-    #     int1 = integrate(J_int_fn, ω, (l = 10f0 ^(-30f0), h = τ_norm_f, N = 1, rule = :quadgk))
-    # end
+    if typeof(ω) <: AbstractVector
+        int1 = reshape([integrate(J_int_fn, ω[i], (l = 10f0 ^(-30f0), h = τ_norm_f[i], N = 1, rule = :quadgk)) for i in eachindex(ω)], size(ω)...)
+    else
+        int1 = integrate(J_int_fn, ω, (l = 10f0 ^(-30f0), h = τ_norm_f, N = 1, rule = :quadgk))
+    end
 
-    int1 = 0f0
+    # int1 = 0f0
     @show int1
     @show J_int_fn.(10f0 ^(-30f0), 0f0)
     @show J_int_fn.(τ_norm_f, 0f0)
 
     J1 = Ju .* (1f0 .+ int1)
-    J2 = Ju.*(π/2 .* J_int_fn.(τ_norm_f, 0f0) .+ τ_norm)
+    J2 = Ju.*(π/2 .* J_int_fn.(τ_norm_f, 0f0) .* (τ_norm_f) .+ τ_norm)
 
     Qinv = J2 .* inv.(J1)
     Ma = sqrt.(inv.(J1.^2 + J2.^2))
@@ -441,19 +384,48 @@ function forward(m::xfit_mxw; params = params_xfit_mxw)
 
 end
 
+# andrade_analytical
 
-m_andrade_psp = andrade_psp(1273f0, 0.2f0, 3.1f0, 10f-3, 0.01f0, 3300f0, 1f0)
 
-forward(m_andrade_psp)
+function forward(m::andrade_analytical; params = params_andrade_analytical)
+ 
+    @unpack α, β, η_ss, viscosity_method, viscosity_mech, elastic_type, elastic_params, viscous_type, viscous_params = params
 
-m_eburgers_psp = eburgers_psp(1273f0, 0.2f0, 3.1f0, 10f-3, 0.01f0, 3300f0, 0, 1000f0, 1f0)
-# T, P, dg, σ, ϕ, ρ, 0f0, 0f0, f
-forward(m_eburgers_psp)
+    resp_elastic = forward(elastic_type([getfield(m, k) for k in fieldnames(elastic_type)]...), params = elastic_params)
+    # resp_elastic = forward(anharmonic(m.T, m.P, m.ρ))
+    @unpack G, K, Vp, Vs = resp_elastic
 
-m_premelt_anelastic = premelt_anelastic(1273f0, 0.2f0, 3.1f0, 10f-3, 0.01f0, 3300f0, 0, 1000f0, 1f0)
-# T, P, dg, σ, ϕ, ρ, 0f0, 0f0, f
-forward(m_premelt_anelastic)
+    Ju = inv(G)
 
-m_xfit_mxw = xfit_mxw(1273f0, 0.2f0, 3.1f0, 10f-3, 0.01f0, 3300f0, 1000f0, 0, 1f0)
-# T, P, dg, σ, ϕ, ρ, 0f0, 0f0, f
-forward(m_xfit_mxw)
+    ω = 2π .* m.f
+    # τ = inv.(ω)
+
+    if viscosity_method
+        η = get_η_diff(m, Val{viscous_type}(), viscous_params) # CHANGE HERE
+    else
+        η = η_ss
+    end
+
+    τ_maxwell = η/G
+
+    MJ_real = 1 + β * gamma(1 + α) * cos(α*π/2) .* inv.(α .* ω)
+    MJ_imag = inv(ω.*τ_maxwell) .+ β * gamma(1 + α) * cos(α*π/2) .* inv.(α .* ω)
+
+    J1 = Ju .* MJ_real
+    J2 = Ju .* MJ_imag
+
+    J1J2_fac = 0.5f0 .* (1 + sqrt.(1+(J2./J1).^2))
+    # (1 + sqrt.(1+(J2./J1).^2)) / 2
+    Qinv = J2 ./ J1 .* J1J2_fac
+
+    Ma = sqrt.(inv.(J1.^2 + J2.^2))
+    Va = sqrt.(Ma ./ m.ρ)
+
+    Vave = sum(Va) * inv(length(m.f))
+
+    return RockPhyAnelastic(
+        J1, J2, Qinv, Ma, Va, Vave
+    )
+    
+end
+

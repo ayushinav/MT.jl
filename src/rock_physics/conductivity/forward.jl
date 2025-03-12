@@ -1,13 +1,6 @@
-# utils
-
-fO2(T) = 10.0f0^(-24441.9f0 * inv(T) + 13.296f0)
-
-arrh_dry(S, H, k, T) = S * exp(-H * inv(k * T))
-arrh_wet(S, H, k, T, w, a, r) = S * (w^r) * exp(-(H - a * (w^inv(3.0f0))) * inv(k * T))
-
 # minerals
 
-function forward(m::SEO3, p)
+function forward(m::SEO3, p; params = params_SEO3)
     @unpack S_bfe, H_bfe, S_bmg, H_bmg, S_ufe, H_ufe, S_umg, H_umg = params_SEO3
     fO₂ = fO2(m.T)
 
@@ -20,10 +13,10 @@ function forward(m::SEO3, p)
     concMg = bmg + 6.21f30 * exp(-1.83f0 * inv(boltz_k * m.T)) * fO₂^(1 / 6)
     σ = concFe * ufe * charge_e + 2.0f0 * concMg * umg * charge_e
 
-    return log10(σ)
+    return RockphyCond(log10(σ))
 end
 
-function forward(m::UHO2014, p)
+function forward(m::UHO2014, p; params = params_UHO2014)
 
     # Va = 0 so no dependence on pressure
     @unpack H_v, S_v, H_p, S_p, H_h, S_h, a_h, r_h = params_UHO2014
@@ -34,13 +27,13 @@ function forward(m::UHO2014, p)
 
     σ = σ_v + σ_p + σ_h
 
-    return log10(σ)
+    return RockphyCond(log10(σ))
 end
 
 forward(m::const_matrix, p) = log10(m.σ)
 
-function forward(m::Jones2012, p)
-    @unpack S, r, H, a = params_Jones2012
+function forward(m::Jones2012, p; params = params_Jones2012)
+    @unpack S, r, H, a, params_SEO3 = params_Jones2012
 
     @unpack S_bfe, H_bfe, S_bmg, H_bmg, S_ufe, H_ufe, S_umg, H_umg = params_SEO3
 
@@ -60,10 +53,10 @@ function forward(m::Jones2012, p)
 
     σ = σ_H + σ_A
 
-    return log10(σ)
+    return RockphyCond(log10(σ))
 end
 
-function forward(m::Poe2010, p)
+function forward(m::Poe2010, p; params = params_Poe2010)
     @unpack S_H100, H_H100, a_H100, r_H100, S_H010, H_H010, a_H010, r_H010, S_H001, H_H001, a_H001, r_H001, S_A100, H_A100, S_A010, H_A010, S_A001, H_A001 = params_Poe2010
 
     # Anhydrous
@@ -80,10 +73,10 @@ function forward(m::Poe2010, p)
 
     σ = σ_H + σ_A
 
-    return log10(σ)
+    return RockphyCond(log10(σ))
 end
 
-function forward(m::Yoshino2009, p)
+function forward(m::Yoshino2009, p; params = params_Yoshino2009)
     @unpack S_i, H_i, S_h, H_h, S_p, H_p, a_p, r_p = params_Yoshino2009
 
     # ionic conduction
@@ -97,10 +90,10 @@ function forward(m::Yoshino2009, p)
 
     σ = σ_i + σ_h + σ_p
 
-    return log10(σ)
+    return RockphyCond(log10(σ))
 end
 
-function forward(m::Wang2006, p)
+function forward(m::Wang2006, p; params = params_Wang2006)
     @unpack S_H, H_H, a_H, r_H, S_A, H_A = params_Wang2006
 
     # anhydrous
@@ -110,21 +103,21 @@ function forward(m::Wang2006, p)
 
     σ = σ_H + σ_A
 
-    return log10(σ)
+    return RockphyCond(log10(σ))
 end
 
 # melt
 
-function forward(m::Ni2011, p)
+function forward(m::Ni2011, p; params = params_Ni2011)
     @unpack T_corr, D = params_Ni2011
 
     ls = 2.172f0 - (860.82f0 - 204.46f0 * sqrt(m.Ch2o_m / 1.0f4)) * inv(m.T - T_corr)
     σ = 10.0f0^ls
 
-    return log10(σ)
+    return RockphyCond(log10(σ))
 end
 
-function forward(m::Sifre2014, p)
+function forward(m::Sifre2014, p; params = params_Sifre2014)
     @unpack a_h2o, b_h2o, c_h2o, d_h2o, e_h2o, a_c2o, b_c2o, c_c2o, d_c2o, e_c2o = params_Sifre2014
 
     H_h2o = a_h2o * exp(-b_h2o * m.Ch2o_m * 1.0f-4) + c_h2o
@@ -141,11 +134,11 @@ function forward(m::Sifre2014, p)
     # summation of conduction mechanisms
     σ = melt_co2 + melt_h2o
 
-    return log10(σ)
+    return RockphyCond(log10(σ))
 end
 
-function forward(m::Gaillard2008, p)
+function forward(m::Gaillard2008, p; params = params_Gaillard2008)
     @unpack S, H = params_Gaillard2008
     σ = arrh_dry(S, H, gas_R, m.T)
-    return log10(σ)
+    return RockphyCond(log10(σ))
 end
