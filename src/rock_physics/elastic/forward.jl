@@ -1,30 +1,4 @@
-
-
-## response
-
-mutable struct RockphyElastic{T1,T2,T3,T4} #<: AbstractRockphyResponse
-    G::T1
-    K::T2
-    Vp::T3
-    Vs::T4
-    # dG_dT::T5
-    # dG_dP::T6
-end
-
-"""
-T : Temperature (Kelvin)
-P : Pressure (GPa)
-ρ : density (kg/m³)
-"""
-mutable struct anharmonic{T1,T2,T3}
-    T::T1
-    P::T2
-    ρ::T3
-    # Gu_TP::T4
-    # Ku_TP::T5
-end
-
-# anharmonic(T, P, ρ) = anharmonic(T, P, ρ, -1.0f0, -1.0f0)
+# anharmonic
 
 function calc_Gu₀(G1, dG_dT1, dG_dP1, G2, dG_dT2, dG_dP2; χ=1.0f0)
 
@@ -66,18 +40,8 @@ function forward(m::anharmonic; params=params_anharmonic.Isaak1992)
 
 end
 
-mutable struct anharmonic_poro{T1,T2,T3,T4}
-    T::T1
-    P::T2
-    ρ::T3
-    ϕ::T4
-    # Gu_TP::T5
-    # Ku_TP::T6
-end
 
-# anharmonic_poro(T, P, ρ, ϕ) = anharmonic_poro(T, P, ρ, ϕ, -1.0f0, -1.0f0)
-
-
+# anharmonic_poro
 
 function melt_shear_moduli(μ, ϕ, A, ν)
     ψ = 1 - A * sqrt(ϕ)
@@ -148,13 +112,7 @@ function forward(m::anharmonic_poro; params=params_anharmonic_poro)
 end
 
 
-mutable struct SLB2005_{T1,T2}
-    T::T1
-    P::T2
-end
-
-
-function forward(m::SLB2005_; params = [])
+function forward(m::SLB2005; params = [])
     dV_P = 0.0380f0 * m.P
     dV_T = -0.000378f0 * (m.T- 300)
 
@@ -162,16 +120,3 @@ function forward(m::SLB2005_; params = [])
 
     return RockphyElastic(0f0, 0f0, 0f0, Vs * 1f3)
 end
-
-m_anharmonic = anharmonic(1273f0, 0.2f0, 3300f0)
-
-forward(m_anharmonic)
-
-m_anharmonic_poro = anharmonic_poro(1273f0, 0.2f0, 3300f0, 0.01f0)
-
-forward(m_anharmonic_poro)
-
-m_SLB2005 = SLB2005_(1273f0, 0.2f0)
-
-forward(m_SLB2005)
-

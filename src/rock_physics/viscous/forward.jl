@@ -1,25 +1,4 @@
-
-mutable struct RockphyViscous{T1,T2} #<: AbstractRockphyResponse
-    ϵ_rate::T1
-    η::T2
-    # η_diff::T3
-end
-
-"""
-T : K
-P : GPa
-dg : μm
-σ : GPa
-ϕ
-"""
-mutable struct HZK2011{T1, T2, T3, T4, T5}
-    T::T1
-    P::T2
-    dg::T3
-    σ::T4
-    ϕ::T5
-end
-
+# HZK2011
 
 function get_melt_enhancement(phi,α,x_ϕ_c,ϕ_c)
     a = log(x_ϕ_c)
@@ -66,24 +45,7 @@ function forward(m::HZK2011; params = params_HZK2011)
 
 end
 
-
-"""
-T : K
-P : GPa
-dg : μm
-σ : GPa
-ϕ
-"""
-mutable struct HK2003{T1, T2, T3, T4, T5, T6}
-    T::T1
-    P::T2
-    dg::T3
-    σ::T4
-    ϕ::T5
-    Ch2o::T6
-end
-
-HK2003(T, P, dg, σ, ϕ) = HK2003(T, P, dg, σ, ϕ, 0f0)
+# HK2003
 
 function calc_fH2O(H2O_ppm, H2O_o, P, T)
     E = 40f3
@@ -91,30 +53,6 @@ function calc_fH2O(H2O_ppm, H2O_o, P, T)
     A_o = 26
 
     return (H2O_ppm >= H2O_o) * H2O_ppm/A_o * exp((E + P *V)/ (MT.gas_R * 1f3 * T))
-end
-
-
-function forward(m::HK2003; params = params_HK2003)
-    @unpack mechs, ch2o_o, p_dep_calc, melt_enhancement = params
-
-    P = p_dep_calc * m.P
-
-    fH2O = calc_fH2O(m.Ch2o, ch2o_o, P, m.T)
-
-    ϵ_rate = 0f0
-
-    # x_phi_c = Int(melt_enhancement)
-    x_ϕ_c_vec = get_melt_settings_for_x_ϕ_c(Val{melt_enhancement}())
-
-    for mech in keys(mechs)
-        sr = sr_flow_law_calculation(m.T, P* 1f9, m.σ, m.dg, m.ϕ, fH2O, (HK2003_mech(m.T, fH2O, mechs, mech)..., x_ϕ_c = getfield(x_ϕ_c_vec, mech)))
-        ϵ_rate += sr
-    end
-
-    η = m.σ * 1f3 * 1f6 / ϵ_rate
-
-    return RockphyViscous(ϵ_rate, η)
-
 end
 
 function HK2003_mech(T, fH2O, mechs, mech)
@@ -143,17 +81,30 @@ function HK2003_mech(T, fH2O, mechs, mech)
     return ps #(ps..., x_ϕ_c = getfield(x_ϕ_c_vec, mech))
 end
 
-mutable struct xfit_premelt{T1, T2, T3, T4, T5, T6, T7}
-    T::T1
-    P::T2
-    dg::T3
-    σ::T4
-    ϕ::T5
-    Ch2o::T6
-    T_solidus::T7
+function forward(m::HK2003; params = params_HK2003)
+    @unpack mechs, ch2o_o, p_dep_calc, melt_enhancement = params
+
+    P = p_dep_calc * m.P
+
+    fH2O = calc_fH2O(m.Ch2o, ch2o_o, P, m.T)
+
+    ϵ_rate = 0f0
+
+    # x_phi_c = Int(melt_enhancement)
+    x_ϕ_c_vec = get_melt_settings_for_x_ϕ_c(Val{melt_enhancement}())
+
+    for mech in keys(mechs)
+        sr = sr_flow_law_calculation(m.T, P* 1f9, m.σ, m.dg, m.ϕ, fH2O, (HK2003_mech(m.T, fH2O, mechs, mech)..., x_ϕ_c = getfield(x_ϕ_c_vec, mech)))
+        ϵ_rate += sr
+    end
+
+    η = m.σ * 1f3 * 1f6 / ϵ_rate
+
+    return RockphyViscous(ϵ_rate, η)
+
 end
 
-xfit_premelt(T, P, dg, σ, ϕ, T_solidus) = xfit_premelt(T, P, dg, σ, ϕ, 0f0, T_solidus)
+# xfit_premelt
 
 function calc_An(Tprime, ϕ, params) 
     @unpack α, T_η, γ, B, Tr, Pr, η_r, H, V, M, dg_r = params
@@ -188,18 +139,3 @@ function forward(m::xfit_premelt; params = params_xfit_premelt)
 
     return RockphyViscous(0f0, η)
 end
-
-
-m_HZK2011 = HZK2011(1273f0, 0.2f0, 3.1f0, 10f-3, 0.01f0)
-
-forward(m_HZK2011)
-
-m_HK2003 = HK2003(1273f0, 0.2f0, 3.1f0, 10f-3, 0.01f0)
-
-forward(m_HK2003)
-
-m_xfit_premelt = xfit_premelt(1273f0, 0.2f0, 3.1f0, 10f-3, 0.01f0, 1000f0)
-
-forward(m_xfit_premelt)
-
-# RockphyViscous{Float32, Float64}(0.0f0, 7.133103851381647e13)

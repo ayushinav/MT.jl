@@ -180,3 +180,17 @@ params_xfit_mxw = (
     viscous_type = xfit_premelt,
     viscous_params = params_xfit_premelt
 )
+
+params_andrade_analytical = (
+    α = 1/3f0,
+    β =1f-4,
+    η_ss = 1f23,
+    viscosity_method = true,
+    viscosity_mech = :diff,
+
+    elastic_type = anharmonic,
+    elastic_params = params_anharmonic.Isaak1992,
+
+    viscous_type = xfit_premelt,
+    viscous_params = params_xfit_premelt
+)

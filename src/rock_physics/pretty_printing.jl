@@ -3,14 +3,14 @@ const p_names_definition = (T="Temperature (K)", Ch2o_m="Water concentration in 
     Cco2_m="CO₂ concentration in melt (ppm)")
 
 function Base.show(io::IO,
-        m::model) where {model <: Union{MT.AbstractMineralModel, MT.AbstractMeltModel}}
+        m::model) where {model <: AbstractCondModel}
     println("Model : ", typeof(m).name.name)
     for k in propertynames(m)
         println(p_names_definition[k], " : ", getfield(m, k))
     end
 end
 
-function Base.show(io::IO, m::model) where {model <: mixing_models}
+function Base.show(io::IO, m::model) where {model <: mixing_phases}
     if typeof(first(m.mixing_type)) <: MT.single_phase
         println("# Single phase composition")
         println(first(m.model_list))

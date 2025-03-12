@@ -1,5 +1,5 @@
 """
-    construct_mixing_models(params, p_names, ϕ, model_list, mixing_type)
+    construct_mixing_phases(params, p_names, ϕ, model_list, mixing_type)
 
 returns a `mixing_models` type containing all the variables for rock physics modeling
 
@@ -21,7 +21,7 @@ returns a `mixing_models` type containing all the variables for rock physics mod
       + `HS1962_minus` : mixing two phases to get the Hashim Strikman lower bound
       + `MAL` : mixing the two phases using the Modified Archie's Law
 """
-function construct_mixing_models(
+function construct_mixing_phases(
         params::Vector, p_names::Vector, ϕ::Vector, model_list::Vector, mixing_type::Vector)
     var_list = vcat([[fieldnames(ir)...] for ir in model_list]...)
     unique!(var_list)
@@ -57,7 +57,7 @@ end
 
 constructs a `mixing_models` type which can then be used to do rock physics modeling. Should be called using `construct_mixing_models`
 """
-mutable struct mixing_models{T1, T2} <: AbstractRockphyModel
+mutable struct mixing_phases{T1, T2} <: AbstractRockphyModel
     params::T1 # vector of parameters 
     p_names::Vector{Symbol} # Vector of symbols telling the parameters in vector
     ϕ::T2 # phase ratios
@@ -70,7 +70,7 @@ end
 # we can have total water conc and the ratio by which it goes into different phases
 # this would just imply adding one more argument while calling `forward` for different rock physics types
 
-function forward(m::model, p) where {model <: mixing_models}
+function forward(m::model, p) where {model <: mixing_phases}
     σs = [] #zeros(length(m.model_list))
 
     params = (; zip(m.p_names, m.params)...)
