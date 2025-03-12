@@ -20,11 +20,6 @@ jobs:
       fail-fast: false
       matrix:
         version: ["1.10"]
-        group:
-          - "forward"
-          - "occam"
-          - "rp"
-          - "types"
     steps:
       - uses: actions/checkout@v4
 

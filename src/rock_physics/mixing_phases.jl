@@ -1,91 +1,104 @@
-"""
-    construct_mixing_phases(params, p_names, ϕ, model_list, mixing_type)
 
-returns a `mixing_models` type containing all the variables for rock physics modeling
-
-## Arguments
-
-  - `params` : parameter values for rock physics models
-
-  - `p_names` : list of symbols, each associating with each value in `params`
-  - `ϕ` : vol fraction of different phases
-
-      + for `mixing_type` = `single_phase`, `ϕ` = `[1]` (total vol occupied by one phase)
-      + for `mixing_type` = `HS1962_plus` and `HS1962_minus`, `ϕ` is a vector of one element that can be varied but should be less than 1.
-        This is the vol melt fraction.
-  - `model_list` : list of model types required to build up the rock physics model and mixing them
-  - `mixing_type` : determines how to mix model types. Current mixing laws include
-
-      + `single_phase` : no mixing, when there's only a single phase
-      + `HS1962_plus` : mixing two phases to get the Hashim Strikman upper bound
-      + `HS1962_minus` : mixing two phases to get the Hashim Strikman lower bound
-      + `MAL` : mixing the two phases using the Modified Archie's Law
-"""
-function construct_mixing_phases(
-        params::Vector, p_names::Vector, ϕ::Vector, model_list::Vector, mixing_type::Vector)
-    var_list = vcat([[fieldnames(ir)...] for ir in model_list]...)
-    unique!(var_list)
-    f_ = reduce(&, [ir ∈ p_names for ir in var_list])
-    @assert f_==true """all the variables required by models are not included in `p_names`. \n
-    parameters mentioned : $p_names \n
-    all parameters required : $var_list \n
-    """
-
-    if typeof(first(mixing_type)) <: Union{HS1962_plus, HS1962_minus, MAL}
-        @assert length(model_list)==2 "`$mixing_type` model allows for only 2 models to mix, the first one being the solid and the second melt"
-        @assert length(ϕ)==1 "only the fraction of the second component, ie melt, $(model_list[2]) is needed"
-        @assert length(params)==length(p_names) "mismatch between the number of parameter names and their values"
-
-        return mixing_models(params, p_names, ϕ, model_list, mixing_type)
-
-    elseif typeof(first(mixing_type)) <: single_phase
-        @assert length(model_list)==1 "single phase models require only one model in `model_list`"
-        @assert length(ϕ) == 1&&first(ϕ) == 1 "single phase models will have total fraction for the single phase"
-        return mixing_models(params, p_names, ϕ, model_list, mixing_type)
-
-        return mixing_models(params, p_names, ϕ, model_list, mixing_type)
-
-    else
-        @assert length(model_list)==(length(ϕ) + 1) """each phase and it's vol fraction should be provided, except for the last one, 
-        where the vol fraction for the last one is obtained from the remaining variables 1 - ∑ϕ"""
-        return mixing_models(params, p_names, ϕ, model_list, mixing_type)
-    end
-end
-
-"""
-    mixing_models
-
-constructs a `mixing_models` type which can then be used to do rock physics modeling. Should be called using `construct_mixing_models`
-"""
-mutable struct mixing_phases{T1, T2} <: AbstractRockphyModel
-    params::T1 # vector of parameters 
+mutable struct model_multiphase{T2, T3} <: MT.AbstractRockphyModel
+    ps::T2 # vector of parameters 
     p_names::Vector{Symbol} # Vector of symbols telling the parameters in vector
-    ϕ::T2 # phase ratios
+    ϕ::T3 # phase ratios
     model_list::Vector{<:Any}
     mixing_type
+    params
+    resp_fields
     # Ch2o::T4
     # h2o_part::T5
 end
 
-# we can have total water conc and the ratio by which it goes into different phases
-# this would just imply adding one more argument while calling `forward` for different rock physics types
+mutable struct consturct_model_multiphase
+    model_list
+    mixing_type
+    resp_fields
+    # p_names
+end
 
-function forward(m::model, p) where {model <: mixing_phases}
-    σs = [] #zeros(length(m.model_list))
+function consturct_model_multiphase(model_list, mixing_type)
+    if !(reduce(&, supertype.(model_list) .<: supertype(first(model_list))))
+        @error "all the model names should be of the same supertype. If they are of different types, provide a `resp_fields` argument"
+    end
 
-    params = (; zip(m.p_names, m.params)...)
+    rp_type = forward(first(model_list))
+    resp_fields = [fieldnames(rp_type)...]
+
+    if typeof(mixing_type) <: Union{HS1962_plus, HS1962_minus, MAL}
+        @assert length(model_list)==2 "`$mixing_type` model allows for only 2 models to mix, the first one being the solid and the second melt"
+
+    elseif typeof(mixing_type) <: single_phase
+        @assert length(model_list)==1 "single phase models require only one model in `model_list`"
+    end
+
+    return consturct_model_multiphase(model_list, mixing_type, resp_fields)
+end
+
+model_mixed = consturct_model_multiphase([SEO3, Ni2011], HS1962_plus())
+
+function (m::consturct_model_multiphase)(; ϕ=0.0f0, params=(;), p...)
+    var_list = vcat([[fieldnames(ir)...] for ir in m.model_list]...)
+    unique!(var_list)
+    p_names = [keys(p)...]
+    ps = [p[k] for k in p_names]
+
+    params_vec = [(Symbol(im) ∈ keys(params)) ? (getfield(params, Symbol(im))) :
+                  MT.default_params(Val{im}()) for im in m.model_list]
+    params_nt = (; zip(Symbol.(m.model_list), (params_vec))...)
+
+    f_ = reduce(&, [ir ∈ p_names for ir in var_list])
+    @assert f_==true """all the variables required by models are not included in `p_names`. \n
+    parameters mentioned : $p_names \n
+    all parameters required : $var_list \n 
+    """ # can have a better message here (p_names belonging to corresponding rp_types)
+
+    if typeof(m.mixing_type) <: Union{HS1962_plus, HS1962_minus, MAL}
+        @assert length(ϕ)==1 "only the fraction of the second component, ie melt, $(model_list[2]) is needed"
+
+        return model_multiphase(
+            ps, p_names, ϕ, m.model_list, [m.mixing_type], params_nt, m.resp_fields)
+
+    elseif typeof(m.mixing_type) <: single_phase
+        @assert length(ϕ) == 1&&first(ϕ) == 1 "single phase models will have total fraction for the single phase"
+        return model_multiphase(
+            ps, p_names, ϕ, m.model_list, [m.mixing_type], params_nt, m.resp_fields)
+
+    else
+        @assert length(model_list)==(length(ϕ) + 1) """each phase and it's vol fraction should be provided, except for the last one, 
+        where the vol fraction for the last one is obtained from the remaining variables 1 - ∑ϕ"""
+        return model_multiphase(
+            ps, p_names, ϕ, m.model_list, [m.mixing_type], params_nt, m.resp_fields)
+    end
+end
+
+function forward(m::model, p) where {model <: mixers}
+    resps = [] #zeros(eltype(m.ps), length(m.model_list))
+    # resps_ = []
+
+    ps = (; zip(m.p_names, m.ps)...)
 
     # water partition code
 
     for i in eachindex(m.model_list)
         var_list = [(fieldnames(m.model_list[i]))...]
-        σ = forward(m.model_list[i](params[var_list]...), [])
-        push!(σs, σ)
+        resp = MT.forward(m.model_list[i](ps[var_list]...), [];
+            params=getfield(m.params, Symbol(m.model_list[i])))
+        # resps[i] = getfield(resp, first(m.resp_fields))
+        push!(resps, resp)
     end
 
-    σ_net = mix_models(σs, m.ϕ, first(m.mixing_type))
+    var_list = [(fieldnames(first(m.model_list)))...]
+    resp_net = MT.forward(first(m.model_list)(ps[var_list]...), [];
+        params=getfield(m.params, Symbol(first(m.model_list))))
 
-    return RockphyCond([σ_net])
+    for k in m.resp_fields
+        r_net = MT.mix_models(getfield.(resps, k), m.ϕ, first(m.mixing_type))
+        setfield!(resp_net, k, r_net)
+    end
+
+    return resp_net
 end
 
 function mix_models(σs, ϕ, ::HS1962_plus)

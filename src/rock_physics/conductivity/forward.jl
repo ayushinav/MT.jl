@@ -1,7 +1,7 @@
 # minerals
 
 function forward(m::SEO3, p; params = params_SEO3)
-    @unpack S_bfe, H_bfe, S_bmg, H_bmg, S_ufe, H_ufe, S_umg, H_umg = params_SEO3
+    @unpack S_bfe, H_bfe, S_bmg, H_bmg, S_ufe, H_ufe, S_umg, H_umg = params
     fO₂ = fO2(m.T)
 
     # sT 
@@ -19,7 +19,7 @@ end
 function forward(m::UHO2014, p; params = params_UHO2014)
 
     # Va = 0 so no dependence on pressure
-    @unpack H_v, S_v, H_p, S_p, H_h, S_h, a_h, r_h = params_UHO2014
+    @unpack H_v, S_v, H_p, S_p, H_h, S_h, a_h, r_h = params
 
     σ_v = arrh_dry(S_v, H_v, gas_R, m.T)
     σ_p = arrh_dry(S_p, H_p, gas_R, m.T)
@@ -57,7 +57,7 @@ function forward(m::Jones2012, p; params = params_Jones2012)
 end
 
 function forward(m::Poe2010, p; params = params_Poe2010)
-    @unpack S_H100, H_H100, a_H100, r_H100, S_H010, H_H010, a_H010, r_H010, S_H001, H_H001, a_H001, r_H001, S_A100, H_A100, S_A010, H_A010, S_A001, H_A001 = params_Poe2010
+    @unpack S_H100, H_H100, a_H100, r_H100, S_H010, H_H010, a_H010, r_H010, S_H001, H_H001, a_H001, r_H001, S_A100, H_A100, S_A010, H_A010, S_A001, H_A001 = params
 
     # Anhydrous
     σ_A100 = arrh_dry(S_A100, H_A100, boltz_k, m.T)
@@ -94,7 +94,7 @@ function forward(m::Yoshino2009, p; params = params_Yoshino2009)
 end
 
 function forward(m::Wang2006, p; params = params_Wang2006)
-    @unpack S_H, H_H, a_H, r_H, S_A, H_A = params_Wang2006
+    @unpack S_H, H_H, a_H, r_H, S_A, H_A = params
 
     # anhydrous
 
@@ -109,7 +109,7 @@ end
 # melt
 
 function forward(m::Ni2011, p; params = params_Ni2011)
-    @unpack T_corr, D = params_Ni2011
+    @unpack T_corr, D = params
 
     ls = 2.172f0 - (860.82f0 - 204.46f0 * sqrt(m.Ch2o_m / 1.0f4)) * inv(m.T - T_corr)
     σ = 10.0f0^ls
@@ -118,7 +118,7 @@ function forward(m::Ni2011, p; params = params_Ni2011)
 end
 
 function forward(m::Sifre2014, p; params = params_Sifre2014)
-    @unpack a_h2o, b_h2o, c_h2o, d_h2o, e_h2o, a_c2o, b_c2o, c_c2o, d_c2o, e_c2o = params_Sifre2014
+    @unpack a_h2o, b_h2o, c_h2o, d_h2o, e_h2o, a_c2o, b_c2o, c_c2o, d_c2o, e_c2o = params
 
     H_h2o = a_h2o * exp(-b_h2o * m.Ch2o_m * 1.0f-4) + c_h2o
     lS_h2o = d_h2o * H_h2o + e_h2o
@@ -138,7 +138,7 @@ function forward(m::Sifre2014, p; params = params_Sifre2014)
 end
 
 function forward(m::Gaillard2008, p; params = params_Gaillard2008)
-    @unpack S, H = params_Gaillard2008
+    @unpack S, H = params
     σ = arrh_dry(S, H, gas_R, m.T)
     return RockphyCond(log10(σ))
 end
