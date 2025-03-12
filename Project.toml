@@ -1,7 +1,7 @@
 name = "MT"
 uuid = "333b7055-2ef7-4b1e-a2ef-5fb1688f630d"
 authors = ["Abhinav Pratap Singh"]
-version = "0.5.0"
+version = "0.5.1"
 
 [deps]
 ConcreteStructs = "2569d6c7-a4a2-43d3-a901-331e8e4be471"
