@@ -15,7 +15,7 @@ calc_Gu(Gu_0, ΔT, ΔP, ∂G_∂T, ∂G_∂P) = Gu_0 + ΔT * ∂G_∂T + ΔP * �
 calc_Vp(K, G, ρ) = sqrt((K + 4G / 3) / ρ)
 calc_Vs(G, ρ) = sqrt(G / ρ)
 
-function forward(m::anharmonic; params=params_anharmonic.Isaak1992)
+function forward(m::anharmonic, p; params=params_anharmonic.Isaak1992)
     @unpack T_K_ref, P_Pa_ref, Gu_0_ol, dG_dT, dG_dP, ν, Gu_0_crust, dG_dT_crust, dG_dP_crust, Gu_TP, Ku_TP = params
 
     Gu₀, dG_dT₀, dG_dP₀ = calc_Gu₀(Gu_0_ol, dG_dT, dG_dP, Gu_0_crust, dG_dT_crust, dG_dP_crust) #since χ is 1., we are always using ol
@@ -96,7 +96,7 @@ function Vp_Vs_calc(ϕ, G, K, Γ_G, Γ_K, ρ, Km)
     return Vp, Vs    
 end
 
-function forward(m::anharmonic_poro; params=params_anharmonic_poro)
+function forward(m::anharmonic_poro, p; params=params_anharmonic_poro)
     @unpack m_A, m_K, ν, p_anharmonic = params
 
     anh_p = forward(
@@ -111,8 +111,7 @@ function forward(m::anharmonic_poro; params=params_anharmonic_poro)
     return RockphyElastic(Gueff, Kueff, Vp, Vs)
 end
 
-
-function forward(m::SLB2005; params = [])
+function forward(m::SLB2005, p; params = (;))
     dV_P = 0.0380f0 * m.P
     dV_T = -0.000378f0 * (m.T- 300)
 
@@ -120,3 +119,12 @@ function forward(m::SLB2005; params = [])
 
     return RockphyElastic(0f0, 0f0, 0f0, Vs * 1f3)
 end
+
+
+function forward(::Type{M}) where M <: AbstractElasticModel
+    return RockphyElastic
+end
+
+default_params(::Val{anharmonic}) = params_anharmonic.Isaak1992
+default_params(::Val{anharmonic_poro}) = params_anharmonic_poro
+default_params(::Val{SLB2005}) = (;)

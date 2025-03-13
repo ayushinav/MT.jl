@@ -10,7 +10,7 @@ function Base.show(io::IO,
     end
 end
 
-function Base.show(io::IO, m::model) where {model <: mixing_phases}
+function Base.show(io::IO, m::model) where {model <: model_multiphase}
     if typeof(first(m.mixing_type)) <: MT.single_phase
         println("# Single phase composition")
         println(first(m.model_list))

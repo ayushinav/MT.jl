@@ -142,3 +142,17 @@ function forward(m::Gaillard2008, p; params = params_Gaillard2008)
     σ = arrh_dry(S, H, gas_R, m.T)
     return RockphyCond(log10(σ))
 end
+
+function forward(::Type{M}) where M <: AbstractCondModel
+    return RockphyCond
+end
+
+default_params(::Val{SEO3}) = params_SEO3
+default_params(::Val{UHO2014}) = params_UHO2014
+default_params(::Val{Jones2012}) =params_Jones2012
+default_params(::Val{Poe2010}) = params_Poe2010
+default_params(::Val{Wang2006}) = params_Wang2006
+default_params(::Val{Yoshino2009}) = params_Yoshino2009
+default_params(::Val{Ni2011}) = params_Ni2011
+default_params(::Val{Sifre2014}) = params_Sifre2014
+default_params(::Val{Gaillard2008}) = params_Gaillard2008
