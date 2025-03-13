@@ -40,13 +40,3 @@ params_Sifre2014 = (
     a_c2o=789166.0f0, b_c2o=0.1808f0, c_c2o=32820.0f0, d_c2o=5.50f-5, e_c2o=5.7956f0)
 
 params_Gaillard2008 = (S=3440.0f0, H=31.9f0)
-
-default_params(::Val{SEO3}) = params_SEO3
-default_params(::Val{UHO2014}) = params_UHO2014
-default_params(::Val{Jones2012}) =params_Jones2012
-default_params(::Val{Poe2010}) = params_Poe2010
-default_params(::Val{Wang2006}) = params_Wang2006
-default_params(::Val{Yoshino2009}) = params_Yoshino2009
-default_params(::Val{Ni2011}) = params_Ni2011
-default_params(::Val{Sifre2014}) = params_Sifre2014
-default_params(::Val{Gaillard2008}) = params_Gaillard2008

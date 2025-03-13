@@ -73,7 +73,7 @@ function (m::consturct_model_multiphase)(; ϕ=0.0f0, params=(;), p...)
     end
 end
 
-function forward(m::model, p) where {model <: mixers}
+function forward(m::model, p) where {model <: model_multiphase}
     resps = [] #zeros(eltype(m.ps), length(m.model_list))
     # resps_ = []
 
