@@ -40,3 +40,13 @@ params_Sifre2014 = (
     a_c2o=789166.0f0, b_c2o=0.1808f0, c_c2o=32820.0f0, d_c2o=5.50f-5, e_c2o=5.7956f0)
 
 params_Gaillard2008 = (S=3440.0f0, H=31.9f0)
+
+const default_params_SEO3 = deepcopy(params_SEO3)
+const default_params_UHO2014 = deepcopy(params_UHO2014)
+const default_params_Jones2012 = deepcopy(params_Jones2012)
+const default_params_Poe2010 = deepcopy(params_Poe2010)
+const default_params_Wang2006 = deepcopy(params_Wang2006)
+const default_params_Yoshino2009 = deepcopy(params_Yoshino2009)
+const default_params_Ni2011 = deepcopy(params_Ni2011)
+const default_params_Sifre2014 = deepcopy(params_Sifre2014)
+const default_params_Gaillard2008 = deepcopy(params_Gaillard2008)
