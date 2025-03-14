@@ -14,7 +14,7 @@ end
 
 function sr_flow_law_calculation(T, P, σ, d, ϕ, fH2O, x_ϕ_c, params)
     # @show params
-    @unpack A, Q, V, p, n, alf, r, ϕ_c = first(params)
+    @unpack A, Q, V, p, n, alf, r, ϕ_c = params
 
     # (x_phi_c == 0) && (x_ϕ_c = 1f0)
 
@@ -25,31 +25,15 @@ function sr_flow_law_calculation(T, P, σ, d, ϕ, fH2O, x_ϕ_c, params)
 end
 
 
-# function sr_flow_law_calculation2(T, P, σ, d, ϕ, fH2O, x_ϕ_c, mechs, mech, pvec)
-#     # k = HK2003_mech1(T, fH2O, mech)
-#     # pvec .= values(getfield(getfield(mechs, mech), k))
+function sr_flow_law_calculation_HK2003(T, P, σ, d, ϕ, fH2O, x_ϕ_c, mechs, mech)
 
-#     # pvec .= HK2003_mech(T, fH2O, mechs, mech)
-#     HK2003_mech2!(pvec, T, fH2O, mechs, mech)
-#     # params = getfield(getfield(mechs, mech), k)
-#     A = pvec[1]
-#     Q = pvec[2]
-#     V = pvec[3]
-#     p = pvec[4]
-#     n = pvec[5]
-#     alf = pvec[6]
-#     r = pvec[7]
-#     ϕ_c = pvec[8]
-#     # @unpack A, Q, V, p, n, alf, r, ϕ_c = params #getfield(getfield(mechs, mech), k)
-#     # @show Base.summarysize(params)
+    @unpack A, Q, V, p, n, alf, r, ϕ_c = HK2003_mech(T, fH2O, mechs, mech)
 
-#     # (x_phi_c == 0) && (x_ϕ_c = 1f0)
+    sr = @. inv(x_ϕ_c) * A * ((σ* 1f3)^ n) * (d^ (-p)) * exp(- (Q + P * V)/(MT.gas_R * T * 1f3)) * (fH2O^r)
+    enhance = @. get_melt_enhancement(ϕ, alf, x_ϕ_c, ϕ_c)
 
-#     sr = @. inv(x_ϕ_c) * A * ((σ* 1f3)^ n) * (d^ (-p)) * exp(- (Q + P * V)/(MT.gas_R * T * 1f3)) * (fH2O^r)
-#     enhance = @. get_melt_enhancement(ϕ, alf, x_ϕ_c, ϕ_c)
-
-#     return @. sr * enhance
-# end
+    return @. sr * enhance
+end
 
 # HK2003
 
@@ -60,6 +44,33 @@ function calc_fH2O(H2O_ppm, H2O_o, P, T)
 
     return (H2O_ppm >= H2O_o) * H2O_ppm/A_o * exp((E + P *V)/ (MT.gas_R * 1f3 * T))
 end
+
+
+# function HK2003_mech2!(pvec, T, fH2O, mechs, mech)
+#     if mech == :diff
+#         if fH2O > 0
+#             pvec .=  getfield(getfield(mechs, mech), :wet) |> values
+#         else
+#             pvec .=  getfield(getfield(mechs, mech), :dry) |> values
+#         end
+#     elseif mech == :disl
+#         if fH2O > 0
+#             pvec .=  getfield(getfield(mechs, mech), :wet) |> values
+#         else
+#             pvec .=  getfield(getfield(mechs, mech), :dry) |> values
+#         end
+#     elseif mech == :gbs
+#         if T >= (1250 + 273)
+#             pvec .=  getfield(getfield(mechs, mech), :gt1250) |> values
+#         else
+#             pvec .=  getfield(getfield(mechs, mech), :lt1250) |> values
+#         end
+#     end
+
+#     # x_ϕ_c_vec = get_melt_settings_for_x_ϕ_c(Val{melt_enhancement}())
+
+#     return pvec #(ps..., x_ϕ_c = getfield(x_ϕ_c_vec, mech))
+# end
 
 function HK2003_mech(T, fH2O, mechs, mech)
     if mech == :diff
@@ -82,9 +93,9 @@ function HK2003_mech(T, fH2O, mechs, mech)
         end
     end
 
-    # x_ϕ_c_vec = get_melt_settings_for_x_ϕ_c(Val{melt_enhancement}())
+    
 
-    return ps #(ps..., x_ϕ_c = getfield(x_ϕ_c_vec, mech))
+    return ps 
 end
 
 # xfit_premelt
