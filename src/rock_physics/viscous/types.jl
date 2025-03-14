@@ -2,7 +2,6 @@
 mutable struct RockphyViscous{T1,T2} #<: AbstractRockphyResponse
     ϵ_rate::T1
     η::T2
-    # η_diff::T3
 end
 
 """
