@@ -107,7 +107,7 @@ function calc_An(Tprime, ϕ, α, T_η, γ, B)
         if (Tprime < 1)
             return exp(- log(γ) *(Tprime - T_η)/ (Tprime * (1f0 - T_η)))
         else
-            @show α, ϕ, γ, B
+            # @show α, ϕ, γ, B
             return exp(-α * ϕ) * inv(γ * B)
         end
     end

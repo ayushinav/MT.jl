@@ -1,13 +1,15 @@
 name = "MT"
 uuid = "333b7055-2ef7-4b1e-a2ef-5fb1688f630d"
 authors = ["Abhinav Pratap Singh"]
-version = "0.5.2"
+version = "0.5.3"
 
 [deps]
+BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 ConcreteStructs = "2569d6c7-a4a2-43d3-a901-331e8e4be471"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 Hwloc = "0e44f5e4-bd66-52a0-8798-143a42290a1d"
 InteractiveUtils = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
+JET = "c3a54625-cd67-489e-a8e7-0a5a0ff4e31b"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 LinearSolve = "7ed4a6bd-45f5-4d41-b270-4a48e9bafcae"
 NonlinearSolve = "8913a72c-1f9b-4ce2-8d82-65094dcecaec"
@@ -18,12 +20,15 @@ ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
 PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
 QuadGK = "1fd47b50-473d-5c70-9696-f719f8f3bcdc"
 ReTestItems = "817f1d60-ba6b-4fd5-9520-3cf149f6a823"
+Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
 SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
 Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 Turing = "fce5fe82-541a-59a6-adf8-730c64b5f9a0"
 UnPack = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
 
 [compat]
+BenchmarkTools = "1.6.0"
+Revise = "3.7.2"
 julia = "1"
 
 [extras]
