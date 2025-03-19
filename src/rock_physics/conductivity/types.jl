@@ -231,7 +231,7 @@ mutable struct Ni2011{F1, F2} <: AbstractCondModel
     T::F1
     Ch2o_m::F2
     function Ni2011(T, Ch2o_m)
-        if T < params_Ni2011.T_corr
+        if any(T .< params_Ni2011.T_corr)
             @warn "T (= $T K) should be greater than $(params_Ni2011.T_corr) K for `Ni2011` otherwise erroneous values are obtained"
         end
         return new{typeof(T), typeof(Ch2o_m)}(T, Ch2o_m)

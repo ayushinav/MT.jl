@@ -27,7 +27,7 @@ function forward(m::UHO2014, p; params=default_params_UHO2014)
 
     σ = @. σ_v + σ_p + σ_h
 
-    return RockphyCond(log10(σ))
+    return RockphyCond(log10.(σ))
 end
 
 forward(m::const_matrix, p) = log10(m.σ)
@@ -53,7 +53,7 @@ function forward(m::Jones2012, p; params=default_params_Jones2012)
 
     σ = @. σ_H + σ_A
 
-    return RockphyCond(log10(σ))
+    return RockphyCond(log10.(σ))
 end
 
 function forward(m::Poe2010, p; params=default_params_Poe2010)
@@ -73,11 +73,11 @@ function forward(m::Poe2010, p; params=default_params_Poe2010)
 
     σ = @. σ_H + σ_A
 
-    return RockphyCond(log10(σ))
+    return RockphyCond(log10.(σ))
 end
 
 function forward(m::Yoshino2009, p; params=default_params_Yoshino2009)
-    @unpack S_i, H_i, S_h, H_h, S_p, H_p, a_p, r_p = params_Yoshino2009
+    @unpack S_i, H_i, S_h, H_h, S_p, H_p, a_p, r_p = params
 
     # ionic conduction
     σ_i = @. arrh_dry(S_i, H_i, boltz_k, m.T)
@@ -90,7 +90,7 @@ function forward(m::Yoshino2009, p; params=default_params_Yoshino2009)
 
     σ = @. σ_i + σ_h + σ_p
 
-    return RockphyCond(log10(σ))
+    return RockphyCond(log10.(σ))
 end
 
 function forward(m::Wang2006, p; params=default_params_Wang2006)
@@ -103,7 +103,7 @@ function forward(m::Wang2006, p; params=default_params_Wang2006)
 
     σ = @. σ_H + σ_A
 
-    return RockphyCond(log10(σ))
+    return RockphyCond(log10.(σ))
 end
 
 # melt
@@ -114,10 +114,10 @@ function forward(m::Ni2011, p; params=default_params_Ni2011)
     ls = @. 2.172f0 - (860.82f0 - 204.46f0 * sqrt(m.Ch2o_m / 1.0f4)) * inv(m.T - T_corr)
     σ = @. 10.0f0^ls
 
-    return RockphyCond(log10(σ))
+    return RockphyCond(log10.(σ))
 end
 
-function forward(m::Sifre2014, p; params=params_Sifre2014)
+function forward(m::Sifre2014, p; params=default_params_Sifre2014)
     @unpack a_h2o, b_h2o, c_h2o, d_h2o, e_h2o, a_c2o, b_c2o, c_c2o, d_c2o, e_c2o = params
 
     H_h2o = @. a_h2o * exp(-b_h2o * m.Ch2o_m * 1.0f-4) + c_h2o
@@ -134,13 +134,13 @@ function forward(m::Sifre2014, p; params=params_Sifre2014)
     # summation of conduction mechanisms
     σ = @. melt_co2 + melt_h2o
 
-    return RockphyCond(log10(σ))
+    return RockphyCond(log10.(σ))
 end
 
 function forward(m::Gaillard2008, p; params=default_params_Gaillard2008)
     @unpack S, H = params
     σ = @. arrh_dry(S, H, gas_R, m.T)
-    return RockphyCond(log10(σ))
+    return RockphyCond(log10.(σ))
 end
 
 function forward(::Type{M}) where {M <: AbstractCondModel}
