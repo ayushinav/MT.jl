@@ -19,30 +19,25 @@ function forward(m::anharmonic_poro, p; params=default_params_anharmonic_poro)
     @unpack m_A, m_K, ν, p_anharmonic = params
 
     anh_p = forward(anharmonic(m.T, m.P, m.ρ), []; params=params.p_anharmonic)
-
-    # @show typeof(anh_p.G)
+    @unpack G, K = anh_p
 
     Γ_G = @. melt_shear_moduli(m.ϕ, m_A, ν)
-    Gueff = @. Γ_G * anh_p.G
-    # Gueff, Γ_G = ntuple(i -> getindex.(G_s, i), length(first(G_s)))
+    Gueff = @. Γ_G * G
+
     Γ_K = @. melt_bulk_moduli(m.ϕ, m_A, ν)
-    K_sk = @. Γ_K * anh_p.K
+    K_sk = @. Γ_K * K
 
-    nr = @. (1 - K_sk / anh_p.K)^2
-    dr = @. 1 - m.ϕ - K_sk / anh_p.K + m.ϕ * anh_p.K / m_K
+    nr = @. (1 - K_sk / K)^2
+    dr = @. 1 - m.ϕ - K_sk / K + m.ϕ * K / m_K
 
-    Kueff = @. K_sk + (nr / (dr + 1.0f-10)) * anh_p.K
-    μ_eff = @. anh_p.G * Γ_G
+    Kueff = @. K_sk + (nr / (dr + 1.0f-10)) * K
+    μ_eff = @. G * Γ_G
     K_nr = @. (1 - Γ_K)^2
-    K_dr = @. 1 - m.ϕ - Γ_K + m.ϕ * anh_p.K / m_K
-    K_eff = @. anh_p.K * (Γ_K + K_nr / (K_dr + 1.0f-10))
+    K_dr = @. 1 - m.ϕ - Γ_K + m.ϕ * K / m_K
+    K_eff = @. K * (Γ_K + K_nr / (K_dr + 1.0f-10))
 
     Vp = @. calc_Vp(K_eff, μ_eff, m.ρ)
     Vs = @. calc_Vs(μ_eff, m.ρ)
-
-    # Vp_Vs = @. Vp_Vs_calc(m.ϕ, anh_p.G, anh_p.K, Γ_G, Γ_K, m.ρ, m_K) # slightly different here
-
-    # Vp, Vs = ntuple(i -> getindex.(Vp_Vs, i), length(first(Vp_Vs)))
 
     return RockphyElastic(Gueff, Kueff, Vp, Vs)
 end
