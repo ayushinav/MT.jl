@@ -1,5 +1,8 @@
-get_melt_settings_for_x_ϕ_c(::Val{true}) = (diff=5.0f0, disl=1.0f0, gbs=2.5f0)
-get_melt_settings_for_x_ϕ_c(::Val{false}) = (diff=1.0f0, disl=1.0f0, gbs=1.0f0)
+const melt_settings_true = (diff=5.0f0, disl=1.0f0, gbs=2.5f0)
+const melt_settings_false = (diff=1.0f0, disl=1.0f0, gbs=1.0f0)
+
+get_melt_settings_for_x_ϕ_c(::Val{true}) = melt_settings_true
+get_melt_settings_for_x_ϕ_c(::Val{false}) = melt_settings_false
 
 params_anharmonic = (
     Isaak1992=(

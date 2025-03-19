@@ -6,7 +6,7 @@ function forward(m::anharmonic, p; params=default_params_anharmonic.Isaak1992)
     
     ΔT = @. m.T - T_K_ref # K
     ΔP = @. m.P * 1.0f9 - P_Pa_ref # Pa
-    Gu_tp = @. calc_Gu(Gu₀ * 1.0f9, ΔT, ΔP, dG_dT₀, dG_dP₀, Gu_TP)
+    Gu_tp = @. calc_Gu(Gu₀, ΔT, ΔP, dG_dT₀, dG_dP₀, Gu_TP)
     Ku_tp = @. calc_Ku(Gu_tp, ν, Ku_TP)
 
     Vp = @. calc_Vp(Ku_tp, Gu_tp, m.ρ)

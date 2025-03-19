@@ -34,9 +34,9 @@ include("rock_physics/viscous/cache.jl")
 include("rock_physics/viscous/types.jl")
 include("rock_physics/viscous/forward.jl")
 
-include("rock_physics/anelastic/utils.jl")
 include("rock_physics/anelastic/cache.jl")
 include("rock_physics/anelastic/types.jl")
+include("rock_physics/anelastic/utils.jl")
 include("rock_physics/anelastic/forward.jl")
 
 include("rock_physics/mixing_phases.jl")

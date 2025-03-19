@@ -4,11 +4,11 @@ params_andrade_psp = (
     τ_MR = 10f0 ^ (5.3f0),
     E = 303f3,
     G_UR = 62.2f0, # GPa,
-    TR = 1173,
+    TR = 1173f0,
     PR = 2f-1,
     dR = 3.1f0,
     Vstar = 1f-5,
-    M = 1,
+    M = 1f0,
     melt_alpha = 25,
     ϕ_c = 1f-5,
     # x_ϕ_c = 5,
@@ -20,86 +20,86 @@ params_andrade_psp = (
 
 params_JF10 = (
     bg_only = (
-        dR = 13.4,  # ref grain size in microns
-        G_UR = 62.5,  # GPa, unrel. G, reference val.
-        E = 303000,  # J/mol
-        m_a = 1.19,  # grain size exponent for tau_i, i in (L,H,P)
-        alf = 0.257,  # high temp background tau exponent
-        DeltaB = 1.13,  # relaxation strength
-        Tau_LR = 1e-3,  # Relaxation time lower limit reference
-        Tau_HR = 1e7,  # Relaxation time higher limit reference
-        Tau_MR = 10^6.95,  # Reference Maxwell relaxation time
-        DeltaP = 0,  # no peak, set to 0
-        sig = 0,  # no peak, set to 0
-        Tau_PR = 0,  # no peak, set to 0
-        TR = 1173,
-        PR = 0.2,
+        dR = 13.4f0,  # ref grain size in microns
+        G_UR = 62.5f0,  # GPa, unrel. G, reference val.
+        E = 303000f0,  # J/mol
+        m_a = 1.19f0, # grain size exponent for tau_i,i in (L,H,P)
+        alf = 0.257f0, # high temp background tau exponent
+        DeltaB = 1.13f0, # relaxation strength
+        Tau_LR = 1f-3,  # Relaxation time lower limit reference
+        Tau_HR = 1f7,  # Relaxation time higher limit reference
+        Tau_MR = 10^6.95f0, # Reference Maxwell relaxation time
+        DeltaP = 0f0, # no peak, set to 0
+        sig = 0f0, # no peak, set to 0
+        Tau_PR = 0f0, # no peak, set to 0
+        TR = 1173f0,
+        PR = 0.2f0,
         Vstar = 1f-5,
-        m_v = 3, 
-        melt_alpha = 25,
+        m_v = 3f0, 
+        melt_alpha = 25f0,
         ϕ_c = 1f-5,
         # x_ϕ_c = 5,
     ),
     bg_peak = (
-        DeltaP = 0.057,  # relaxation strength of peak
-        sig = 4,  # sigma, peak breadth
-        Tau_PR = 10^-3.4,  # center maxwell time
-        dR = 13.4,  # ref grain size in microns
-        G_UR = 66.5,  # GPa, unrel. G, reference val.
-        E = 360000,  # J/mol
-        m_a = 1.31,  # grain size exponent for tau_i, i in (L,H,P)
-        alf = 0.274,  # high temp background tau exponent
-        DeltaB = 1.13,  # relaxation strength of background
-        Tau_LR = 1e-3,  # Relaxation time lower limit reference
-        Tau_HR = 1e7,  # Relaxation time higher limit reference
-        Tau_MR = 10^7.48,  # Reference Maxwell relaxation time
-        TR = 1173,
-        PR = 0.2,
+        DeltaP = 0.057f0,  # relaxation strength of peak
+        sig = 4f0,  # sigma, peak breadth
+        Tau_PR = 10^-3.4f0,  # center maxwell time
+        dR = 13.4f0,  # ref grain size in microns
+        G_UR = 66.5f0,  # GPa, unrel. G, reference val.
+        E = 360000f0,  # J/mol
+        m_a = 1.31f0,  # grain size exponent for tau_i, i in (L,H,P)
+        alf = 0.274f0,  # high temp background tau exponent
+        DeltaB = 1.13f0,  # relaxation strength of background
+        Tau_LR = 1f-3,  # Relaxation time lower limit reference
+        Tau_HR = 1f7,  # Relaxation time higher limit reference
+        Tau_MR = 10^7.48f0,  # Reference Maxwell relaxation time
+        TR = 1173f0,
+        PR = 0.2f0,
         Vstar = 1f-5,
-        m_v = 3,
-        melt_alpha = 25,
+        m_v = 3f0,
+        melt_alpha = 25f0,
         ϕ_c = 1f-5,
         # x_ϕ_c = 5,
     ),
     s6585_bg_only = (
-        dR = 3.1,  # ref grain size in microns
-        G_UR = 62.0,  # GPa, unrel. G, reference val.
-        E = 303000,  # J/mol
-        m_a = 1.19,  # grain size exponent for tau_i, i in (L,H,P)
-        alf = 0.33,  # high temp background tau exponent
-        DeltaB = 1.4,  # relaxation strength
-        Tau_LR = 1e-2,  # Relaxation time lower limit reference
-        Tau_HR = 1e6,  # Relaxation time higher limit reference
-        Tau_MR = 10^5.2,  # Reference Maxwell relaxation time
-        DeltaP = 0,  # no peak, set to 0
-        sig = 0,  # no peak, set to 0
-        Tau_PR = 0,  # no peak, set to 0
-        TR = 1173,
-        PR = 0.2,
+        dR = 3.1f0,  # ref grain size in microns
+        G_UR = 62.0f0,  # GPa, unrel. G, reference val.
+        E = 303000f0,  # J/mol
+        m_a = 1.19f0,  # grain size exponent for tau_i, i in (L,H,P)
+        alf = 0.33f0,  # high temp background tau exponent
+        DeltaB = 1.4f0,  # relaxation strength
+        Tau_LR = 1f-2,  # Relaxation time lower limit reference
+        Tau_HR = 1f6,  # Relaxation time higher limit reference
+        Tau_MR = 10^5.2f0,  # Reference Maxwell relaxation time
+        DeltaP = 0f0,  # no peak, set to 0
+        sig = 0f0,  # no peak, set to 0
+        Tau_PR = 0f0,  # no peak, set to 0
+        TR = 1173f0,
+        PR = 0.2f0,
         Vstar = 1f-5,
-        m_v = 3,
-        melt_alpha = 25,
+        m_v = 3f0,
+        melt_alpha = 25f0,
         ϕ_c = 1f-5,
         # x_ϕ_c = 5,
     ),
     s6585_bg_peak = (
-        DeltaP = 0.07,  # relaxation strength of peak
-        sig = 4,  # sigma, peak breadth
-        Tau_PR = 10^-2.9,  # center maxwell time
-        dR = 3.1,  # ref grain size in microns
-        G_UR = 66.5,  # GPa, unrel. G, reference val.
-        E = 327000,  # J/mol
-        m_a = 1.19,  # grain size exponent for tau_i, i in (L,H,P)
-        alf = 0.33,  # high temp background tau exponent
-        DeltaB = 1.4,  # relaxation strength
-        Tau_LR = 1e-2,  # Relaxation time lower limit reference
-        Tau_HR = 1e6,  # Relaxation time higher limit reference
-        Tau_MR = 10^5.4,  # Reference Maxwell relaxation time
-        TR = 1173,
-        PR = 0.2,
+        DeltaP = 0.07f0,  # relaxation strength of peak
+        sig = 4f0,  # sigma, peak breadth
+        Tau_PR = 10^-2.9f0,  # center maxwell time
+        dR = 3.1f0,  # ref grain size in microns
+        G_UR = 66.5f0,  # GPa, unrel. G, reference val.
+        E = 327000f0,  # J/mol
+        m_a = 1.19f0,  # grain size exponent for tau_i, i in (L,H,P)
+        alf = 0.33f0,  # high temp background tau exponent
+        DeltaB = 1.4f0,  # relaxation strength
+        Tau_LR = 1f-2,  # Relaxation time lower limit reference
+        Tau_HR = 1f6,  # Relaxation time higher limit reference
+        Tau_MR = 10^5.4f0,  # Reference Maxwell relaxation time
+        TR = 1173f0,
+        PR = 0.2f0,
         Vstar = 1f-5,
-        m_v = 3,
-        melt_alpha = 25,
+        m_v = 3f0,
+        melt_alpha = 25f0,
         ϕ_c = 1f-5,
         # x_ϕ_c = 5,
     )
@@ -124,25 +124,25 @@ params_eburgers_psp = (
 
 params_premelt_anelastic = (
     params_xfit = ( 
-        α_B = 0.38,  # high temp background exponent
-        A_B = 0.664,  # high temp background dissipation strength
+        α_B = 0.38f0,  # high temp background exponent
+        A_B = 0.664f0,  # high temp background dissipation strength
 
-        # Pre-melting dissipation peak settings
-        τ_pp = 6e-5,  # peak center, table 4 of YT16, paragraph before eq 10
-        A_p_fac_1 = 0.01,
-        A_p_fac_2 = 0.4,
-        A_p_fac_3 = 0.03,
-        σ_p_fac_1 = 4,
-        σ_p_fac_2 = 37.5,
-        σ_p_fac_3 = 7,
-        A_p_Tn_pts = [0.91, 0.96, 1],  # Tn cutoff points
-        σ_p_Tn_pts = [0.92, 1],  # Tn cutoff points
+        # Prf-melting dissipation peak settings
+        τ_pp = 6f-5,  # peak center, table 4 of YT16, paragraph before eq 10
+        A_p_fac_1 = 0.01f0,
+        A_p_fac_2 = 0.4f0,
+        A_p_fac_3 = 0.03f0,
+        σ_p_fac_1 = 4f0,
+        σ_p_fac_2 = 37.5f0,
+        σ_p_fac_3 = 7f0,
+        A_p_Tn_pts = [0.91f0, 0.96f0, 1f0],  # Tn cutoff points
+        σ_p_Tn_pts = [0.92f0, 1f0],  # Tn cutoff points
 
         # Melt effects
         include_direct_melt_effect = false,  # set to 1 to include YT2024 melt effect
-        β = 1.38,  # determined in YT2024, named Beta_P in YT2024 eq 5
-        β_B = 6.94,  # YT2024 only
-        poro_Λ = 4.0 , # Table 6 YT2024
+        β = 1.38f0,  # determined in YT2024, named Beta_P in YT2024 eq 5
+        β_B = 6.94f0,  # YT2024 only
+        poro_Λ = 4.0f0, # Table 6 YT2024
     ),
 
     elastic_type = anharmonic,
@@ -154,31 +154,53 @@ params_premelt_anelastic = (
 
 params_xfit_mxw = (
     fit1 = (
-        β2 = 1853,
+        β2 = 1853f0,
+        τ_cutoff = 1f-11
+    )
+)
+
+params_xfit_mxw = (
+    fit1 = (
+        β2 = 1853f0,
         τ_cutoff = 1f-11,
+        α2 = 0.5f0,
+        β1 = 0.32f0,
+        α_a = 0.39f0,
+        α_b = 0.28f0,
+        α_c = 2.6f0,
+        α_τn = 1f-1,
+        melt_alpha = 25f0,
+        ϕ_c = 1f-5,
+        fit = :fit1,
+        scaling_method = 1,
+
+        elastic_type = anharmonic,
+        elastic_params = params_anharmonic.Isaak1992,
+
+        viscous_type = xfit_premelt,
+        viscous_params = params_xfit_premelt
     ),
 
     fit2 = (
-        β2_fit2 = 8.476f0,
-        τ_cutoff_fit2 = 5f-6
+        β2 = 8.476f0,
+        τ_cutoff = 5f-6,
+        α2 = 0.5f0,
+        β1 = 0.32f0,
+        α_a = 0.39f0,
+        α_b = 0.28f0,
+        α_c = 2.6f0,
+        α_τn = 1f-1,
+        melt_alpha = 25f0,
+        ϕ_c = 1f-5,
+        fit = :fit1,
+        scaling_method = 1,
+
+        elastic_type = anharmonic,
+        elastic_params = params_anharmonic.Isaak1992,
+
+        viscous_type = xfit_premelt,
+        viscous_params = params_xfit_premelt
     ),
-
-    α2 = 0.5f0,
-    β1 = 0.32f0,
-    α_a = 0.39f0,
-    α_b = 0.28f0,
-    α_c = 2.6f0,
-    α_τn = 1f-1,
-    melt_alpha = 25,
-    ϕ_c = 1f-5,
-    fit = :fit1,
-    scaling_method = 1,
-
-    elastic_type = anharmonic,
-    elastic_params = params_anharmonic.Isaak1992,
-
-    viscous_type = xfit_premelt,
-    viscous_params = params_xfit_premelt
 )
 
 params_andrade_analytical = (
@@ -194,3 +216,9 @@ params_andrade_analytical = (
     viscous_type = xfit_premelt,
     viscous_params = params_xfit_premelt
 )
+
+const default_params_andrade_psp = deepcopy(params_andrade_psp)
+const default_params_eburgers_psp = deepcopy(params_eburgers_psp)
+const default_params_premelt_anelastic = deepcopy(params_premelt_anelastic)
+const default_params_xfit_mxw = deepcopy(params_xfit_mxw.fit1)
+const default_params_andrade_analytical = deepcopy(params_andrade_analytical)
