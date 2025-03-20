@@ -52,8 +52,6 @@ function forward(m::eburgers_psp, p; params = MT.default_params_eburgers_psp)
     J1 = @. 1 + τ_fac * int1
     J2 = @. ω * τ_fac *int2 + inv(ω * τ_maxwell)
 
-    @show DeltaP
-
     if DeltaP > 0 # bugs
         J1_int_fn2(x, ω, tau_p) = inv(x) * (exp(- log(x/tau_p) * inv(sig) )^2) * 0.5f0 * inv(1 + (ω*x)^2)
 
@@ -149,11 +147,11 @@ function forward(m::xfit_mxw, p; params = default_params_xfit_mxw)
     f_norm = @. τ_maxwell * m.f
 
     τ_norm_f = @. inv(2f0π * f_norm)
-
+    
     J_int_fn(x, _) = inv(x) * xfit_mxw_func(x, α_a, α_b, α_c, α2, β1, β2, α_τn, τ_cutoff)
 
     int1 = broadcast(tau_norm_f -> 
-            integrate_s(J_int_fn, 0f0, (l = 10f0 ^(-30f0), h= tau_norm_f, N = 1, rule = Val{:quadgk}())), τ_norm_f) # TODO : check this case
+            integrate_s(J_int_fn, 0f0, (l = 10f0 ^(-30f0), h= tau_norm_f, N = 1, rule = :quadgk)), τ_norm_f) # TODO : check this case
 
     int2 = broadcast(J_int_fn, τ_norm_f, 0f0)
 
@@ -183,7 +181,7 @@ function forward(m::andrade_analytical, p; params = default_params_andrade_analy
     ω = @. 2f0π * m.f
 
     if viscosity_method
-        η = get_η_diff(m, Val{viscous_type}(), viscous_params) # CHANGE HERE
+        η = get_η_diff(m, Val{viscous_type}(), viscous_params) # CHANGE HERE for any mechanism
     else
         η = η_ss
     end
@@ -191,7 +189,7 @@ function forward(m::andrade_analytical, p; params = default_params_andrade_analy
     τ_maxwell = @. η/G
 
     MJ_real = @. 1 + β * gamma(1 + α) * cos(α*π/2f0) * inv.(α * ω)
-    MJ_imag = @. inv(ω*τ_maxwell) + β * gamma(1 + α) * cos(α*π/2f0) * inv.(α * ω)
+    MJ_imag = @. inv(ω*τ_maxwell) + β * gamma(1 + α) * sin(α*π/2f0) * inv(ω^α)
 
     J1 = @. Ju * MJ_real
     J2 = @. Ju * MJ_imag
@@ -202,7 +200,7 @@ function forward(m::andrade_analytical, p; params = default_params_andrade_analy
     Ma = sqrt.(inv.(J1.^2 + J2.^2))
     Va = sqrt.(Ma ./ m.ρ)
 
-    Vave = sum(Va) * inv(length(m.f))
+    Vave = sum(Va, dims = 2) * inv(length(m.f))
 
     return RockPhyAnelastic(
         J1, J2, Qinv, Ma, Va, Vave

@@ -213,8 +213,8 @@ params_andrade_analytical = (
     elastic_type = anharmonic,
     elastic_params = params_anharmonic.Isaak1992,
 
-    viscous_type = xfit_premelt,
-    viscous_params = params_xfit_premelt
+    viscous_type = HK2003,
+    viscous_params = params_HK2003
 )
 
 const default_params_andrade_psp = deepcopy(params_andrade_psp)

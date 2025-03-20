@@ -66,7 +66,7 @@ export AbstractModelDistribution, AbstractResponseDistribution
 export AbstractGeophyModelDistribution, AbstractGeophyResponseDistribution
 export RockphyModelDistribution, RockphyResponseDistribution
 export MTModel, MTResponse
-export RockphyCond
+export RockphyCond, RockphyElastic, RockphyViscous, RockPhyAnelastic
 export get_Z, get_appres, get_phase, forward!, forward
 # export zero, copy
 export plot_response, prepare_plot, prepare_plot!

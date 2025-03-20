@@ -48,7 +48,7 @@ function get_η_diff(m, viscous_type::Val{HK2003}, params_viscous)
 
     P = @. p_dep_calc * m.P
     x_ϕ_c_vec = get_melt_settings_for_x_ϕ_c(Val{melt_enhancement}())
-    fH2O = calc_fH2O(m.Ch2o, ch2o_o, P, m.T)
+    fH2O = @. calc_fH2O(m.Ch2o, ch2o_o, P, m.T)
     ϵ_rate_diff = broadcast((T, P, σ, d, ϕ, fH2O) -> sr_flow_law_calculation_HK2003(T, P * 1f9, σ, d, ϕ, fH2O, getfield(x_ϕ_c_vec, :diff), mechs, :diff), m.T, P, m.σ, m.dg, m.ϕ, fH2O)
     η_diff = @. m.σ * 1f9 / ϵ_rate_diff
 
@@ -70,10 +70,11 @@ function calc_maxwell_times(Gu, m::eburgers_psp, params_btype, JF10_visc, params
     @unpack TR, PR, dR, E, Vstar, Tau_LR, Tau_HR, Tau_MR, Tau_PR, m_a, m_v, melt_alpha, ϕ_c = params_btype
     x_ϕ_c = getfield(get_melt_settings_for_x_ϕ_c(Val{melt_enhancement}()), :diff)
 
+
     if JF10_visc
         scale = @. (m.dg/ dR)^m_v * exp(E/(MT.gas_R * 1f3) * (1/m.T - 1/TR) + Vstar/(MT.gas_R * 1f3) * (m.P/m.T - PR/TR) * 1f9)
         new_scale = @. add_melt_effects(m.ϕ, scale, melt_alpha, ϕ_c, x_ϕ_c)
-        τ_maxwell = @. Tau_MR * add_melt_effects(m.ϕ, new_scale, melt_alpha, ϕ_c, x_ϕ_c)
+        τ_maxwell = @. Tau_MR * new_scale
 
     else
     # requires η_diff here
@@ -138,19 +139,10 @@ end
 
 function integrate_s(J_int_fn::F, ω::T, integration_params) where {F, T}
     @unpack l, h, N, rule = integration_params
-    # @show rule, typeof
-    # let ω = ω
-        # f = let ω = ω  
-        #     x -> J_int_fn(x, ω) end
-    #     # @show ω, "scalar_fn"
-    #     return integrate_fn(f, l, h, N, Val{:simpson}())
-    # end
-    f(x) = J_int_fn(x, ω)
-    # return f(l)
-    # return J_int_fn(l, ω)
-    return integrate_fn(f, l, h, N, Val{:simpson}())
-    # return integrate_fn(f, l, h, N, Val{rule}())
 
+    f(x) = J_int_fn(x, ω)
+    # return integrate_fn(f, l, h, N, Val{:simpson}())
+    return integrate_fn(f, l, h, N, Val{rule}())
 
 end 
 
@@ -173,12 +165,16 @@ function calc_Ap(Tn, ϕ, params)
     A_p = 0f0
     if Tn >= A_p_Tn_pts[3]
         A_p = A_p_fac_3 + β_p * ϕ
-    elseif Tn < A_p_Tn_pts[3]
-        A_p = A_p_fac_3
-    elseif Tn < A_p_Tn_pts[2]
-        A_p = A_p_fac_1 + A_p_fac_2 * (Tn - A_p_Tn_pts[1])
-    elseif Tn < A_p_Tn_pts[1]
-        A_p = A_p_fac_1
+    else
+        if Tn >= A_p_Tn_pts[2]
+            A_p = A_p_fac_3
+        else
+            if Tn >= A_p_Tn_pts[1]
+                A_p = A_p_fac_1 + A_p_fac_2 * (Tn - A_p_Tn_pts[1])
+            else
+                A_p = A_p_fac_1
+            end
+        end
     end
 
     return A_p
@@ -189,9 +185,9 @@ function calc_σp(Tn, params)
 
     σ_p = 0f0
     
-    if σ_p_fac_1 < σ_p_Tn_pts[1]
+    if Tn < σ_p_Tn_pts[1]
         σ_p = σ_p_fac_1
-    elseif (σ_p_fac_1 >= σ_p_Tn_pts[1]) && (σ_p_fac_1 < σ_p_Tn_pts[2])
+    elseif (Tn >= σ_p_Tn_pts[1]) && (Tn < σ_p_Tn_pts[2])
         σ_p = σ_p_fac_1 + σ_p_fac_2 * (Tn - σ_p_Tn_pts[1])
     else
         σ_p = σ_p_fac_3

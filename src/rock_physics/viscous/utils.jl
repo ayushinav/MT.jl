@@ -3,7 +3,7 @@
 function get_melt_enhancement(phi,α,x_ϕ_c,ϕ_c)
     a = log(x_ϕ_c)
     ratefac = inv(ϕ_c)
-    step = a*erf(phi.*ratefac)
+    step = a*erf(phi*ratefac)
     slope = α*phi
     ln_SR_phi_enh = slope + step
     SR_phi_enh = exp(ln_SR_phi_enh)
@@ -18,7 +18,7 @@ function sr_flow_law_calculation(T, P, σ, d, ϕ, fH2O, x_ϕ_c, params)
 
     # (x_phi_c == 0) && (x_ϕ_c = 1f0)
 
-    sr = @. inv(x_ϕ_c) * A * ((σ* 1f3)^ n) * (d^ (-p)) * exp(- (Q + P * V)/(MT.gas_R * T * 1f3)) * (fH2O^r)
+    sr = @. inv(x_ϕ_c) * A * ((σ* 1f3)^ n) * (d^ (-p)) * exp(- (Q + P * 1f9 * V)/(MT.gas_R * T * 1f3)) * (fH2O^r)
     enhance = @. get_melt_enhancement(ϕ, alf, x_ϕ_c, ϕ_c)
 
     return @. sr * enhance
