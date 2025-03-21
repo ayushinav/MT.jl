@@ -21,9 +21,9 @@ function forward(m::HK2003, p; params = default_params_HK2003)
 
     P = @. p_dep_calc * m.P
 
-    fH2O = @. calc_fH2O(m.Ch2o, ch2o_o, P, m.T)
+    fH2O = @. calc_fH2O(m.Ch2o_ol, ch2o_o, P, m.T)
 
-    ϵ_rate = zero(m.T .+ m.P.+ m.dg.+ m.σ.+ m.ϕ .+ m.Ch2o)
+    ϵ_rate = zero(m.T .+ m.P.+ m.dg.+ m.σ.+ m.ϕ .+ m.Ch2o_ol)
 
     x_ϕ_c_vec = get_melt_settings_for_x_ϕ_c(Val{melt_enhancement}())
 

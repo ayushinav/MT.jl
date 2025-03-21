@@ -139,7 +139,7 @@ params_premelt_anelastic = (
         σ_p_Tn_pts = [0.92f0, 1f0],  # Tn cutoff points
 
         # Melt effects
-        include_direct_melt_effect = false,  # set to 1 to include YT2024 melt effect
+        include_direct_melt_effect = false,  # set to true to include YT2024 melt effect
         β = 1.38f0,  # determined in YT2024, named Beta_P in YT2024 eq 5
         β_B = 6.94f0,  # YT2024 only
         poro_Λ = 4.0f0, # Table 6 YT2024
@@ -155,13 +155,6 @@ params_premelt_anelastic = (
 params_xfit_mxw = (
     fit1 = (
         β2 = 1853f0,
-        τ_cutoff = 1f-11
-    )
-)
-
-params_xfit_mxw = (
-    fit1 = (
-        β2 = 1853f0,
         τ_cutoff = 1f-11,
         α2 = 0.5f0,
         β1 = 0.32f0,
@@ -171,8 +164,6 @@ params_xfit_mxw = (
         α_τn = 1f-1,
         melt_alpha = 25f0,
         ϕ_c = 1f-5,
-        fit = :fit1,
-        scaling_method = 1,
 
         elastic_type = anharmonic,
         elastic_params = params_anharmonic.Isaak1992,
@@ -192,8 +183,6 @@ params_xfit_mxw = (
         α_τn = 1f-1,
         melt_alpha = 25f0,
         ϕ_c = 1f-5,
-        fit = :fit1,
-        scaling_method = 1,
 
         elastic_type = anharmonic,
         elastic_params = params_anharmonic.Isaak1992,

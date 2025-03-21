@@ -91,4 +91,6 @@ export mcmc_cache, rto_cache
 export stochastic_inverse, get_model_list
 export pre_image, get_kde_image, get_mean_std_image
 
+export default_params
+
 end

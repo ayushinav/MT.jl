@@ -1,5 +1,5 @@
 
-function forward(m::anharmonic, p; params=default_params_anharmonic.Isaak1992)
+function forward(m::anharmonic, p; params=default_params_anharmonic)
     @unpack T_K_ref, P_Pa_ref, Gu_0_ol, dG_dT, dG_dP, ν, Gu_0_crust, dG_dT_crust, dG_dP_crust, Gu_TP, Ku_TP = params
 
     Gu₀, dG_dT₀, dG_dP₀ = @. calc_Gu₀(Gu_0_ol, dG_dT, dG_dP, Gu_0_crust, dG_dT_crust, dG_dP_crust) #since χ is 1., we are always using ol

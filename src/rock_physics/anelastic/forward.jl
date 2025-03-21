@@ -34,7 +34,7 @@ function forward(m::eburgers_psp, p; params = MT.default_params_eburgers_psp)
 
     ω = 2f0π .* m.f
 
-    resp_elastic = resp_elastic = MT.forward_for_anelastic(m, Val{elastic_type}(), params_elastic)
+    resp_elastic = resp_elastic = forward_for_anelastic(m, Val{elastic_type}(), params_elastic)
     @unpack G, K, Vp, Vs = resp_elastic
 
     Ju = @. inv(G)
@@ -52,7 +52,7 @@ function forward(m::eburgers_psp, p; params = MT.default_params_eburgers_psp)
     J1 = @. 1 + τ_fac * int1
     J2 = @. ω * τ_fac *int2 + inv(ω * τ_maxwell)
 
-    if DeltaP > 0 # bugs
+    if DeltaP > 0 # TODO :check for bugs (?)
         J1_int_fn2(x, ω, tau_p) = inv(x) * (exp(- log(x/tau_p) * inv(sig) )^2) * 0.5f0 * inv(1 + (ω*x)^2)
 
         int11 = broadcast((omega, tau_p) -> 
