@@ -15,5 +15,9 @@ params_anharmonic = (
 params_anharmonic_poro = (
     m_A=1.6f0, m_K=30.0f9, ν=0.25f0, p_anharmonic=params_anharmonic.Isaak1992)
 
-const default_params_anharmonic = deepcopy(params_anharmonic)
+const default_params_anharmonic = deepcopy(params_anharmonic.Isaak1992)
 const default_params_anharmonic_poro = deepcopy(params_anharmonic_poro)
+
+default_params(::Val{anharmonic}) = default_params_anharmonic
+default_params(::Val{anharmonic_poro}) = default_params_anharmonic_poro
+default_params(::Val{SLB2005}) = (;)
