@@ -1,3 +1,4 @@
+#! format: off
 # minerals
 
 params_SEO3 = (S_bfe=5.06f24, H_bfe=0.357f0, S_bmg=4.58f26, H_bmg=0.752f0,
@@ -50,13 +51,3 @@ const default_params_Yoshino2009 = deepcopy(params_Yoshino2009)
 const default_params_Ni2011 = deepcopy(params_Ni2011)
 const default_params_Sifre2014 = deepcopy(params_Sifre2014)
 const default_params_Gaillard2008 = deepcopy(params_Gaillard2008)
-
-default_params(::Val{SEO3}) = default_params_SEO3
-default_params(::Val{UHO2014}) = default_params_UHO2014
-default_params(::Val{Jones2012}) = default_params_Jones2012
-default_params(::Val{Poe2010}) = default_params_Poe2010
-default_params(::Val{Wang2006}) = default_params_Wang2006
-default_params(::Val{Yoshino2009}) = default_params_Yoshino2009
-default_params(::Val{Ni2011}) = default_params_Ni2011
-default_params(::Val{Sifre2014}) = default_params_Sifre2014
-default_params(::Val{Gaillard2008}) = default_params_Gaillard2008

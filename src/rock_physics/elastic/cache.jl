@@ -1,3 +1,4 @@
+#! format: off
 const melt_settings_true = (diff=5.0f0, disl=1.0f0, gbs=2.5f0)
 const melt_settings_false = (diff=1.0f0, disl=1.0f0, gbs=1.0f0)
 
@@ -17,7 +18,3 @@ params_anharmonic_poro = (
 
 const default_params_anharmonic = deepcopy(params_anharmonic.Isaak1992)
 const default_params_anharmonic_poro = deepcopy(params_anharmonic_poro)
-
-default_params(::Val{anharmonic}) = default_params_anharmonic
-default_params(::Val{anharmonic_poro}) = default_params_anharmonic_poro
-default_params(::Val{SLB2005}) = (;)

@@ -1,5 +1,5 @@
 
-mutable struct RockphyViscous{T1,T2} <: AbstractRockphyResponse
+mutable struct RockphyViscous{T1, T2} <: AbstractRockphyResponse
     ϵ_rate::T1
     η::T2
 end
@@ -7,11 +7,12 @@ end
 """
     HZK2011(T, P, dg, σ, ϕ)
 
-Calculate strain rate and viscosity for steady state olivine flow, 
+Calculate strain rate and viscosity for steady state olivine flow,
 per Zimmerman and Kohlstedt (2011), using the three creep mechanisms, i.e.,
 diffusion, dislocation, grain boundary sliding
 
-## Arguments 
+## Arguments
+
     - `T` : Temperature of the rock (K)
     - `P` : Pressure (GPa)
     - `dg`: Grain size (μm)
@@ -19,6 +20,7 @@ diffusion, dislocation, grain boundary sliding
     - `ϕ` : Porosity
 
 ## Keyword Arguments
+
     - `params` : Various coefficients required for calculation.
     Coefficients for different mechanisms (stored in `mechs` field):
         - `diff` : Diffusion creep
@@ -31,15 +33,15 @@ diffusion, dislocation, grain boundary sliding
 
     `params` for `HZK2011` holds another important field:
         - `melt_enhancement` : TODO
-    
-## Usage 
+
+## Usage
 
 ```julia
-T = collect(1073f0:30:1373f0)
+T = collect(1073.0f0:30:1373.0f0)
 P = 2 .+ zero(T)
-dg = collect(3f0:4f-1:7f0)
-σ = collect(7.5f0:0.5f0:12.5f0) .* 1f-3
-ϕ = collect(1f-2:1f-3:2f-2)
+dg = collect(3.0f0:4.0f-1:7.0f0)
+σ = collect(7.5f0:0.5f0:12.5f0) .* 1.0f-3
+ϕ = collect(1.0f-2:1.0f-3:2.0f-2)
 
 model = HZK2011(T, P, dg, σ, ϕ)
 
@@ -47,9 +49,10 @@ forward(model, [])
 ```
 
 ## References
-- Hansen, Zimmerman and Kohlstedt, 2011, "Grain boundary sliding in San Carlos olivine: 
-Flow law parameters and crystallographic-preferred orientation", J. Geophys. Res., 
-https://doi.org/10.1029/2011JB008220
+
+  - Hansen, Zimmerman and Kohlstedt, 2011, "Grain boundary sliding in San Carlos olivine:
+    Flow law parameters and crystallographic-preferred orientation", J. Geophys. Res.,
+    https://doi.org/10.1029/2011JB008220
 """
 mutable struct HZK2011{T1, T2, T3, T4, T5}
     T::T1
@@ -62,11 +65,12 @@ end
 """
     HK2003(T, P, dg, σ, ϕ)
 
-Calculate strain rate and viscosity for steady state olivine flow, 
+Calculate strain rate and viscosity for steady state olivine flow,
 per Hirth and Kohlstedt (2003), using the three creep mechanisms, i.e.,
 diffusion, dislocation, grain boundary sliding
 
-## Arguments 
+## Arguments
+
     - `T` : Temperature of the rock (K)
     - `P` : Pressure (GPa)
     - `dg`: Grain size (μm)
@@ -74,9 +78,11 @@ diffusion, dislocation, grain boundary sliding
     - `ϕ` : Porosity
 
 ## Optional Arguments
+
     - `Ch2o_ol` : Water concentration in olivine (ppm), defaults to 0 ppm.
 
 ## Keyword Arguments
+
     - `params` : Various coefficients required for calculation.
     Coefficients for different mechanisms (stored in `mechs` field):
         - `diff` : Diffusion creep
@@ -90,13 +96,14 @@ diffusion, dislocation, grain boundary sliding
     `params` for `HK2003` holds another important field:
     - `melt_enhancement` : TODO
 
-## Usage 
+## Usage
+
 ```julia
-T = collect(1073f0:30:1373f0)
+T = collect(1073.0f0:30:1373.0f0)
 P = 2 .+ zero(T)
-dg = collect(3f0:4f-1:7f0)
-σ = collect(7.5f0:0.5f0:12.5f0) .* 1f-3
-ϕ = collect(1f-2:1f-3:2f-2)
+dg = collect(3.0f0:4.0f-1:7.0f0)
+σ = collect(7.5f0:0.5f0:12.5f0) .* 1.0f-3
+ϕ = collect(1.0f-2:1.0f-3:2.0f-2)
 
 model = HK2003(T, P, dg, σ, ϕ)
 
@@ -104,9 +111,10 @@ forward(model, [])
 ```
 
 ## References
-- Hirth and Kohlstedt, 2003, "Rheology of the Upper Mantle and the Mantle Wedge: A View from the Experimentalists", 
-Inside the Subduction Factory, J. Eiler (Ed.). 
-https://doi.org/10.1029/138GM06
+
+  - Hirth and Kohlstedt, 2003, "Rheology of the Upper Mantle and the Mantle Wedge: A View from the Experimentalists",
+    Inside the Subduction Factory, J. Eiler (Ed.).
+    https://doi.org/10.1029/138GM06
 """
 mutable struct HK2003{T1, T2, T3, T4, T5, T6}
     T::T1
@@ -117,7 +125,7 @@ mutable struct HK2003{T1, T2, T3, T4, T5, T6}
     Ch2o_ol::T6
 end
 
-HK2003(T, P, dg, σ, ϕ) = HK2003(T, P, dg, σ, ϕ, 0f0)
+HK2003(T, P, dg, σ, ϕ) = HK2003(T, P, dg, σ, ϕ, 0.0f0)
 
 """
     xfit_premelt(T, P, dg, σ, ϕ)
@@ -177,4 +185,8 @@ mutable struct xfit_premelt{T1, T2, T3, T4, T5, T6, T7}
     Ch2o_ol::T7
 end
 
-xfit_premelt(T, P, dg, σ, ϕ, T_solidus) = xfit_premelt(T, P, dg, σ, ϕ, T_solidus, 0f0)
+xfit_premelt(T, P, dg, σ, ϕ, T_solidus) = xfit_premelt(T, P, dg, σ, ϕ, T_solidus, 0.0f0)
+
+default_params(::Val{HZK2011}) = default_params_HZK2011
+default_params(::Val{anharmonic_poro}) = default_params_anharmonic_poro
+default_params(::Val{xfit_premelt}) = default_params_xfit_premelt

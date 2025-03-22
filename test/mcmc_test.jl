@@ -1,8 +1,8 @@
-@testitem "fixed discretization" tags = [:mcmc] begin
-    using Distributions, Turing, LinearAlgebra
+@testitem "fixed discretization" tags=[:mcmc] begin
+    using Distributions, Turing
 
-    m_test = MTModel(log10.([100.0, 10.0, 1000.0]), [1e3, 1e3])
-    f = 10 .^ range(-2, stop = 2, length = 25)
+    m_test = MTModel([100.0, 10.0, 1000.0], [1e3, 1e3])
+    f = 10 .^ range(-4; stop=1, length=25)
     ω = vec(2π .* f)
 
     r_obs = forward(m_test, ω)
@@ -16,32 +16,27 @@
 
     respD = MTResponseDistribution(normal_dist, normal_dist)
 
-    z = 10 .^ collect(range(1, stop = 4, length = 100))
+    z = 10 .^ collect(range(1; stop=4, length=100))
     h = diff(z)
-
 
     modelD = MTModelDistribution(
         product_distribution([Uniform(-1.0, 5.0) for i in eachindex(z)]),
-        vec(h),
+        vec(h)
     )
 
-
-    n_samples = 30
+    n_samples = 20
     mcache = mcmc_cache(modelD, respD, n_samples, NUTS())
 
-    mcmc_chain = stochastic_inverse(
-        r_obs,
-        err_resp,
-        ω,
-        mcache,
-        model_trans_utils = (; m = MT.lin_tf),
-    )
+    log_tf2 = transform_utils([], log10, (x) -> 10^x, (x) -> inv(x * log(10)))
+
+    mcmc_chain = stochastic_inverse(r_obs, err_resp, ω, mcache; trans_utils=(m=log_tf,))
 
     model_list = get_model_list(mcmc_chain, modelD)
     W = diagm(inv.([err_resp.ρₐ..., err_resp.ϕ...])) .^ 2
 
-    err = zeros(n_samples)
-    for idx = 1:n_samples
+    rho_err = 0.0
+    ph_err = 0.0
+    for idx in 1:n_samples
         m_model = model_list[idx]
         resp_model = forward(m_model, ω)
 
@@ -55,11 +50,11 @@
     @test sum(err[n_samples-20+1:end]) / 20 <= 1
 end
 
-@testitem "variable discretization" tags = [:mcmc] begin
-    using Distributions, Turing, LinearAlgebra
+@testitem "variable discretization" tags=[:mcmc] begin
+    using Distributions, Turing
 
-    m_test = MTModel(log10.([100.0, 10.0, 1000.0]), [1e3, 1e3])
-    f = 10 .^ range(-2, stop = 2, length = 25)
+    m_test = MTModel([100.0, 10.0, 1000.0], [1e3, 1e3])
+    f = 10 .^ range(-4; stop=1, length=25)
     ω = vec(2π .* f)
 
     r_obs = forward(m_test, ω)
@@ -73,25 +68,28 @@ end
 
     respD = MTResponseDistribution(normal_dist, normal_dist)
 
-    z = 10 .^ collect(range(1, stop = 4, length = 100))
+    z = 10 .^ collect(range(1; stop=4, length=100))
     h = diff(z)
     h_bounds = [[ih / 3, ih * 3] for ih in h]
 
     modelD = MTModelDistribution(
         product_distribution([Uniform(-1.0, 5.0) for i in eachindex(z)]),
-        product_distribution([Uniform(ih_bounds...) for ih_bounds in h_bounds]),
+        product_distribution([Uniform(ih_bounds...) for ih_bounds in h_bounds])
     )
 
-    n_samples = 30
+    n_samples = 20
     mcache = mcmc_cache(modelD, respD, n_samples, NUTS())
 
-    mcmc_chain = stochastic_inverse(r_obs, err_resp, ω, mcache)
+    log_tf2 = transform_utils([], log10, (x) -> 10^x, (x) -> inv(x * log(10)))
+
+    mcmc_chain = stochastic_inverse(r_obs, err_resp, ω, mcache; trans_utils=(m=log_tf,))
 
     model_list = get_model_list(mcmc_chain, modelD)
     W = diagm(inv.([err_resp.ρₐ..., err_resp.ϕ...])) .^ 2
 
-    err = zeros(n_samples)
-    for idx = 1:n_samples
+    rho_err = 0.0
+    ph_err = 0.0
+    for idx in 1:n_samples
         m_model = model_list[idx]
         resp_model = forward(m_model, ω)
 
