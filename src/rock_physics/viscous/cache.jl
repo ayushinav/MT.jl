@@ -1,3 +1,4 @@
+#! format: off
 params_HZK2011 = (
     mechs = (
         diff=(
@@ -37,7 +38,7 @@ params_HZK2011 = (
         ),
         ),
     p_dep_calc = true,
-    melt_enhancement = falsexc
+    melt_enhancement = false
     
 )
 
@@ -142,7 +143,3 @@ params_xfit_premelt = (
 const default_params_HZK2011 = deepcopy(params_HZK2011)
 const default_params_HK2003 = deepcopy(params_HK2003)
 const default_params_xfit_premelt = deepcopy(params_xfit_premelt)
-
-default_params(::Val{HZK2011}) = default_params_HZK2011
-default_params(::Val{anharmonic_poro}) = default_params_anharmonic_poro
-default_params(::Val{xfit_premelt}) = default_params_xfit_premelt

@@ -1,4 +1,4 @@
-@testitem "conductivity tests" tags = [:rp] begin
+@testitem "conductivity tests" tags=[:rp] begin
     using MT
     methods_list = [
         SEO3,
@@ -11,7 +11,7 @@
         # melt
         Ni2011,
         Sifre2014,
-        Gaillard2008,
+        Gaillard2008
     ]
 
     T = collect(1273.0f0:30:1573.0f0)
@@ -20,17 +20,17 @@
     Cco2_m = collect(1.0f4:2.0f3:3.0f4)
 
     inps = (;
-        SEO3 = [T],
-        UHO2014 = [T, Ch2o_ol],
-        Jones2012 = [T, Ch2o_ol],
-        Yoshino2009 = [T, Ch2o_ol],
-        Wang2006 = [T, Ch2o_ol],
-        Poe2010 = [T, Ch2o_ol],
+        SEO3=[T],
+        UHO2014=[T, Ch2o_ol],
+        Jones2012=[T, Ch2o_ol],
+        Yoshino2009=[T, Ch2o_ol],
+        Wang2006=[T, Ch2o_ol],
+        Poe2010=[T, Ch2o_ol],
 
         # melt
-        Ni2011 = [T, Ch2o_m],
-        Sifre2014 = [T, Ch2o_m, Cco2_m],
-        Gaillard2008 = [T],
+        Ni2011=[T, Ch2o_m],
+        Sifre2014=[T, Ch2o_m, Cco2_m],
+        Gaillard2008=[T]
     )
 
     methods_list = [
@@ -44,145 +44,145 @@
         # melt
         Ni2011,
         Sifre2014,
-        Gaillard2008,
+        Gaillard2008
     ]
 
     outs = (;
-        SEO3 = RockphyCond(
+        SEO3=RockphyCond(
             Float32.([
-                -4.0572,
-                -3.8956,
-                -3.7387,
-                -3.5857,
-                -3.4355,
-                -3.2874,
-                -3.1402,
-                -2.9933,
-                -2.8457,
-                -2.6968,
-                -2.5463,
-            ]),
+            -4.0572,
+            -3.8956,
+            -3.7387,
+            -3.5857,
+            -3.4355,
+            -3.2874,
+            -3.1402,
+            -2.9933,
+            -2.8457,
+            -2.6968,
+            -2.5463
+        ]),
         ),
-        UHO2014 = RockphyCond(
+        UHO2014=RockphyCond(
             Float32.([
-                1.2728,
-                1.4152,
-                1.5459,
-                1.6664,
-                1.7780,
-                1.8818,
-                1.9786,
-                2.0692,
-                2.1542,
-                2.2341,
-                2.3095,
-            ]),
+            1.2728,
+            1.4152,
+            1.5459,
+            1.6664,
+            1.7780,
+            1.8818,
+            1.9786,
+            2.0692,
+            2.1542,
+            2.2341,
+            2.3095
+        ]),
         ),
-        Jones2012 = RockphyCond(
+        Jones2012=RockphyCond(
             Float32.([
-                0.1550,
-                0.2774,
-                0.3920,
-                0.4996,
-                0.6011,
-                0.6971,
-                0.7880,
-                0.8744,
-                0.9567,
-                1.0351,
-                1.1099,
-            ]),
+            0.1550,
+            0.2774,
+            0.3920,
+            0.4996,
+            0.6011,
+            0.6971,
+            0.7880,
+            0.8744,
+            0.9567,
+            1.0351,
+            1.1099
+        ]),
         ),
-        Yoshino2009 = RockphyCond(
+        Yoshino2009=RockphyCond(
             Float32.([
-                -0.6429,
-                -0.5108,
-                -0.3878,
-                -0.2729,
-                -0.1650,
-                -0.0634,
-                0.0325,
-                0.1232,
-                0.2093,
-                0.2912,
-                0.3691,
-            ]),
+            -0.6429,
+            -0.5108,
+            -0.3878,
+            -0.2729,
+            -0.1650,
+            -0.0634,
+            0.0325,
+            0.1232,
+            0.2093,
+            0.2912,
+            0.3691
+        ]),
         ),
-        Wang2006 = RockphyCond(
+        Wang2006=RockphyCond(
             Float32.([
-                -0.3832,
-                -0.2753,
-                -0.1734,
-                -0.0768,
-                0.0150,
-                0.1023,
-                0.1857,
-                0.2653,
-                0.3415,
-                0.4144,
-                0.4844,
-            ]),
+            -0.3832,
+            -0.2753,
+            -0.1734,
+            -0.0768,
+            0.0150,
+            0.1023,
+            0.1857,
+            0.2653,
+            0.3415,
+            0.4144,
+            0.4844
+        ]),
         ),
-        Poe2010 = RockphyCond(
+        Poe2010=RockphyCond(
             Float32.([
-                3.4473,
-                3.6441,
-                3.8203,
-                3.9789,
-                4.1224,
-                4.2527,
-                4.3714,
-                4.4800,
-                4.5796,
-                4.6711,
-                4.7554,
-            ]),
+            3.4473,
+            3.6441,
+            3.8203,
+            3.9789,
+            4.1224,
+            4.2527,
+            4.3714,
+            4.4800,
+            4.5796,
+            4.6711,
+            4.7554
+        ]),
         ),
-        Ni2011 = RockphyCond(
+        Ni2011=RockphyCond(
             Float32.([
-                -2.3579,
-                -1.3975,
-                -0.7500,
-                -0.2847,
-                0.0652,
-                0.3375,
-                0.5552,
-                0.7329,
-                0.8807,
-                1.0053,
-                1.1117,
-            ]),
+            -2.3579,
+            -1.3975,
+            -0.7500,
+            -0.2847,
+            0.0652,
+            0.3375,
+            0.5552,
+            0.7329,
+            0.8807,
+            1.0053,
+            1.1117
+        ]),
         ),
-        Sifre2014 = RockphyCond(
+        Sifre2014=RockphyCond(
             Float32.([
-                -0.0128,
-                0.1570,
-                0.3119,
-                0.4537,
-                0.5837,
-                0.7031,
-                0.8131,
-                0.9145,
-                1.0084,
-                1.0954,
-                1.1763,
-            ]),
+            -0.0128,
+            0.1570,
+            0.3119,
+            0.4537,
+            0.5837,
+            0.7031,
+            0.8131,
+            0.9145,
+            1.0084,
+            1.0954,
+            1.1763
+        ]),
         ),
-        Gaillard2008 = RockphyCond(
+        Gaillard2008=RockphyCond(
             Float32.([
-                2.2276,
-                2.2577,
-                2.2865,
-                2.3140,
-                2.3403,
-                2.3655,
-                2.3897,
-                2.4129,
-                2.4352,
-                2.4566,
-                2.4772,
-            ]),
-        ),
+            2.2276,
+            2.2577,
+            2.2865,
+            2.3140,
+            2.3403,
+            2.3655,
+            2.3897,
+            2.4129,
+            2.4352,
+            2.4566,
+            2.4772
+        ]),
+        )
     )
 
     for i in eachindex(methods_list)
@@ -192,7 +192,7 @@
         @inferred forward(model, [])
         @report_call forward(model, [])
         for k in fieldnames(RockphyCond)
-            @test all(isapprox.(getfield(out_, k), getfield(outs[m], k), rtol = 1e-2))
+            @test all(isapprox.(getfield(out_, k), getfield(outs[m], k), rtol=1e-2))
         end
     end
 
@@ -212,16 +212,16 @@
     # end
 end
 
-@testitem "elastic tests" tags = [:rp] begin
+@testitem "elastic tests" tags=[:rp] begin
     T = collect(1273.0f0:30:1573.0f0)
     ρ = collect(3300.0f0:100.0f0:4300.0f0)
     ϕ = collect(1.0f-2:1.0f-3:2.0f-2)
     P = 2 .+ zero(T)
 
-    inps = (anharmonic = [T, P, ρ], anharmonic_poro = [T, P, ρ, ϕ], SLB2005 = [T, P])
+    inps = (anharmonic=[T, P, ρ], anharmonic_poro=[T, P, ρ, ϕ], SLB2005=[T, P])
 
     outs = (
-        anharmonic = MT.RockphyElastic(
+        anharmonic=MT.RockphyElastic(
             [
                 7.1367f10,
                 7.0959f10,
@@ -233,7 +233,7 @@ end
                 6.8511f10,
                 6.8103f10,
                 6.7695f10,
-                6.7287f10,
+                6.7287f10
             ],
             [
                 1.1895f11,
@@ -246,7 +246,7 @@ end
                 1.1419f11,
                 1.1351f11,
                 1.1283f11,
-                1.1215f11,
+                1.1215f11
             ],
             [
                 8.0548f03,
@@ -259,7 +259,7 @@ end
                 7.1682f03,
                 7.0591f03,
                 6.9537f03,
-                6.8516f03,
+                6.8516f03
             ],
             [
                 4.6504f03,
@@ -272,10 +272,10 @@ end
                 4.1386f03,
                 4.0756f03,
                 4.0147f03,
-                3.9558f03,
-            ],
+                3.9558f03
+            ]
         ),
-        anharmonic_poro = RockphyElastic(
+        anharmonic_poro=RockphyElastic(
             [
                 6.9053f10,
                 6.8464f10,
@@ -287,7 +287,7 @@ end
                 6.4982f10,
                 6.4410f10,
                 6.3840f10,
-                6.3272f10,
+                6.3272f10
             ],
             [
                 1.1682f11,
@@ -300,7 +300,7 @@ end
                 1.1090f11,
                 1.1007f11,
                 1.0925f11,
-                1.0843f11,
+                1.0843f11
             ],
             [
                 7.9531f03,
@@ -313,7 +313,7 @@ end
                 7.0230f03,
                 6.9086f03,
                 6.7980f03,
-                6.6910f03,
+                6.6910f03
             ],
             [
                 4.5744f03,
@@ -326,10 +326,10 @@ end
                 4.0306f03,
                 3.9635f03,
                 3.8987f03,
-                3.8359f03,
-            ],
+                3.8359f03
+            ]
         ),
-        SLB2005 = RockphyElastic(
+        SLB2005=RockphyElastic(
             zeros(Float32, 11),
             zeros(Float32, 11),
             zeros(Float32, 11),
@@ -344,9 +344,9 @@ end
                 4.3988f03,
                 4.3875f03,
                 4.3761f03,
-                4.3648f03,
-            ],
-        ),
+                4.3648f03
+            ]
+        )
     )
 
     methods_list = [anharmonic, anharmonic_poro, SLB2005]
@@ -358,13 +358,12 @@ end
         @inferred forward(model, [])
         @report_call forward(model, [])
         for k in fieldnames(RockphyElastic)
-            @test all(isapprox.(getfield(out_, k), getfield(outs[m], k), rtol = 1e-2))
+            @test all(isapprox.(getfield(out_, k), getfield(outs[m], k), rtol=1e-2))
         end
     end
-
 end
 
-@testitem "viscosity tests" tags = [:rp] begin
+@testitem "viscosity tests" tags=[:rp] begin
     T = collect(1073.0f0:30:1373.0f0)
     P = 2 .+ zero(T)
     dg = collect(3.0f0:4.0f-1:7.0f0)
@@ -373,15 +372,15 @@ end
     T_solidus = 1473 .+ zero(T)
 
     inps = (
-        HZK2011 = [T, P, dg, σ, ϕ],
-        HK2003 = [T, P, dg, σ, ϕ, zero(ϕ)],
-        xfit_premelt = [T, P, dg, σ, ϕ, zero(ϕ), T_solidus],
+        HZK2011=[T, P, dg, σ, ϕ],
+        HK2003=[T, P, dg, σ, ϕ, zero(ϕ)],
+        xfit_premelt=[T, P, dg, σ, ϕ, zero(ϕ), T_solidus]
     )
 
     methods_list = [HZK2011, HK2003, xfit_premelt]
 
     outs = (
-        HZK2011 = RockphyViscous(
+        HZK2011=RockphyViscous(
             Float32[
                 1.0f-12,
                 2.0f-12,
@@ -393,7 +392,7 @@ end
                 2.86f-10,
                 5.86f-10,
                 1.1710001f-9,
-                2.283f-9,
+                2.283f-9
             ],
             [
                 8.9619f18,
@@ -406,10 +405,10 @@ end
                 3.85f16,
                 1.96f16,
                 1.03f16,
-                5.5f15,
-            ],
+                5.5f15
+            ]
         ),
-        HK2003 = RockphyViscous(
+        HK2003=RockphyViscous(
             Float32[
                 3.0f-11,
                 7.999999f-11,
@@ -421,7 +420,7 @@ end
                 1.0709999f-8,
                 2.191f-8,
                 4.3609997f-8,
-                8.4579995f-8,
+                8.4579995f-8
             ],
             [
                 2.3787f17,
@@ -434,10 +433,10 @@ end
                 1.03f15,
                 5.2f14,
                 2.8f14,
-                1.5f14,
-            ],
+                1.5f14
+            ]
         ),
-        xfit_premelt = RockphyViscous(
+        xfit_premelt=RockphyViscous(
             zero(T),
             [
                 7.6341f18,
@@ -450,9 +449,9 @@ end
                 8.5f15,
                 3.7f15,
                 1.7f15,
-                8.0f14,
-            ],
-        ),
+                8.0f14
+            ]
+        )
     )
 
     for i in eachindex(methods_list)
@@ -466,16 +465,16 @@ end
         for k in fieldnames(RockphyViscous)
             @test all(
                 isapprox.(
-                    log10.(getfield(out_, k)),
-                    log10.(getfield(outs[m], k)),
-                    rtol = 1.0f-2,
-                ),
+                log10.(getfield(out_, k)),
+                log10.(getfield(outs[m], k)),
+                rtol=1.0f-2
+            ),
             )
         end
     end
 end
 
-@testitem "anelastic tests" tags = [:rp] begin
+@testitem "anelastic tests" tags=[:rp] begin
     T = collect(1073.0f0:30:1373.0f0)
     P = 2 .+ zero(T)
     dg = collect(3.0f0:4.0f-1:7.0f0)
@@ -486,18 +485,18 @@ end
     ρ = collect(3300.0f0:100.0f0:4300.0f0)
 
     inps = (
-        andrade_psp = [T, P, dg, σ, ϕ, ρ, f'],
-        eburgers_psp = [T, P, dg, σ, ϕ, ρ, zero(ϕ), T_solidus, f'],
-        premelt_anelastic = [T, P, dg, σ, ϕ, ρ, zero(ϕ), T_solidus, f'],
-        xfit_mxw = [T, P, dg, σ, ϕ, ρ, zero(ϕ), T_solidus, f'],
-        andrade_analytical = [T, P, dg, σ, ϕ, ρ, f'],
+        andrade_psp=[T, P, dg, σ, ϕ, ρ, f'],
+        eburgers_psp=[T, P, dg, σ, ϕ, ρ, zero(ϕ), T_solidus, f'],
+        premelt_anelastic=[T, P, dg, σ, ϕ, ρ, zero(ϕ), T_solidus, f'],
+        xfit_mxw=[T, P, dg, σ, ϕ, ρ, zero(ϕ), T_solidus, f'],
+        andrade_analytical=[T, P, dg, σ, ϕ, ρ, f']
     )
 
-    methods_list =
-        [andrade_psp, eburgers_psp, premelt_anelastic, xfit_mxw, andrade_analytical]
+    methods_list = [
+        andrade_psp, eburgers_psp, premelt_anelastic, xfit_mxw, andrade_analytical]
 
     outs = (
-        andrade_psp = RockPhyAnelastic(
+        andrade_psp=RockPhyAnelastic(
             [
                 1.352f-11,
                 1.361f-11,
@@ -509,7 +508,7 @@ end
                 1.419f-11,
                 1.431f-11,
                 1.444f-11,
-                1.458f-11,
+                1.458f-11
             ],
             [
                 1.40f-14,
@@ -522,7 +521,7 @@ end
                 8.80f-14,
                 1.098f-13,
                 1.356f-13,
-                1.663f-13,
+                1.663f-13
             ],
             [
                 1.039f-3,
@@ -535,7 +534,7 @@ end
                 6.20326f-3,
                 7.669f-3,
                 9.394f-3,
-                1.141f-2,
+                1.141f-2
             ],
             [
                 7.3952f10,
@@ -548,7 +547,7 @@ end
                 7.0455f10,
                 6.9869f10,
                 6.9253f10,
-                6.8604f10,
+                6.8604f10
             ],
             [
                 4.7339f03,
@@ -561,7 +560,7 @@ end
                 4.1969f03,
                 4.1281f03,
                 4.0606f03,
-                3.9943f03,
+                3.9943f03
             ],
             [
                 4.7339f03,
@@ -574,10 +573,10 @@ end
                 4.1969f03,
                 4.1281f03,
                 4.0606f03,
-                3.9943f03,
-            ],
+                3.9943f03
+            ]
         ),
-        eburgers_psp = RockPhyAnelastic(
+        eburgers_psp=RockPhyAnelastic(
             [
                 1.353f-11,
                 1.362f-11,
@@ -589,7 +588,7 @@ end
                 1.430f-11,
                 1.443f-11,
                 1.458f-11,
-                1.473f-11,
+                1.473f-11
             ],
             [
                 3.06f-14,
@@ -602,7 +601,7 @@ end
                 1.287f-13,
                 1.525f-13,
                 1.795f-13,
-                2.099f-13,
+                2.099f-13
             ],
             [
                 2.3f-3,
@@ -615,7 +614,7 @@ end
                 9.0f-3,
                 1.06f-2,
                 1.23f-2,
-                1.42f-2,
+                1.42f-2
             ],
             [
                 7.3907f10,
@@ -628,7 +627,7 @@ end
                 6.9941f10,
                 6.9279f10,
                 6.8590f10,
-                6.7872f10,
+                6.7872f10
             ],
             [
                 4.7325f03,
@@ -641,7 +640,7 @@ end
                 4.1815f03,
                 4.1106f03,
                 4.0412f03,
-                3.9729f03,
+                3.9729f03
             ],
             [
                 4.7325f03,
@@ -654,10 +653,10 @@ end
                 4.1815f03,
                 4.1106f03,
                 4.0412f03,
-                3.9729f03,
-            ],
+                3.9729f03
+            ]
         ),
-        premelt_anelastic = RockPhyAnelastic(
+        premelt_anelastic=RockPhyAnelastic(
             [
                 1.351f-11,
                 1.360f-11,
@@ -669,7 +668,7 @@ end
                 1.442f-11,
                 1.464f-11,
                 1.491f-11,
-                1.576f-11,
+                1.576f-11
             ],
             [
                 1.28f-14,
@@ -682,7 +681,7 @@ end
                 2.259f-13,
                 2.854f-13,
                 3.646f-13,
-                6.147f-13,
+                6.147f-13
             ],
             [
                 9.4591f-4,
@@ -695,7 +694,7 @@ end
                 1.57f-2,
                 1.95f-2,
                 2.44f-2,
-                3.90f-2,
+                3.90f-2
             ],
             [
                 7.3998f10,
@@ -708,7 +707,7 @@ end
                 6.9328f10,
                 6.8299f10,
                 6.7042f10,
-                6.3399f10,
+                6.3399f10
             ],
             [
                 4.7354f03,
@@ -721,7 +720,7 @@ end
                 4.1634f03,
                 4.0818f03,
                 3.9959f03,
-                3.8412f03,
+                3.8412f03
             ],
             [
                 4.7354f03,
@@ -734,10 +733,10 @@ end
                 4.1634f03,
                 4.0818f03,
                 3.9959f03,
-                3.8412f03,
-            ],
+                3.8412f03
+            ]
         ),
-        xfit_mxw = RockPhyAnelastic(
+        xfit_mxw=RockPhyAnelastic(
             [
                 1.412f-11,
                 1.432f-11,
@@ -749,7 +748,7 @@ end
                 1.574f-11,
                 1.603f-11,
                 1.633f-11,
-                1.665f-11,
+                1.665f-11
             ],
             [
                 1.713f-13,
@@ -762,7 +761,7 @@ end
                 3.476f-13,
                 3.909f-13,
                 4.410f-13,
-                4.991f-13,
+                4.991f-13
             ],
             [
                 0.0121,
@@ -775,7 +774,7 @@ end
                 0.0221,
                 0.0244,
                 0.0270,
-                0.0300,
+                0.0300
             ],
             [
                 7.0802f10,
@@ -788,7 +787,7 @@ end
                 6.3498f10,
                 6.2372f10,
                 6.1218f10,
-                6.0033f10,
+                6.0033f10
             ],
             [
                 4.6322f03,
@@ -801,7 +800,7 @@ end
                 3.9848f03,
                 3.9009f03,
                 3.8185f03,
-                3.7373f03,
+                3.7373f03
             ],
             [
                 4.6322f03,
@@ -814,10 +813,10 @@ end
                 3.9848f03,
                 3.9009f03,
                 3.8185f03,
-                3.7373f03,
-            ],
+                3.7373f03
+            ]
         ),
-        andrade_analytical = RockPhyAnelastic(
+        andrade_analytical=RockPhyAnelastic(
             [
                 1.3500f-11,
                 1.3570f-11,
@@ -829,7 +828,7 @@ end
                 1.4040f-11,
                 1.4120f-11,
                 1.4200f-11,
-                1.4280f-11,
+                1.4280f-11
             ],
             [
                 3.27f-16,
@@ -842,7 +841,7 @@ end
                 4.95f-16,
                 6.45f-16,
                 9.22f-16,
-                1.422f-15,
+                1.422f-15
             ],
             [
                 2.4240f-5,
@@ -855,7 +854,7 @@ end
                 3.5230f-5,
                 4.5650f-5,
                 6.4890f-5,
-                9.9510f-5,
+                9.9510f-5
             ],
             [
                 7.4084f10,
@@ -868,7 +867,7 @@ end
                 7.1228f10,
                 7.0820f10,
                 7.0412f10,
-                7.0004f10,
+                7.0004f10
             ],
             [
                 4.7381f03,
@@ -881,7 +880,7 @@ end
                 4.2198f03,
                 4.1561f03,
                 4.0945f03,
-                4.0349f03,
+                4.0349f03
             ],
             [
                 4.7381f03,
@@ -894,9 +893,9 @@ end
                 4.2198f03,
                 4.1561f03,
                 4.0945f03,
-                4.0349f03,
-            ],
-        ),
+                4.0349f03
+            ]
+        )
     )
 
     for i in eachindex(methods_list)
@@ -908,10 +907,10 @@ end
         for k in fieldnames(RockPhyAnelastic)
             @test all(
                 isapprox.(
-                    log10.(getfield(out_, k)),
-                    log10.(getfield(outs[m], k)),
-                    rtol = 1.5f-2,
-                ),
+                log10.(getfield(out_, k)),
+                log10.(getfield(outs[m], k)),
+                rtol=1.5f-2
+            ),
             )
         end
     end

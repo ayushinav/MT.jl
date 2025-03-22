@@ -23,16 +23,19 @@ Andrade model with pseudo-scaling per Jackson and Faul (2010)
     - `ρ` : Density (kg/m³)
 
 ## Keyword Arguments
+
     - `params` : Various coefficients required for calculation.
     Also holds coefficients and the type of `RockphyElastic` model to be used.
 
     To investigate coefficients, call `default_params(Val{andrade_psp}())`. 
     To modify coefficients, check the relevant documentation page. This
     will also users to pick any particular type of `RockphyElastic` model, defaults to `anharmonic`.
-    
+
 ## Usage
 
 !!! note
+
+
 **Make sure that the dimension of vector `f` is one more than the other parameters.
 Check relevant tutorials. Note the transpose on `f` when making the model in the following eg.**
 
@@ -53,9 +56,10 @@ forward(model, [])
 ```
 
 ## References
+
   - Jackson and Faul, 2010, "Grainsize-sensitive viscoelastic relaxation in olivine: Towards a robust laboratory-based model for seismological application",
-  Phys. Earth Planet. Inter.,
-  https://doi.org/10.1016/j.pepi.2010.09.005
+    Phys. Earth Planet. Inter.,
+    https://doi.org/10.1016/j.pepi.2010.09.005
 """
 mutable struct andrade_psp{T1, T2, T3, T4, T5, T6, T7}
     T::T1
@@ -81,13 +85,11 @@ Extended Burgers model with pseudo-scaling per Jackson and Faul (2010)
     - `σ` : Shear stress (GPa)
     - `ϕ` : Porosity
     - `ρ` : Density (kg/m³)
-
-## Optional Arguments 
-    - `T_solidus` : Solidus temperature (K), defaults to 0 K 
-    (only used when using `xfit_premelt` for viscosity calculations)
-    - `Ch2o_ol` : water concentration in olivine (in ppm), defaults to 0 ppm
+    - `Ch2o_ol` : water concentration in olivine (in ppm)
+    - `T_solidus` : Solidus temperature (K), only used when using `xfit_premelt` for viscosity calculations
 
 ## Keyword Arguments
+
     - `params` : Various coefficients required for calculation.
     Also holds coefficients and the type of `RockphyElastic` model and `RockphyViscous model` to be used.
 
@@ -116,6 +118,8 @@ Extended Burgers model with pseudo-scaling per Jackson and Faul (2010)
 ## Usage
 
 !!! note
+
+
 **Make sure that the dimension of vector `f` is one more than the other parameters.
 Check relevant tutorials. Note the transpose on `f` when making the model in the following eg.**
 
@@ -137,13 +141,14 @@ forward(model, [])
 ```
 
 ## References
-  - Faul and Jackson, 2015, "Transient Creep and Strain Energy Dissipation: An Experimental Perspective",
-  Ann. Rev. of Earth and Planetary Sci., 
-  https://doi.org/10.1146/annurev-earth-060313-054732
 
-  - Jackson and Faul, 2010, "Grainsize-sensitive viscoelastic relaxation in olivine: 
-  Towards a robust laboratory-based model for seismological application", Phys. Earth Planet. Inter.,
-  https://doi.org/10.1016/j.pepi.2010.09.005
+  - Faul and Jackson, 2015, "Transient Creep and Strain Energy Dissipation: An Experimental Perspective",
+    Ann. Rev. of Earth and Planetary Sci.,
+    https://doi.org/10.1146/annurev-earth-060313-054732
+
+  - Jackson and Faul, 2010, "Grainsize-sensitive viscoelastic relaxation in olivine:
+    Towards a robust laboratory-based model for seismological application", Phys. Earth Planet. Inter.,
+    https://doi.org/10.1016/j.pepi.2010.09.005
 """
 mutable struct eburgers_psp{T1, T2, T3, T4, T5, T6, T7, T8, T9}
     T::T1
@@ -163,7 +168,7 @@ eburgers_psp(T, P, dg, σ, ϕ, ρ, f) = eburgers_psp(T, P, dg, σ, ϕ, ρ, 0.0f0
     xfit_premelt(T, P, dg, σ, ϕ, ρ, T_solidus, Ch2o_ol, f)
 
 Calculate anelastic properties stored in `RockPhyAnelastic` using the
-Master curve maxwell scaling per near-solidus parametrization of Yamauchi and Takei (2016), 
+Master curve maxwell scaling per near-solidus parametrization of Yamauchi and Takei (2016),
 with optional extension to include direct melt effects of Yamauchi and Takei (2024)
 
 ## Arguments
@@ -174,27 +179,26 @@ with optional extension to include direct melt effects of Yamauchi and Takei (20
     - `σ` : Shear stress (GPa)
     - `ϕ` : Porosity
     - `ρ` : Density (kg/m³)
-
-## Optional Arguments 
-    - `T_solidus` : Solidus temperature (K), defaults to 0 K 
-    (only used when using `xfit_premelt` for viscosity calculations)
-    - `Ch2o_ol` : water concentration in olivine (in ppm), defaults to 0 ppm
+    - `Ch2o_ol` : water concentration in olivine (in ppm)
+    - `T_solidus` : Solidus temperature (K)
 
 ## Keyword Arguments
+
     - `params` : Various coefficients required for calculation.
     Also holds coefficients and the type of `RockphyElastic` model and `RockphyViscous model` to be used.
 
     To investigate coefficients, call `default_params(Val{xfit_premelt}())`. 
     To modify coefficients, check the relevant documentation page. This
-    will also users to pick any particular type of `RockphyElastic` model, defaults to `anharmonic`,
-    as well as `RockphyViscous` model (for diffusion-derived viscosity), defaults to `xfit_mxw`
+    will also users to pick any particular type of `RockphyElastic` model, defaults to `anharmonic`.
 
     `params` for `premelt_anelastic` holds another important field:
         - `include_direct_melt_effect` : Whether to include the melt effect of Yamauchi and Takei (2024), defaults to false
-    
+
 ## Usage
 
 !!! note
+
+
 **Make sure that the dimension of vector `f` is one more than the other parameters.
 Check relevant tutorials. Note the transpose on `f` when making the model in the following eg.**
 
@@ -216,13 +220,14 @@ forward(model, [])
 ```
 
 ## References
-  - Yamauchi and Takei, 2016, "Polycrystal anelasticity at near-solidus temperatures", 
-  J. Geophys. Res. Solid Earth, 
-  https://doi.org/10.1002/2016JB013316
-  
+
+  - Yamauchi and Takei, 2016, "Polycrystal anelasticity at near-solidus temperatures",
+    J. Geophys. Res. Solid Earth,
+    https://doi.org/10.1002/2016JB013316
+
   - Yamauchi and Takei, 2024, "Effect of Melt on Polycrystal Anelasticity",
-  J. Geophys. Res. Solid Earth, 
-  https://doi.org/10.1029/2023JB027738
+    J. Geophys. Res. Solid Earth,
+    https://doi.org/10.1029/2023JB027738
 """
 mutable struct premelt_anelastic{T1, T2, T3, T4, T5, T6, T7, T8, T9}
     T::T1
@@ -254,13 +259,11 @@ Master curve maxwell scaling per McCarthy, Takei and Hiraga (2011)
     - `σ` : Shear stress (GPa)
     - `ϕ` : Porosity
     - `ρ` : Density (kg/m³)
-
-## Optional Arguments 
-    - `T_solidus` : Solidus temperature (K), defaults to 0 K 
-    (only used when using `xfit_premelt` for viscosity calculations)
-    - `Ch2o_ol` : water concentration in olivine (in ppm), defaults to 0 ppm
+    - `Ch2o_ol` : water concentration in olivine (in ppm)
+    - `T_solidus` : Solidus temperature (K), only used when using `xfit_premelt` for viscosity calculations
 
 ## Keyword Arguments
+
     - `params` : Various coefficients required for calculation. 
     Available options are `fit1` and `fit2`, defaults to `fit1`, i.e, `params_xfit_mxw.fit1`
     Also holds coefficients and the type of `RockphyElastic` model and `RockphyViscous model` to be used.
@@ -269,10 +272,12 @@ Master curve maxwell scaling per McCarthy, Takei and Hiraga (2011)
     To modify coefficients, check the relevant documentation page. This
     will also users to pick any particular type of `RockphyElastic` model, defaults to `anharmonic`,
     as well as `RockphyViscous` model (for diffusion-derived viscosity), defaults to `xfit_mxw`
-    
+
 ## Usage
 
 !!! note
+
+
 **Make sure that the dimension of vector `f` is one more than the other parameters.
 Check relevant tutorials. Note the transpose on `f` when making the model in the following eg.**
 
@@ -294,9 +299,11 @@ forward(model, [])
 ```
 
 ## References
-  - McCarthy, Takei, Hiraga, 2011, "Experimental study of attenuation and dispersion over a broad frequency range: 
-  2. The universal scaling of polycrystalline materials", Journal of Geophy Reasearch,
-   http://dx.doi.org/10.1029/2011JB008384
+
+  - McCarthy, Takei, Hiraga, 2011, "Experimental study of attenuation and dispersion over a broad frequency range:
+
+ 2. The universal scaling of polycrystalline materials", Journal of Geophy Research,
+    http://dx.doi.org/10.1029/2011JB008384
 """
 mutable struct xfit_mxw{T1, T2, T3, T4, T5, T6, T7, T8, T9}
     T::T1
@@ -326,6 +333,7 @@ Master curve maxwell scaling per McCarthy, Takei and Hiraga (2011)
     - `ρ` : Density (kg/m³)
 
 ## Keyword Arguments
+
     - `params` : Various coefficients required for calculation. 
     Also holds coefficients and the type of `RockphyElastic` model and `RockphyViscous model` to be used.
 
@@ -333,10 +341,12 @@ Master curve maxwell scaling per McCarthy, Takei and Hiraga (2011)
     To modify coefficients, check the relevant documentation page. This
     will also users to pick any particular type of `RockphyElastic` model, defaults to `anharmonic`,
     as well as `RockphyViscous` model (for diffusion-derived viscosity), defaults to `HK2003`
-    
+
 ## Usage
 
 !!! note
+
+
 **Make sure that the dimension of vector `f` is one more than the other parameters.
 Check relevant tutorials. Note the transpose on `f` when making the model in the following eg.**
 
@@ -356,18 +366,18 @@ forward(model, [])
 ```
 
 ## References
+
   - Andrade, 1910, "On the viscous flow in metals, and allied phenomena",
-  Proceedings of the Royal Society of London, 
-  https://doi.org/10.1098/rspa.1910.0050
+    Proceedings of the Royal Society of London,
+    https://doi.org/10.1098/rspa.1910.0050
 
-  - Cooper, 2002, "Seismic Wave Attenuation: Energy Dissipation in Viscoelastic Crystalline Solids", 
-  Reviews in mineralogy and geochemistry, 
-  https://doi.org/10.2138/gsrmg.51.1.253,
-
-  - Lau and Holtzman, 2019, "“Measures of Dissipation in Viscoelastic Media” Extended: 
-  Toward Continuous Characterization Across Very Broad Geophysical Time Scales",
-  Geophysical Research Letters,
-  https://doi.org/10.1029/2019GL083529
+  - Cooper, 2002, "Seismic Wave Attenuation: Energy Dissipation in Viscoelastic Crystalline Solids",
+    Reviews in mineralogy and geochemistry,
+    https://doi.org/10.2138/gsrmg.51.1.253,
+  - Lau and Holtzman, 2019, "“Measures of Dissipation in Viscoelastic Media” Extended:
+    Toward Continuous Characterization Across Very Broad Geophysical Time Scales",
+    Geophysical Research Letters,
+    https://doi.org/10.1029/2019GL083529
 """
 mutable struct andrade_analytical{T1, T2, T3, T4, T5, T6, T7}
     T::T1
@@ -378,3 +388,9 @@ mutable struct andrade_analytical{T1, T2, T3, T4, T5, T6, T7}
     ρ::T6
     f::T7
 end
+
+const default_params_andrade_psp = deepcopy(params_andrade_psp)
+const default_params_eburgers_psp = deepcopy(params_eburgers_psp)
+const default_params_premelt_anelastic = deepcopy(params_premelt_anelastic)
+const default_params_xfit_mxw = deepcopy(params_xfit_mxw.fit1)
+const default_params_andrade_analytical = deepcopy(params_andrade_analytical)

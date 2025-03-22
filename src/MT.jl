@@ -19,9 +19,9 @@ include("models/mt.jl")
 include("response/1dmt.jl")
 include("forward/1dmt.jl")
 
-include("rock_physics/conductivity/utils.jl")
 include("rock_physics/conductivity/cache.jl")
 include("rock_physics/conductivity/types.jl")
+include("rock_physics/conductivity/utils.jl")
 include("rock_physics/conductivity/forward.jl")
 
 include("rock_physics/elastic/utils.jl")
@@ -41,6 +41,8 @@ include("rock_physics/anelastic/forward.jl")
 
 include("rock_physics/mixing_phases.jl")
 include("rock_physics/combine_models.jl")
+include("rock_physics/pretty_printing.jl")
+
 include("utils.jl")
 include("inverse/utils.jl")
 include("inverse/bounds_transformation.jl")
@@ -57,7 +59,6 @@ include("probabilistic/post_inv_utils.jl")
 include("plots/utils.jl")
 include("plots/plots.jl")
 include("plots/prob_utils.jl")
-include("rock_physics/pretty_printing.jl")
 
 # export μ
 export AbstractModel, AbstractResponse
