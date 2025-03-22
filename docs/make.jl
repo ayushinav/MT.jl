@@ -5,7 +5,7 @@ using MT
 using Documenter
 
 include("pages.jl")
-DocMeta.setdocmeta!(MT, :DocTestSetup, :(using MT); recursive = true)
+DocMeta.setdocmeta!(MT, :DocTestSetup, :(using MT); recursive=true)
 
 makedocs(;
     modules=[MT],
@@ -19,7 +19,7 @@ makedocs(;
         edit_link="main",
         assets=String[]
     ),
-    pages = pages,
+    pages=pages
 )
 
 deploydocs(; repo="github.com/ayushinav/MT.git", devbranch="main")

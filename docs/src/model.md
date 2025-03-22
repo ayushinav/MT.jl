@@ -13,9 +13,9 @@ Define the model using `model` and you are done.
 
 ```@example model_demo
 using MT
-ρ= log10.([500., 100., 400., 1000.]);
-h= [100., 100., 100.];
-m= MTModel(ρ, h)
+ρ = log10.([500.0, 100.0, 400.0, 1000.0]);
+h = [100.0, 100.0, 100.0];
+m = MTModel(ρ, h)
 ```
 
 This `model` can then just be passed into `forward` function to get the `response`.
