@@ -85,7 +85,7 @@ export Ni2011, Sifre2014, Gaillard2008
 export anharmonic, anharmonic_poro, SLB2005
 export HZK2011, HK2003, xfit_premelt
 export eburgers_psp, andrade_psp, andrade_analytical, premelt_anelastic, xfit_mxw
-export model_multiphase, consturct_model_multiphase
+export model_multiphase, construct_model_multiphase
 export construct_mixing_models, mixing_models, HS1962_plus, HS1962_minus, single_phase, MAL
 export construct_model_multi_rp, model_multi_rp
 export mcmc_cache, rto_cache
