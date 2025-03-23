@@ -43,11 +43,11 @@
         err[idx] = χ²(
             reduce(vcat, [getfield(resp_model, k) for k in [:ρₐ, :ϕ]]),
             reduce(vcat, [getfield(r_obs, k) for k in [:ρₐ, :ϕ]]);
-            W = W,
+            W=W
         )
     end
 
-    @test sum(err[n_samples-20+1:end]) / 20 <= 1
+    @test sum(err[(n_samples - 20 + 1):end]) / 20 <= 1
 end
 
 @testitem "variable discretization" tags=[:mcmc] begin
@@ -96,9 +96,9 @@ end
         err[idx] = χ²(
             reduce(vcat, [getfield(resp_model, k) for k in [:ρₐ, :ϕ]]),
             reduce(vcat, [getfield(r_obs, k) for k in [:ρₐ, :ϕ]]);
-            W = W,
+            W=W
         )
     end
 
-    @test sum(err[n_samples-20+1:end]) / 20 <= 1
+    @test sum(err[(n_samples - 20 + 1):end]) / 20 <= 1
 end
