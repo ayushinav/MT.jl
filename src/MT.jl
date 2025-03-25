@@ -8,6 +8,8 @@ using Turing
 using Distributions
 using Statistics
 # using ConcreteStructs
+using Enzyme
+using DifferentiationInterface 
 using UnPack
 using ProgressMeter
 import Base: show

@@ -66,10 +66,12 @@ end
 
 # should generally be good for most inversions
 const sigmoid_tf = transform_utils([-3.0, 6.0], sigmoid, inverse_sigmoid, d_sigmoid);
-const pow_tf = transform_utils(Vector{Float32}([]), (x,p) -> 10^x, (x,p) -> log10, (x,p) -> (10^x * log(10)));
-const log_tf = transform_utils(Vector{Float32}([]), (x,p) -> log10(x), (x,p) -> 10^x, (x,p) -> inv(x * log(10)));
+const pow_tf = transform_utils(
+    Vector{Float32}([]), (x, p) -> 10^x, (x, p) -> log10, (x, p) -> (10^x * log(10)));
+const log_tf = transform_utils(
+    Vector{Float32}([]), (x, p) -> log10(x), (x, p) -> 10^x, (x, p) -> inv(x * log(10)));
 const pow_sigmoid_tf = transform_utils(
     [-3.0, 6.0], pow_sigmoid, inverse_pow_sigmoid, d_pow_sigmoid);
-const lin_tf = transform_utils(Vector{Float32}([]), (x,p) -> x, (x,p) -> x, (x,p) -> 1.0);
-const phi_scale_tf = transform_utils(
-    [90f0], (x,p) -> scale_fn(x, first(p)), (x, p) -> inverse_scale_fn(x, first(p)), (x,p) -> d_scale_fn(x, first(p)))
+const lin_tf = transform_utils(Vector{Float32}([]), (x, p) -> x, (x, p) -> x, (x, p) -> 1.0);
+const phi_scale_tf = transform_utils([90.0f0], (x, p) -> scale_fn(x, first(p)),
+    (x, p) -> inverse_scale_fn(x, first(p)), (x, p) -> d_scale_fn(x, first(p)))

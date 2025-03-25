@@ -55,7 +55,7 @@ performs a single step of occam inversion, using golden line search.
   - `reg_term`: (For internals) When model in physical domain does not exist, `reg_term` helps, eg. case of RTO-TKO
   - `verbose`: whether to print updates after each iteration, defaults to true
 """
-function occam_step_new!(mₖ₊₁::model1, # to store the next update, which will eventually be copied to mₖ
+function occam_step!(mₖ₊₁::model1, # to store the next update, which will eventually be copied to mₖ
         respₖ₊₁::response, # to store the response for mₖ₊₁, for error calculation and anything
         vars::Union{AbstractVector{Float32}, AbstractVector{Float64}}, # to compute the forward model
         χ2::Union{Float64, Float32}, # threshold chi-squared error that needs to be met

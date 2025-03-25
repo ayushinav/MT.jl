@@ -53,6 +53,21 @@ mutable struct return_code{T1 <: AbstractModel}
     misfit_achieved::AbstractFloat
 end
 
+function wrapper_DI!(
+        r_vec, m, h, vars, resp_cache, resp_fields, response_trans_utils, model_type)
+    model_ = model_type(m, h)
+    forward!(resp_cache, model_, vars, response_trans_utils)
+
+    n_resp_start = 1
+    n_resp_end = 0
+    for k in resp_fields
+        n_resp_end += length(getfield(resp_cache, k))
+        r_vec[n_resp_start:n_resp_end] .= getfield(resp_cache, k)
+        n_resp_start += n_resp_end
+    end
+    nothing
+end
+
 do_verbose(iter::Int, verbose::Bool) = verbose
 do_verbose(verbose::Bool) = verbose
 do_verbose(iter::Int, verbose::Int) = (iter % verbose)
