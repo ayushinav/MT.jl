@@ -65,9 +65,14 @@ function inverse!(mₖ::model1,
     (L === nothing) && (L = prec.(∂(n_model)))
 
     respₖ = zero_abstract(robs)
-    jc = jacobian_cache(response_fields, robs, mₖ, model_fields)
 
-    lin_utils = linear_utils(view(mₖ.m, :), zeros(prec, n_resp), view(jc.j, :, :))
+    nresps = sum([length(getfield(robs, k)) for k in response_fields])
+    nmods = length(mₖ.m)
+
+    jc = zeros(eltype(mₖ.m), nresps, nmods)
+    # jc = jacobian_cache(response_fields, robs, mₖ, model_fields).j
+
+    lin_utils = linear_utils(view(mₖ.m, :), zeros(prec, n_resp), view(jc, :, :))
 
     for (i, k) in enumerate(response_fields)
         setfield!(respₖ, k, view(lin_utils.Fₖ, ((i - 1) * n_vars + 1):(i * n_vars)))
@@ -111,7 +116,7 @@ function inverse!(mₖ::model1,
         Constant(response_fields), Constant(response_trans_utils), Constant(model_type))
 
     DifferentiationInterface.jacobian!(
-        wrapper_DI!, rvec, jc.j, prep_j, AutoEnzyme(; mode=set_runtime_activity(Reverse)),
+        wrapper_DI!, rvec, jc, prep_j, AutoEnzyme(; mode=set_runtime_activity(Reverse)),
         mₖ.m, Constant(mₖ.h), Constant(vars), Cache(resp_cache),
         Constant(response_fields), Constant(response_trans_utils), Constant(model_type))
 
@@ -121,7 +126,7 @@ function inverse!(mₖ::model1,
         # jc.j .= first(Enzyme.jacobian(set_runtime_activity(Reverse), f_temp, mₖ.m))
 
         DifferentiationInterface.jacobian!(
-            wrapper_DI!, rvec, jc.j, AutoEnzyme(; mode=set_runtime_activity(Reverse)),
+            wrapper_DI!, rvec, jc, AutoEnzyme(; mode=set_runtime_activity(Reverse)),
             mₖ.m, Constant(mₖ.h), Constant(vars),
             Cache(resp_cache), Constant(response_fields),
             Constant(response_trans_utils), Constant(model_type))
