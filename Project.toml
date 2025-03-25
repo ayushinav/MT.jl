@@ -7,7 +7,6 @@ version = "0.5.4"
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 ConcreteStructs = "2569d6c7-a4a2-43d3-a901-331e8e4be471"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
-Hwloc = "0e44f5e4-bd66-52a0-8798-143a42290a1d"
 InteractiveUtils = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
 JET = "c3a54625-cd67-489e-a8e7-0a5a0ff4e31b"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
@@ -30,10 +29,16 @@ UnPack = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
 BenchmarkTools = "1.6.0"
 Revise = "3.7.2"
 julia = "1"
+PyCall = "1.96.4"
 
 [extras]
+PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+ReTestItems = "817f1d60-ba6b-4fd5-9520-3cf149f6a823"
+JET = "c3a54625-cd67-489e-a8e7-0a5a0ff4e31b"
+Hwloc = "0e44f5e4-bd66-52a0-8798-143a42290a1d"
+Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
 
 [targets]
-test = ["Test", "BenchmarkTools"]
+test = ["Test", "BenchmarkTools", "ReTestItems", "JET", "Hwloc"]

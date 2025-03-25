@@ -39,7 +39,7 @@ return message in the form of `return_code` and updates `mₖ` in-place.
 
 `inverse!(m_occam, r_obs, Occam([1e-2, 1e6]))`
 """
-function inverse_new!(mₖ::model1,
+function inverse!(mₖ::model1,
         robs::response,
         vars::Vector{Float64},
         alg_cache::occam_cache;
@@ -100,15 +100,37 @@ function inverse_new!(mₖ::model1,
     end
 
     μ_last = 0.0
+    resp_cache = zero(robs)
+
+    rvec = zero(lin_utils.Fₖ)
+
+    model_type = typeof(mₖ).name.wrapper
+    prep_j = prepare_jacobian(
+        wrapper_DI!, rvec, AutoEnzyme(; mode=set_runtime_activity(Reverse)),
+        mₖ.m, Constant(mₖ.h), Constant(vars), Cache(resp_cache),
+        Constant(response_fields), Constant(response_trans_utils), Constant(model_type))
+
+    DifferentiationInterface.jacobian!(
+        wrapper_DI!, rvec, jc.j, prep_j, AutoEnzyme(; mode=set_runtime_activity(Reverse)),
+        mₖ.m, Constant(mₖ.h), Constant(vars), Cache(resp_cache),
+        Constant(response_fields), Constant(response_trans_utils), Constant(model_type))
+
     while itr <= max_iters
         do_verbose(verbose) && (print("$itr: "))
-        jacobian!(jc, mₖ, vars, model_fields, response_fields)
+        # @time MT.jacobian!(jc, mₖ, vars, model_fields, response_fields)
+        # jc.j .= first(Enzyme.jacobian(set_runtime_activity(Reverse), f_temp, mₖ.m))
+
+        DifferentiationInterface.jacobian!(
+            wrapper_DI!, rvec, jc.j, AutoEnzyme(; mode=set_runtime_activity(Reverse)),
+            mₖ.m, Constant(mₖ.h), Constant(vars),
+            Cache(resp_cache), Constant(response_fields),
+            Constant(response_trans_utils), Constant(model_type))
 
         for k in model_fields # to computational domain
             getfield(mₖ, k) .= model_trans_utils.itf.(getfield(mₖ, k))
         end
 
-        μ_last = occam_step_new!(mₖ₊₁, # to store the next update, which will eventually be copied to mₖ
+        μ_last = occam_step!(mₖ₊₁, # to store the next update, which will eventually be copied to mₖ
             respₖ₊₁, # to store the response for mₖ₊₁, for error calculation and anything
             vars, # to compute the forward model
             χ2, # threshold chi-squared error that needs to be met
