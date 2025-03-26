@@ -64,7 +64,8 @@ function stochastic_inverse(r_obs::resp1,
         vars,
         alg_cache::rto_cache;
         model_trans_utils::NamedTuple=(m=sigmoid_tf, h=lin_tf),
-        response_trans_utils::NamedTuple=(ρₐ=lin_tf, ϕ=lin_tf)) where {
+        response_trans_utils::NamedTuple=(ρₐ=lin_tf, ϕ=lin_tf),
+        verbose = false) where {
         resp1 <: AbstractGeophyResponse, resp2 <: AbstractGeophyResponse}
     W = Diagonal(vcat([inv.(getfield(err_resp, k)) .^ 2
                        for k in fieldnames(typeof(err_resp))]...))
@@ -85,7 +86,7 @@ function stochastic_inverse(r_obs::resp1,
     i = 1
 
     while i <= (alg_cache.n_samples)
-        # (i % 10 == 0) && (@show i)
+        do_verbose(i, verbose) && (println("no of samples => $i"))
 
         ## Step 1
 
