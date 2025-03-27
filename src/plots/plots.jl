@@ -133,13 +133,18 @@ plots a 1D MT model, for now.
 function plot_model(m::MTModel; max_depth=5 * sum(m.h), kwargs...) # add depth lims later?, add kwargs
     h2 = cumsum(m.h)
 
+    h1 = 1f-2
+    if any(m.h .< 1f-3)
+        h1 = 1f-5
+    end
+
     xlabel, ylabel = get_model_labels(m)
     if max_depth <= h2[end]
         @warn("`max_depth` you provided does not capture the model in entirety. \n Defaulting it to 5 x the total model thickness. \n If you want to constrain the plots use `ylim` argument.")
         max_depth = 5 * h2[end]
     end
 
-    Plots.plot(10 .^ [m.m[1], m.m...], [1, h2..., max_depth]; scale=:log10,
+    Plots.plot(10 .^ [m.m[1], m.m...], [h1, h2..., max_depth]; scale=:log10,
         linetype=:steppost, yflip=true, xlabel=xlabel, ylabel=ylabel, kwargs...)
 end
 
