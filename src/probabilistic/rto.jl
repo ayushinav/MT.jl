@@ -84,9 +84,9 @@ function stochastic_inverse(r_obs::resp1,
     μ_chains = zeros(1, alg_cache.n_samples)
 
     i = 1
+    prog = Progress(alg_cache.n_samples; enabled = true)
 
     while i <= (alg_cache.n_samples)
-        do_verbose(i, verbose) && (println("no of samples => $i"))
 
         ## Step 1
 
@@ -200,6 +200,8 @@ function stochastic_inverse(r_obs::resp1,
         μ_chains[1, i] = μ
 
         i += 1
+
+        next!(prog; showvalues = [(Symbol("#samples"), i)])
     end
 
     idcs = broadcast(!isnan, view(m_chains, 1, :))

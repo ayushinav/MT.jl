@@ -67,7 +67,7 @@ end
 # should generally be good for most inversions
 const sigmoid_tf = transform_utils([-3.0, 6.0], sigmoid, inverse_sigmoid, d_sigmoid);
 const pow_tf = transform_utils(
-    Vector{Float32}([]), (x, p) -> 10^x, (x, p) -> log10, (x, p) -> (10^x * log(10)));
+    Vector{Float32}([]), (x, p) -> 10^x, (x, p) -> log10(x), (x, p) -> (10^x * log(10)));
 const log_tf = transform_utils(
     Vector{Float32}([]), (x, p) -> log10(x), (x, p) -> 10^x, (x, p) -> inv(x * log(10)));
 const pow_sigmoid_tf = transform_utils(
