@@ -133,9 +133,9 @@ plots a 1D MT model, for now.
 function plot_model(m::MTModel; max_depth=5 * sum(m.h), kwargs...) # add depth lims later?, add kwargs
     h2 = cumsum(m.h)
 
-    h1 = 1f-2
-    if any(m.h .< 1f-3)
-        h1 = 1f-5
+    h1 = 1.0f-2
+    if any(m.h .< 1.0f-3)
+        h1 = 1.0f-5
     end
 
     xlabel, ylabel = get_model_labels(m)
