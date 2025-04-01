@@ -75,8 +75,6 @@ function stochastic_inverse(r_obs::resp1, err_resp::resp2, vars, alg_cache::mcmc
         response_fields=Symbol.(response_fields), model_fields=Symbol.(model_fields),
         model_trans_utils=transf_utils, response_trans_utils=response_trans_utils)
 
-    @show kwargs
-
     if typeof(alg_cache.sampler) <: Turing.AdvancedVI.VariationalInference
         return vi(mcmc_model, alg_cache.sampler)
     else

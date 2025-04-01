@@ -10,9 +10,7 @@ pow10(x::T) where {T} = 10^x
 const default_mt_tf_fns = (ρₐ=lin_tf, ϕ=lin_tf)
 
 function get_Z(ρ::T1, h::T2, ω::T) where {T1, T2, T}
-    Z = complex(zero(eltype(ρ)))
     broadcast!(pow10, ρ, ρ)
-    # ρ .= 10 .^ ρ
     k = sqrt(im * ω * μ / ρ[end])
     Z = ω * μ / k
 

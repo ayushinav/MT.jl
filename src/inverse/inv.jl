@@ -86,7 +86,7 @@ function inverse!(mₖ::model1,
 
     lin_prob = LinearProblem(inv_utils.D'inv_utils.D,
         lin_utils.Jₖ' * (inv_utils.dobs + lin_utils.Jₖ * lin_utils.mₖ - lin_utils.Fₖ))
-    linsolve_prob = init(lin_prob;
+    linsolve_prob = LinearSolve.init(lin_prob;
         assumptions=LinearSolve.OperatorAssumptions(
             true; condition=LinearSolve.OperatorCondition.WellConditioned))
 

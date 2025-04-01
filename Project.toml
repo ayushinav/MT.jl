@@ -4,7 +4,6 @@ authors = ["Abhinav Pratap Singh"]
 version = "0.5.4"
 
 [deps]
-BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 ConcreteStructs = "2569d6c7-a4a2-43d3-a901-331e8e4be471"
 DifferentiationInterface = "a0c0ee7d-e4b9-4e03-894e-1c5f64a51d63"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
@@ -27,8 +26,6 @@ UnPack = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
 
 [compat]
 BenchmarkTools = "1.6.0"
-DifferentiationInterface = "0.6.48"
-Enzyme = "0.13.34"
 PyCall = "1.96.4"
 Revise = "3.7.2"
 julia = "1"
