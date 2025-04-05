@@ -1,167 +1,134 @@
-# most geophysical surveys generally have the same units across, what would be the point of passing units then?
+## response plots
 
-"""
-    prepare_plot(d::resp1, ω; plot_type = :scatter, field_names::Vector{Symbol}= [k for k ∈ fieldnames(typeof(d))], 
-    kwargs...) where {resp1 <: AbstractResponse}
+function plot_response(vars, resp::response; errs=zero(resp), plt_type=:lines,
+        kwargs...) where {response <: AbstractGeophyResponse}
+    k = fieldnames(response)
+    f = Figure()
+    axs = [Axis(f[i, 1]) for i in eachindex(k)]
 
-Prepares and returns a vector of plots for a response `d` (y-axis) parametrized on `ω` (x-axis)
+    if plt_type === :lines
+        for i in eachindex(axs)
+            lines!(axs[i], vars, getproperty(resp, k[i]); kwargs...)
+            xscale, yscale = get_scales(response, Val{k[i]}())
 
-## Arguments
+            axs[i].xscale = xscale
+            axs[i].yscale = yscale
 
-  - `d` : The `response` to be plotted
-  - `ω` : `d` is usually plotted as a function of some `ω`
+            xlabel, ylabel = get_labels(response, Val{k[i]}())
+            axs[i].xlabel = xlabel
+            axs[i].ylabel = ylabel
+        end
 
-## Keyword arguments
+    elseif plt_type === :scatter
+        for i in eachindex(axs)
+            scatter!(axs[i], vars, getproperty(resp, k[i]); kwargs...)
+            xscale, yscale = get_scales(response, Val{k[i]}())
 
-  - `plot_type` : `:plot` for line plot, `:scatter` for scatter plot.
-  - `field_names` : If the response contains more than one parameters, say phase and amplitude, `fieldn_names` determines which of them should be plotted. Defaults to plotting all of them.
-  - `kwargs` : Controls properties of the plot, splats the argument to `Plots.jl`
-"""
-function prepare_plot(d::resp1, ω; plot_type=:scatter,
-        field_names::Vector{Symbol}=[k for k in fieldnames(typeof(d))],
-        kwargs...) where {resp1 <: AbstractResponse}
-    units = get_units(d)
-    yscale = get_scale(d)
-    plts = []
+            axs[i].xscale = xscale
+            axs[i].yscale = yscale
 
-    for i in eachindex(field_names)
-        pi = getfield(Plots, plot_type)(2π ./ ω, getfield(d, field_names[i]); xscale=:log10,
-            # yerr = getfield(d_err, field_names[i]),
-            yscale=yscale[i], ylabel="$(units[i])", xlabel="T (s)", kwargs...)
-        push!(plts, pi)
+            xlabel, ylabel = get_labels(response, Val{k[i]}())
+            axs[i].xlabel = xlabel
+            axs[i].ylabel = ylabel
+        end
+    elseif plt_type === :errors
+        for i in eachindex(axs)
+            errorbars!(axs[i], vars, getproperty(resp, k[i]),
+                getproperty(errs, k[i]) ./ 2; kwargs...)
+            xscale, yscale = get_scales(response, Val{k[i]}())
+
+            axs[i].xscale = xscale
+            axs[i].yscale = yscale
+
+            xlabel, ylabel = get_labels(response, Val{k[i]}())
+            axs[i].xlabel = xlabel
+            axs[i].ylabel = ylabel
+        end
     end
 
-    return plts
+    return f
 end
 
-"""
-prepare_plot!(plts::Vector{Any}, d::resp1, ω; plot_type = :scatter, field_names::Vector{Symbol}= [k for k ∈ fieldnames(typeof(d))],
-kwargs...) where {resp1 <: AbstractResponse}
-Modifies `plts`, the vector of plots, with same functionality as `prepare_plot(d, ω)`.
-"""
-function prepare_plot!(plts::Vector{Any}, d::resp1, ω; plot_type=:scatter,
-        field_names::Vector{Symbol}=[k for k in fieldnames(typeof(d))],
-        kwargs...) where {resp1 <: AbstractResponse}
-    units = get_units(d)
-    yscale = get_scale(d)
-    plot_type = Symbol("$(plot_type)!")
+function plot_response!(f, vars, resp::response; errs=zero(resp), plt_type=:lines,
+        kwargs...) where {response <: AbstractGeophyResponse}
+    k = fieldnames(response)
+    axs = [f.content[i] for i in eachindex(k)]
 
-    for i in eachindex(field_names)
-        Plots.plot!(plts[i], 2π ./ ω, getfield(d, field_names[i]); xscale=:log10,
-            # yerr = getfield(d_err, field_names[i]),
-            yscale=yscale[i], ylabel="$(units[i])", xlabel="T (s)", kwargs...)
+    if plt_type === :lines
+        for i in eachindex(axs)
+            lines!(axs[i], vars, getproperty(resp, k[i]); kwargs...)
+            xscale, yscale = get_scales(response, Val{k[i]}())
+
+            axs[i].xscale = xscale
+            axs[i].yscale = yscale
+        end
+
+    elseif plt_type === :scatter
+        for i in eachindex(axs)
+            scatter!(axs[i], vars, getproperty(resp, k[i]); kwargs...)
+            xscale, yscale = get_scales(response, Val{k[i]}())
+
+            axs[i].xscale = xscale
+            axs[i].yscale = yscale
+        end
+    elseif plt_type === :errors
+        for i in eachindex(axs)
+            errorbars!(axs[i], vars, getproperty(resp, k[i]),
+                getproperty(errs, k[i]) ./ 2; kwargs...)
+            xscale, yscale = get_scales(response, Val{k[i]}())
+
+            axs[i].xscale = xscale
+            axs[i].yscale = yscale
+        end
     end
+end
+
+## model plots
+
+function plot_model(model::m_type; kwargs...) where {m_type}
+    fig = Figure()
+    ax = Axis(fig[1, 1])
+
+    m = model.m
+    h = model.h
+
+    m_vec = 10 .^ [m[1], m...]
+    h_v = cumsum(h)
+    h_vec = [1.0f-2, h_v..., 2 * h_v[end]]
+
+    stairs!(ax, m_vec, h_vec; step=:post, kwargs...)
+
+    ax.yreversed = true
+
+    xscale, yscale = get_scales(m_type)
+    ax.xscale = xscale
+    ax.yscale = yscale
+
+    xlabel, ylabel = get_labels(m_type)
+    ax.xlabel = xlabel
+    ax.ylabel = ylabel
+
+    fig
+end
+
+function plot_model!(f, model::m_type; kwargs...) where {m_type}
+    ax = f.content[1]
+    m = model.m
+    h = model.h
+
+    m_vec = 10 .^ [m[1], m...]
+    h_v = cumsum(h)
+    h_vec = [1.0f-2, h_v..., 2 * h_v[end]]
+
+    stairs!(ax, m_vec, h_vec; step=:post, kwargs...)
     nothing
 end
 
-"""
-    prepare_plot(d::resp1, ω, d_err::resp2; plot_type = :scatter, field_names::Vector{Symbol}= [k for k ∈ fieldnames(typeof(d))], 
-    kwargs...) where {resp1 <: AbstractResponse, resp2 <: AbstractResponse}
-
-Prepares and returns a vector of plots for a response `d` (y-axis) parametrized on `ω` (x-axis)
-
-## Arguments
-
-  - `d` : The `response` to be plotted
-  - `ω` : `d` is usually plotted as a function of some `ω`
-    `d_err` : Of the same type as `d`, contains the error bars in response
-
-## Keyword arguments
-
-  - `plot_type` : `:plot` for line plot, `:scatter` for scatter plot.
-  - `field_names` : If the response contains more than one parameters, say phase and amplitude, `fieldn_names` determines which of them should be plotted. Defaults to plotting all of them.
-  - `kwargs` : Controls properties of the plot, splats the argument to `Plots.jl`
-"""
-function prepare_plot(d::resp1, ω, d_err::resp2; plot_type=:scatter,
-        field_names::Vector{Symbol}=[k for k in fieldnames(typeof(d))],
-        kwargs...) where {resp1 <: AbstractResponse, resp2 <: AbstractResponse}
-    units = get_units(d)
-    yscale = get_scale(d)
-    plts = []
-
-    for i in eachindex(field_names)
-        pi = getfield(Plots, plot_type)(2π ./ ω, getfield(d, field_names[i]); xscale=:log10,
-            yerr=getfield(d_err, field_names[i]), yscale=yscale[i],
-            ylabel="$(field_names[i]) ($(units[i]))", xlabel="T (s)", kwargs...)
-        push!(plts, pi)
-    end
-
-    return plts
-end
-
-"""
-prepare_plot!(plts::Vector{Any}, d::resp1, ω, d_err::resp2; plot_type = :scatter, field_names::Vector{Symbol}= [k for k ∈ fieldnames(typeof(d))],
-kwargs...) where {resp1 <: AbstractResponse, resp2 <: AbstractResponse}
-Modifies `plts`, the vector of plots, with same functionality as `prepare_plot(d, ω, d_err)`.
-"""
-function prepare_plot!(plts::Vector{Any}, d::resp1, ω, d_err::resp2; plot_type=:scatter,
-        field_names::Vector{Symbol}=[k for k in fieldnames(typeof(d))],
-        kwargs...) where {resp1 <: AbstractResponse, resp2 <: AbstractResponse}
-    units = get_units(d)
-    yscale = get_scale(d)
-    plot_type = Symbol("$(plot_type)!")
-
-    for i in eachindex(field_names)
-        getfield(Plots, plot_type)(
-            plts[i], 2π ./ ω, getfield(d, field_names[i]); xscale=:log10,
-            yerr=getfield(d_err, field_names[i]), yscale=yscale[i],
-            ylabel="$(field_names[i]) ($(units[i]))", xlabel="T (s)", kwargs...)
-    end
-    nothing
-end
-
-function plot_response(plts::Vector{Any}; kwargs...)
-    Plots.plot(plts...; layout=(length(plts), 1),
-        size=(400, 400 * length(plts)), margin=3Plots.mm, kwargs...)
-end
-
-# for any other survey, we will almost always have two options, either a layer model or model defined at different points. Our function does it on a layer model, for a model defined at points, one can simply interpolate and choose small grid spacing for the interpolator, converting the point model into a layer model
-"""
-    plot_model(m::MTModel; max_depth= m.h[end]*5, kwargs...)
-
-plots a 1D MT model, for now.
-
-## Arguments
-
-  - `m` : model to be plotted, contains both the model values and the layer thicknesses
-
-## Keyword arguments
-
-  - `max_depth` : max depth to which the last layer should extend, defaults to 5 x the total model thickness. If you want to constrain the plots use `ylim` argument. # add depth lims later?, add kwargs
-  - `kwargs` : Controls properties of the plot, splats the argument to `Plots.jl`
-"""
-function plot_model(m::MTModel; max_depth=5 * sum(m.h), kwargs...) # add depth lims later?, add kwargs
-    h2 = cumsum(m.h)
-
-    h1 = 1.0f-2
-    if any(m.h .< 1.0f-3)
-        h1 = 1.0f-5
-    end
-
-    xlabel, ylabel = get_model_labels(m)
-    if max_depth <= h2[end]
-        @warn("`max_depth` you provided does not capture the model in entirety. \n Defaulting it to 5 x the total model thickness. \n If you want to constrain the plots use `ylim` argument.")
-        max_depth = 5 * h2[end]
-    end
-
-    Plots.plot(10 .^ [m.m[1], m.m...], [h1, h2..., max_depth]; scale=:log10,
-        linetype=:steppost, yflip=true, xlabel=xlabel, ylabel=ylabel, kwargs...)
-end
-
-"""
-    plot_model!(plt, m::MTModel; max_depth= 5*cumsum(m.h), kwargs...) 
-
-Plots on the same model with the same functionality as `plot_model`.
-"""
-function plot_model!(plt, m::MTModel; max_depth=5 * sum(m.h), kwargs...)
-    h2 = cumsum(m.h)
-
-    xlabel, ylabel = get_model_labels(m)
-    if max_depth <= h2[end]
-        @warn("`max_depth` you provided does not capture the model in entirety. \n Defaulting it to 2 x the total model thickness. \n If you want to constrain the plots use `ylim` argument.")
-        max_depth = 2 * h2[end]
-    end
-
-    Plots.plot!(plt, 10 .^ [m.m[1], m.m...], [1, h2..., max_depth];
-        scale=:log10, linetype=:steppost, yflip=true, kwargs...)
-end
+#= 
+fig = Figure()
+ax = Axis(fig[1,1])
+plot_model!(ax, m2)
+ax.yscale = log10
+ylims!(ax, 1e4, 1e0)
+fig
+=#
