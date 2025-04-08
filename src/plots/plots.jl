@@ -46,13 +46,13 @@ function plot_response(vars, resp::response; errs=zero(resp), plt_type=:lines,
         end
     end
 
-    return f
+    return f, axs
 end
 
-function plot_response!(f, vars, resp::response; errs=zero(resp), plt_type=:lines,
+function plot_response!(axs, vars, resp::response; errs=zero(resp), plt_type=:lines,
         kwargs...) where {response <: AbstractGeophyResponse}
     k = fieldnames(response)
-    axs = [f.content[i] for i in eachindex(k)]
+    # axs = [f.content[i] for i in eachindex(k)]
 
     if plt_type === :lines
         for i in eachindex(axs)
@@ -85,42 +85,27 @@ end
 
 ## model plots
 
-function plot_model(model::m_type; kwargs...) where {m_type}
+function plot_model(args...; kwargs...)
     fig = Figure()
     ax = Axis(fig[1, 1])
 
-    m = model.m
-    h = model.h
-
-    m_vec = 10 .^ [m[1], m...]
-    h_v = cumsum(h)
-    h_vec = [1.0f-2, h_v..., 2 * h_v[end]]
-
-    stairs!(ax, m_vec, h_vec; step=:post, kwargs...)
-
+    plot_model!(fig, args...; kwargs...)
     ax.yreversed = true
 
-    xscale, yscale = get_scales(m_type)
-    ax.xscale = xscale
-    ax.yscale = yscale
-
-    xlabel, ylabel = get_labels(m_type)
-    ax.xlabel = xlabel
-    ax.ylabel = ylabel
-
-    fig
+    fig, ax
 end
 
-function plot_model!(f, model::m_type; kwargs...) where {m_type}
-    ax = f.content[1]
+function plot_model!(ax, model::m_type; half_space_thickness = 1.25*sum(model.h), kwargs...) where {m_type}
+    # ax = f.content[1]
     m = model.m
     h = model.h
 
     m_vec = 10 .^ [m[1], m...]
     h_v = cumsum(h)
-    h_vec = [1.0f-2, h_v..., 2 * h_v[end]]
+    h_vec = [1.0f-2, h_v..., half_space_thickness]
 
     stairs!(ax, m_vec, h_vec; step=:post, kwargs...)
+    ax.yreversed = true
     nothing
 end
 
