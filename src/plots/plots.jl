@@ -95,7 +95,8 @@ function plot_model(args...; kwargs...)
     fig, ax
 end
 
-function plot_model!(ax, model::m_type; half_space_thickness = 1.25*sum(model.h), kwargs...) where {m_type}
+function plot_model!(ax, model::m_type; half_space_thickness=1.25 * sum(model.h),
+        kwargs...) where {m_type}
     # ax = f.content[1]
     m = model.m
     h = model.h
