@@ -1,6 +1,6 @@
 module MT
 using LinearAlgebra
-using GLMakie
+using CairoMakie
 using LinearSolve
 using NonlinearSolve
 using Optimization, OptimizationOptimJL
@@ -38,7 +38,7 @@ include("probabilistic/rto.jl")
 include("probabilistic/post_inv_utils.jl")
 include("plots/utils.jl")
 include("plots/plots.jl")
-# include("plots/prob_utils.jl")
+include("plots/prob_utils.jl")
 include("rock_physics/pretty_printing.jl")
 
 # export μ
@@ -66,6 +66,6 @@ export Ni2011, Sifre2014, Gaillard2008
 export construct_mixing_models, mixing_models, HS1962_plus, HS1962_minus, single_phase, MAL
 export mcmc_cache, rto_cache
 export stochastic_inverse, get_model_list
-# export pre_image, get_kde_image, get_mean_std_image
+export get_kde_image, get_kde_image!, get_mean_std_image, get_mean_std_image!
 
 end
