@@ -111,14 +111,14 @@ function inverse!(mₖ::model1,
 
     model_type = typeof(mₖ).name.wrapper
     prep_j = prepare_jacobian(
-        wrapper_DI!, rvec, AutoEnzyme(; mode=set_runtime_activity(Reverse)),
+        wrapper_DI!, rvec, AutoEnzyme(; mode=set_runtime_activity(Enzyme.Reverse)),
         mₖ.m, Constant(mₖ.h), Constant(vars), Cache(resp_cache),
         Constant(response_fields), Constant(response_trans_utils), Constant(model_type))
 
-    DifferentiationInterface.jacobian!(
-        wrapper_DI!, rvec, jc, prep_j, AutoEnzyme(; mode=set_runtime_activity(Reverse)),
-        mₖ.m, Constant(mₖ.h), Constant(vars), Cache(resp_cache),
-        Constant(response_fields), Constant(response_trans_utils), Constant(model_type))
+    DifferentiationInterface.jacobian!(wrapper_DI!, rvec, jc, prep_j,
+        AutoEnzyme(; mode=set_runtime_activity(Enzyme.Reverse)), mₖ.m,
+        Constant(mₖ.h), Constant(vars), Cache(resp_cache), Constant(response_fields),
+        Constant(response_trans_utils), Constant(model_type))
 
     while itr <= max_iters
         do_verbose(verbose) && (print("$itr: "))
@@ -126,7 +126,7 @@ function inverse!(mₖ::model1,
         # jc.j .= first(Enzyme.jacobian(set_runtime_activity(Reverse), f_temp, mₖ.m))
 
         DifferentiationInterface.jacobian!(
-            wrapper_DI!, rvec, jc, AutoEnzyme(; mode=set_runtime_activity(Reverse)),
+            wrapper_DI!, rvec, jc, AutoEnzyme(; mode=set_runtime_activity(Enzyme.Reverse)),
             mₖ.m, Constant(mₖ.h), Constant(vars),
             Cache(resp_cache), Constant(response_fields),
             Constant(response_trans_utils), Constant(model_type))

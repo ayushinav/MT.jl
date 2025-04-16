@@ -1,86 +1,47 @@
 ## response plots
 
-function plot_response(vars, resp::response; errs=zero(resp), plt_type=:lines,
+function plot_response!(axs, vars, resp::response; errs=zero(resp), plt_type=:plot,
         kwargs...) where {response <: AbstractGeophyResponse}
+    k = fieldnames(response)
+
+    if plt_type === :plot
+        for i in eachindex(axs)
+            lines!(axs[i], vars, getproperty(resp, k[i]); kwargs...)
+            xscale, yscale = get_scales(response, Val{k[i]}())
+
+            axs[i].xscale = xscale
+            axs[i].yscale = yscale
+        end
+
+    elseif plt_type === :scatter
+        for i in eachindex(axs)
+            scatter!(axs[i], vars, getproperty(resp, k[i]); kwargs...)
+            xscale, yscale = get_scales(response, Val{k[i]}())
+
+            axs[i].xscale = xscale
+            axs[i].yscale = yscale
+        end
+    elseif plt_type === :errors
+        for i in eachindex(axs)
+            errorbars!(axs[i], vars, getproperty(resp, k[i]),
+                getproperty(errs, k[i]) ./ 2; kwargs...)
+            xscale, yscale = get_scales(response, Val{k[i]}())
+
+            axs[i].xscale = xscale
+            axs[i].yscale = yscale
+        end
+    end
+end
+
+function plot_response(
+        vars, resp::response; kwargs...) where {response <: AbstractGeophyResponse}
     k = fieldnames(response)
     f = Figure()
     axs = [Axis(f[i, 1]) for i in eachindex(k)]
 
-    if plt_type === :lines
-        for i in eachindex(axs)
-            lines!(axs[i], vars, getproperty(resp, k[i]); kwargs...)
-            xscale, yscale = get_scales(response, Val{k[i]}())
-
-            axs[i].xscale = xscale
-            axs[i].yscale = yscale
-
-            xlabel, ylabel = get_labels(response, Val{k[i]}())
-            axs[i].xlabel = xlabel
-            axs[i].ylabel = ylabel
-        end
-
-    elseif plt_type === :scatter
-        for i in eachindex(axs)
-            scatter!(axs[i], vars, getproperty(resp, k[i]); kwargs...)
-            xscale, yscale = get_scales(response, Val{k[i]}())
-
-            axs[i].xscale = xscale
-            axs[i].yscale = yscale
-
-            xlabel, ylabel = get_labels(response, Val{k[i]}())
-            axs[i].xlabel = xlabel
-            axs[i].ylabel = ylabel
-        end
-    elseif plt_type === :errors
-        for i in eachindex(axs)
-            errorbars!(axs[i], vars, getproperty(resp, k[i]),
-                getproperty(errs, k[i]) ./ 2; kwargs...)
-            xscale, yscale = get_scales(response, Val{k[i]}())
-
-            axs[i].xscale = xscale
-            axs[i].yscale = yscale
-
-            xlabel, ylabel = get_labels(response, Val{k[i]}())
-            axs[i].xlabel = xlabel
-            axs[i].ylabel = ylabel
-        end
-    end
+    plot_response!(axs, vars, resp; kwargs...)
 
     return f, axs
-end
-
-function plot_response!(axs, vars, resp::response; errs=zero(resp), plt_type=:lines,
-        kwargs...) where {response <: AbstractGeophyResponse}
-    k = fieldnames(response)
-    # axs = [f.content[i] for i in eachindex(k)]
-
-    if plt_type === :lines
-        for i in eachindex(axs)
-            lines!(axs[i], vars, getproperty(resp, k[i]); kwargs...)
-            xscale, yscale = get_scales(response, Val{k[i]}())
-
-            axs[i].xscale = xscale
-            axs[i].yscale = yscale
-        end
-
-    elseif plt_type === :scatter
-        for i in eachindex(axs)
-            scatter!(axs[i], vars, getproperty(resp, k[i]); kwargs...)
-            xscale, yscale = get_scales(response, Val{k[i]}())
-
-            axs[i].xscale = xscale
-            axs[i].yscale = yscale
-        end
-    elseif plt_type === :errors
-        for i in eachindex(axs)
-            errorbars!(axs[i], vars, getproperty(resp, k[i]),
-                getproperty(errs, k[i]) ./ 2; kwargs...)
-            xscale, yscale = get_scales(response, Val{k[i]}())
-
-            axs[i].xscale = xscale
-            axs[i].yscale = yscale
-        end
-    end
 end
 
 ## model plots
@@ -89,7 +50,7 @@ function plot_model(args...; kwargs...)
     fig = Figure()
     ax = Axis(fig[1, 1])
 
-    plot_model!(fig, args...; kwargs...)
+    plot_model!(ax, args...; kwargs...)
     ax.yreversed = true
 
     fig, ax

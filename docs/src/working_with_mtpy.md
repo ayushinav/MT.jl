@@ -7,7 +7,7 @@
 
 We provide a walktthrough to help get things started and get to the point to use this package. We begin by importing different packages.
 
-```@example mtpy_tut
+```julia
 using LinearAlgebra
 using MT
 using PyCall
@@ -20,7 +20,7 @@ To import `mtpy`, we need to provide its path, relative paths work as well. In o
 
 We now have access to all the functions provided by `mtpy`. You can now use the package any way you want. The following lines of code demonstrate how we take a `.h5` file, which is also created by `mtpy` (check relevant tutorials).
 
-```@example mtpy_tut
+```julia
 np = pyimport("numpy")
 
 filename = abspath(joinpath(dirname(@__FILE__),"../../../../mtpy_v2/mtpy"))
@@ -31,7 +31,7 @@ filename = abspath(joinpath(dirname(@__FILE__),"../../../../mtpy_v2/mtpy"))
 mtpy = imp.load_module(name, file, filename, data)
 ```
 
-```@example mtpy_tut
+```julia
 mc = mtpy.MTCollection()
 
 mc.open_collection("../../../data_for_mtpy_demo/tf_collection2.h5")
@@ -48,7 +48,7 @@ st_keys= st_keys0[idx_sort] # station keys, we call st 0 as unknown_survey, st 1
 
 At the time of writing this, I was not able to completely figure out how to export apparent resistivity and phase data along with the corresponding error bars. In the next section, we calculate these parameters using julia and demonstrate compatibility with `mtpy` functions and objects.
 
-```@example mtpy_tut
+```julia
 tf_arr= [];
 z_arr= [];
 zerr_arr= [];
@@ -104,7 +104,7 @@ gif(anim, fps= 0.5)
 
 Similar plots can also be made with `MT.jl`. We just need to create the corresponding `MTResponse`s and plot them.
 
-```@example mtpy_tut
+```julia
 anim = @animate for i in 1:n_stations
     xy_resp = MTResponse(ρₐ_all[i][:,1,2], ϕ_all[i][:,1,2])
     xy_err_resp = MTResponse(ρₐerr[i][:,1,2], ϕerr[i][:,1,2])

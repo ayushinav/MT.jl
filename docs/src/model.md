@@ -21,5 +21,6 @@ This `model` can then just be passed into `forward` function to get the `respons
 
 The model can then be plotted using 
 ```@example model_demo
-plot_model(m, label= false, max_depth= 1e4)
+f, ax = plot_model(m)
+f
 ```

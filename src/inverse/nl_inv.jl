@@ -96,7 +96,7 @@ function inverse!(mₖ::model1,
         response_fields=response_fields, W=W, μ=alg_cache.μ, r_obs=robs, L=L, mᵣ=mᵣ)
 
     prob = SciMLBase.NonlinearLeastSquaresProblem(
-        construct_cost_function, model_trans_utils.itf.(mₖ.m), p)
+        construct_cost_function_for_nl_inv, model_trans_utils.itf.(mₖ.m), p)
     nlcache = init(prob, alg_cache.alg())
     iters = 1
     chi2 = 1e6
@@ -108,7 +108,7 @@ function inverse!(mₖ::model1,
         forward!(resp_, model, vars, response_trans_utils)
         chi2 = χ²(reduce(vcat, [getfield(resp_, k) for k in response_fields]),
             reduce(vcat, [getfield(robs, k) for k in response_fields]); W=W)
-        do_verbose(verbose) && println("iteration = $iters => data misfit => $chi2")
+        do_verbose(verbose) && println("iteration = $iters : data misfit => $chi2")
 
         if chi2 <= χ2 # check misfit condition
             break
@@ -125,7 +125,7 @@ end
 
 # focussing on just geophysical models for now
 # Not performant at the moment
-function construct_cost_function(m, p)
+function construct_cost_function_for_nl_inv(m, p)
     @unpack model_type, h, model_trans_utils, response_trans_utils, vars, response_fields, W, μ, r_obs, L, mᵣ = p
     # model = model_type(model_trans_utils.tf.(m), h)
     model = model_type(broadcast(model_trans_utils.tf, m), h)
