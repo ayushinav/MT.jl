@@ -1,6 +1,6 @@
 module MT
 using LinearAlgebra
-using Plots
+using CairoMakie
 using LinearSolve
 using NonlinearSolve
 using Optimization, OptimizationOptimJL
@@ -9,12 +9,15 @@ using Distributions
 using Statistics
 using SpecialFunctions
 using QuadGK
+using Enzyme
+using DifferentiationInterface
 using UnPack
 using ProgressMeter
 import Base: show
 
 include("abstract_types.jl")
 include("probabilistic/init_distributions.jl")
+include("inverse/bounds_transformation.jl")
 include("models/mt.jl")
 include("response/1dmt.jl")
 include("forward/1dmt.jl")
@@ -45,7 +48,6 @@ include("rock_physics/pretty_printing.jl")
 
 include("utils.jl")
 include("inverse/utils.jl")
-include("inverse/bounds_transformation.jl")
 include("inverse/jacobian.jl")
 include("inverse/occam.jl")
 include("inverse/inv.jl")
@@ -70,7 +72,7 @@ export MTModel, MTResponse
 export RockphyCond, RockphyElastic, RockphyViscous, RockPhyAnelastic
 export get_Z, get_appres, get_phase, forward!, forward
 # export zero, copy
-export plot_response, prepare_plot, prepare_plot!
+export plot_response, plot_response!
 export plot_model, plot_model!
 export sigmoid, d_sigmoid, inverse_sigmoid, transform_utils, default_tf, log_tf, lin_tf
 export mt_jacobian_cache, jacobian_mt, jacobian!
@@ -90,7 +92,7 @@ export construct_mixing_models, mixing_models, HS1962_plus, HS1962_minus, single
 export construct_model_multi_rp, model_multi_rp
 export mcmc_cache, rto_cache
 export stochastic_inverse, get_model_list
-export pre_image, get_kde_image, get_mean_std_image
+export get_kde_image, get_kde_image!, get_mean_std_image, get_mean_std_image!
 
 export default_params
 

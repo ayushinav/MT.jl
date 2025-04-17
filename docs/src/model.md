@@ -28,5 +28,6 @@ Always use `Float64` or `Float32` types while defining the vectors for resistivi
 The model can then be plotted using
 
 ```@example model_demo
-plot_model(m; label=false, max_depth=1e4)
+f, ax = plot_model(m)
+f
 ```

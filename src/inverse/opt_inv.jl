@@ -94,7 +94,8 @@ function inverse!(mₖ::model1,
         response_trans_utils=response_trans_utils, vars=vars,
         response_fields=response_fields, W=W, μ=alg_cache.μ, r_obs=robs, L=L, mᵣ=mᵣ)
 
-    optfn = OptimizationFunction(construct_cost_function, Optimization.AutoForwardDiff())
+    optfn = OptimizationFunction(
+        construct_cost_function_for_opt, Optimization.AutoForwardDiff())
     prob = OptimizationProblem(optfn, model_trans_utils.itf.(mₖ.m), p)
 
     cb(state, l) = cb_(state, l, verbose, L, alg_cache.μ, model_trans_utils, χ2)
@@ -102,7 +103,7 @@ function inverse!(mₖ::model1,
 
     mₖ.m .= model_trans_utils.tf.(sol.u)
 
-    resp_ = forward(mₖ, vars; response_trans_utils=response_trans_utils)
+    resp_ = forward(mₖ, vars, response_trans_utils)
     chi2 = χ²(reduce(vcat, [getfield(resp_, k) for k in response_fields]),
         reduce(vcat, [getfield(robs, k) for k in response_fields]); W=W)
 
@@ -111,7 +112,21 @@ end
 
 function cb_(state, l, verbose, L, μ, model_trans_utils, χ2)
     chi2 = sqrt(l - μ * norm(L * model_trans_utils.tf.(state.u)))
-    (verbose == true) && println("iteration = $(state.iter) => data misfit => $chi2")
+    do_verbose(verbose) && println("iteration = $(state.iter) : data misfit => $chi2")
 
     return (chi2 < χ2)
+end
+
+function construct_cost_function_for_opt(m, p)
+    @unpack model_type, h, model_trans_utils, response_trans_utils, vars, response_fields, W, μ, r_obs, L, mᵣ = p
+    # model = model_type(model_trans_utils.tf.(m), h)
+    model = model_type(broadcast(model_trans_utils.tf, m), h)
+    resp_ = forward(model, vars, response_trans_utils)
+
+    L1 = χ²(reduce(vcat, [getfield(resp_, k) for k in response_fields]),
+        reduce(vcat, [getfield(r_obs, k) for k in response_fields]); W=W) * sqrt(size(W, 1))
+    L2 = μ * norm(L * (model.m .- mᵣ.m))
+    # @show L1, L2
+
+    return L1^2 + L2
 end

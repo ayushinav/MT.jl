@@ -64,7 +64,8 @@ function stochastic_inverse(r_obs::resp1,
         vars,
         alg_cache::rto_cache;
         model_trans_utils::NamedTuple=(m=sigmoid_tf, h=lin_tf),
-        response_trans_utils::NamedTuple=(ρₐ=lin_tf, ϕ=lin_tf)) where {
+        response_trans_utils::NamedTuple=(ρₐ=lin_tf, ϕ=lin_tf),
+        verbose=false) where {
         resp1 <: AbstractGeophyResponse, resp2 <: AbstractGeophyResponse}
     W = Diagonal(vcat([inv.(getfield(err_resp, k)) .^ 2
                        for k in fieldnames(typeof(err_resp))]...))
@@ -83,9 +84,9 @@ function stochastic_inverse(r_obs::resp1,
     μ_chains = zeros(1, alg_cache.n_samples)
 
     i = 1
+    prog = Progress(alg_cache.n_samples; enabled=true)
 
     while i <= (alg_cache.n_samples)
-        (i % 10 == 0) && (@show i)
 
         ## Step 1
 
@@ -118,6 +119,12 @@ function stochastic_inverse(r_obs::resp1,
                 W=W, χ2=alg_cache.χ2, L=alg_cache.L, max_iters=alg_cache.max_iters,
                 response_fields=alg_cache.response_fields,
                 verbose=alg_cache.verbose, model_trans_utils=model_trans_utils[:m])
+        elseif typeof(alg_cache.alg) <: opt_cache
+            ret_code = inverse!(
+                alg_cache.m₀, pert_resp, vars, OptAlg(; alg=alg_cache.alg.alg, μ=μ);
+                W=W, χ2=alg_cache.χ2, L=alg_cache.L, max_iters=alg_cache.max_iters,
+                response_fields=alg_cache.response_fields,
+                verbose=alg_cache.verbose, model_trans_utils=model_trans_utils[:m])
         end
 
         m_chains[:, i] .= alg_cache.m₀.m
@@ -141,7 +148,7 @@ function stochastic_inverse(r_obs::resp1,
             # broadcast!((x) -> (10.0^model_trans_utils[:m].tf(x)), alg_cache.m₀.m, alg_cache.m₀.m) #  to model domain
             # alg_cache.m₀.m .= model_trans_utils[:m].tf.(alg_cache.m₀.m) # to model domain
 
-            forward!(resp_, alg_cache.m₀, vars; response_trans_utils=response_trans_utils)
+            forward!(resp_, alg_cache.m₀, vars, response_trans_utils)
             # @show "chi2_err"
             chi2_err = χ²(
                 reduce(vcat, [getfield(resp_, k) for k in alg_cache.response_fields]),
@@ -193,6 +200,8 @@ function stochastic_inverse(r_obs::resp1,
         μ_chains[1, i] = μ
 
         i += 1
+
+        next!(prog; showvalues=[(Symbol("#samples"), i)])
     end
 
     idcs = broadcast(!isnan, view(m_chains, 1, :))

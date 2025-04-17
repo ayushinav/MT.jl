@@ -1,11 +1,8 @@
-function get_units(m::MTResponse)
-    return (ρₐ=:Ωm, ϕ=:ᵒ)
-end
+get_scales(::Type{<:MTResponse}, ::Val{:ρₐ}) = log10, log10
+get_scales(::Type{<:MTResponse}, ::Val{:ϕ}) = log10, identity
 
-function get_scale(m::MTResponse)
-    return (ρₐ=:log10, ϕ=:identity)
-end
+get_labels(::Type{<:MTResponse}, ::Val{:ρₐ}) = "T(s)", "ρₐ (Ωm)"
+get_labels(::Type{<:MTResponse}, ::Val{:ϕ}) = "T(s)", "ϕ (ᴼ)"
 
-function get_model_labels(m::MTModel) # can be defined for different types of models of other surveys
-    return "ρ (Ωm)", "Depth (m)"
-end
+get_scales(::Type{<:MTModel}) = log10, log10
+get_labels(::Type{<:MTModel}) = "ρ (Ωm)", "h(m)"

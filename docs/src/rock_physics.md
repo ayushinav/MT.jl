@@ -24,7 +24,7 @@ We support the following rock physics models to obtain the electrical conductivi
 
 Forward calculations are fairly easy and involve calling `forward` function on the model. Following is an example on how we can get the conductivity using `Poe2010`:
 
-```@example rp
+```julia
 using MT
 model_poe = Poe2010(1000 + 273.0, 2e4)
 
@@ -69,7 +69,7 @@ log_cond = forward(mix_single, [])
 
 Now that we know how to compute the rock physics responses, we move towards performing stochastic inversion for rock physics parameters given some rock conductivity and the corresponding uncertainty.
 
-```@example rp
+```julia
 using Distributions
 using StatsPlots
 using Turing

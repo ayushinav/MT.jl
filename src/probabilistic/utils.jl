@@ -65,16 +65,14 @@ makes a `Turing.jl` model to perform MCMC sampling
         mdist <: AbstractModelDistribution, rdist <: AbstractResponseDistribution}
     m0 = (; zip([propertynames(mDist)...], const_data)...)
 
-    for k in propertynames(mDist)
-        if k in model_fields
-            m0[k] ~ getproperty(mDist, k)
-        end
+    for k in model_fields
+        m0[k] ~ getproperty(mDist, k)
     end
 
     m_sample = typeof(m_sample)([broadcast(getproperty(model_trans_utils[k], :tf), m0[k])
                                  for k in propertynames(mDist)]...)
 
-    r_sample = forward(m_sample, vars; response_trans_utils=response_trans_utils)
+    r_sample = forward(m_sample, vars, response_trans_utils)
 
     for k in response_fields
         r_obs[k] ~ getfield(rDist, k)(getfield(r_sample, k), getfield(err_resp, k) .^ 2)
