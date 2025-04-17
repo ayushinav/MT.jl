@@ -12,7 +12,7 @@ pages = [
         "RTO-TKO"=>"tutorials/rto.md",
         "rock physics"=>"rock_physics.md",
     ],
-    "Vizualization" => "vizualization.md",
+    "Visualization" => "visualization.md",
     "API" => "api.md",
     "mtpy tutorial" => "working_with_mtpy.md",
 ]

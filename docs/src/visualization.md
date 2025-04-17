@@ -1,4 +1,4 @@
-# Vizualization
+# Visualization
 
 We make use of `Makie.jl` to generate images. This allows us to be more flexible with and also generate more fancy figures.
 
@@ -155,7 +155,7 @@ Legend(f[1:2,2], ax2)
 f
 ```
 
-Creating a `figure` beforehand and following the recommended guidlines also allows us to plot figures as we like:
+Creating a `figure` beforehand and following the recommended guidelines also allows us to plot figures as we like:
 
 ```@example viz_tut
 f = Figure()
