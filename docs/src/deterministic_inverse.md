@@ -56,7 +56,7 @@ alg_cache = Occam(; μgrid=[1e-2, 1e6])
 inverse!(m_occam, resp, ω, alg_cache, W = W; max_iters= 50, verbose = true)
 ```
 
-### Levenberg-Marquadt
+### Levenberg-Marquardt
 
 While Occam is implemented in the package, we borrow a few from other packages. One of them is `NonlinearSolve.jl`, where we have `Levenberg-Marquadt` scheme. Again, everything boils down to creating the `alg_cache`. You can use [other solvers](https://docs.sciml.ai/NonlinearSolve/stable/solvers/nonlinear_least_squares_solvers/) from the package as well.
 
@@ -147,6 +147,6 @@ plot_model!(ax, m_lbfgs, label = "LBFGS", linewidth = 2)
 ax.xscale = log10
 ax.yscale = log10
 
-f[1,2] = Legend(f, axs[1])
+f[1,2] = Legend(f, ax)
 f
 ```
