@@ -48,12 +48,12 @@ function inverse!(mₖ::model1,
         max_iters=30,
         χ2=1.0,
         response_fields::Vector{Symbol}=[k for k in fieldnames(typeof(robs))],
-        model_trans_utils::transform_utils=sigmoid_tf,
-        response_trans_utils::NamedTuple=(; ρₐ=lin_tf, ϕ=lin_tf),
+        model_trans_utils::trans_utils_T=sigmoid_tf,
+        response_trans_utils::resp_utils_T=default_mt_tf_fns,
         mᵣ=nothing,
         reg_term=nothing,
-        verbose::Bool=true) where {
-        model1 <: AbstractGeophyModel, response <: AbstractGeophyResponse}
+        verbose::Bool=true) where {model1 <: AbstractGeophyModel,
+        response <: AbstractGeophyResponse, trans_utils_T, resp_utils_T}
     prec = eltype(mₖ.m)
     model_fields = [:m]
 
@@ -64,14 +64,17 @@ function inverse!(mₖ::model1,
     (W === nothing) && (W = prec.(I(n_resp)))
     (L === nothing) && (L = prec.(∂(n_model)))
 
-    lin_utils = linear_utils(
-        view(mₖ.m, :), zeros(prec, n_resp), zeros(prec, n_resp, n_model))
-
     respₖ = zero_abstract(robs)
-    jc = jacobian_cache(response_fields, robs, mₖ, model_fields)
+
+    nresps = sum([length(getfield(robs, k)) for k in response_fields])
+    nmods = length(mₖ.m)
+
+    jc = zeros(eltype(mₖ.m), nresps, nmods)
+    # jc = jacobian_cache(response_fields, robs, mₖ, model_fields).j
+
+    lin_utils = linear_utils(view(mₖ.m, :), zeros(prec, n_resp), view(jc, :, :))
 
     for (i, k) in enumerate(response_fields)
-        setfield!(jc.j, k, view(lin_utils.Jₖ, ((i - 1) * n_vars + 1):(i * n_vars), :))
         setfield!(respₖ, k, view(lin_utils.Fₖ, ((i - 1) * n_vars + 1):(i * n_vars)))
     end
 
@@ -83,11 +86,11 @@ function inverse!(mₖ::model1,
 
     lin_prob = LinearProblem(inv_utils.D'inv_utils.D,
         lin_utils.Jₖ' * (inv_utils.dobs + lin_utils.Jₖ * lin_utils.mₖ - lin_utils.Fₖ))
-    linsolve_prob = init(lin_prob;
+    linsolve_prob = LinearSolve.init(lin_prob;
         assumptions=LinearSolve.OperatorAssumptions(
             true; condition=LinearSolve.OperatorCondition.WellConditioned))
 
-    forward!(respₖ, mₖ, vars; response_trans_utils=response_trans_utils) # for the first iteration
+    forward!(respₖ, mₖ, vars, response_trans_utils) # for the first iteration
     itr = 1
     chi2 = prec(1e6)
 
@@ -102,9 +105,31 @@ function inverse!(mₖ::model1,
     end
 
     μ_last = 0.0
+    resp_cache = zero(robs)
+
+    rvec = zero(lin_utils.Fₖ)
+
+    model_type = typeof(mₖ).name.wrapper
+    prep_j = prepare_jacobian(
+        wrapper_DI!, rvec, AutoEnzyme(; mode=set_runtime_activity(Enzyme.Reverse)),
+        mₖ.m, Constant(mₖ.h), Constant(vars), Cache(resp_cache),
+        Constant(response_fields), Constant(response_trans_utils), Constant(model_type))
+
+    DifferentiationInterface.jacobian!(wrapper_DI!, rvec, jc, prep_j,
+        AutoEnzyme(; mode=set_runtime_activity(Enzyme.Reverse)), mₖ.m,
+        Constant(mₖ.h), Constant(vars), Cache(resp_cache), Constant(response_fields),
+        Constant(response_trans_utils), Constant(model_type))
+
     while itr <= max_iters
-        verbose && (print("$itr: "))
-        jacobian!(mₖ, vars, jc; model_fields=model_fields, response_fields=response_fields)
+        do_verbose(verbose) && (print("$itr: "))
+        # @time MT.jacobian!(jc, mₖ, vars, model_fields, response_fields)
+        # jc.j .= first(Enzyme.jacobian(set_runtime_activity(Reverse), f_temp, mₖ.m))
+
+        DifferentiationInterface.jacobian!(
+            wrapper_DI!, rvec, jc, AutoEnzyme(; mode=set_runtime_activity(Enzyme.Reverse)),
+            mₖ.m, Constant(mₖ.h), Constant(vars),
+            Cache(resp_cache), Constant(response_fields),
+            Constant(response_trans_utils), Constant(model_type))
 
         for k in model_fields # to computational domain
             getfield(mₖ, k) .= model_trans_utils.itf.(getfield(mₖ, k))
@@ -122,10 +147,9 @@ function inverse!(mₖ::model1,
             model_fields=model_fields, response_fields=response_fields,
             mᵣ=mᵣ, verbose=verbose, reg_term=reg_term)
 
-        for k in model_fields # copying things to mₖ
-            getfield(mₖ, k) .= getfield(mₖ₊₁, k)
-        end
-        forward!(respₖ, mₖ, vars; response_trans_utils=response_trans_utils)
+        mₖ.m .= mₖ₊₁.m
+
+        forward!(respₖ, mₖ, vars, response_trans_utils)
         chi2 = χ²(reduce(vcat, [getfield(respₖ, k) for k in response_fields]),
             inv_utils.dobs; W=inv_utils.W)
         if chi2 < χ2
