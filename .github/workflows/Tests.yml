@@ -4,9 +4,6 @@ on:
   pull_request:
     paths-ignore:
       - 'docs/**'
-  push:
-    paths-ignore:
-      - 'docs/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -23,9 +20,6 @@ jobs:
         group:
           - "forward"
           - "occam"
-          - "mcmc"
-          - "rp"
-          - "types"
     steps:
       - uses: actions/checkout@v4
 

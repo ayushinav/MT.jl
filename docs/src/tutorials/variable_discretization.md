@@ -7,7 +7,6 @@ Let's denote the model parameters, eg., conductivity, by `m`, and the layer thic
 m = [m_1, m_2, m_3, ... , m_N] \\
 h = [h_1, h_2, h_3, ... , h_{N_1}]
 ```
-[link](probabilistic_inverse)
 ## Copy-Pasteable code
 ```julia
 using MT
