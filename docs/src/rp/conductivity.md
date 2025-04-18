@@ -19,27 +19,28 @@ The distribution with temperature looks like (compare with fig. 1B of [Constable
 ```
 
 ```@example cond_plts
-f = Figure() 
-ax = Axis(f[3:8,3:8], yscale = log10,  
-xlabel = "10⁴/T (K⁻¹)", ylabel = "σ (S/m)", 
-yticks = LogTicks(WilkinsonTicks(6, k_min=5)), 
-backgroundcolor = (:magenta, 0.05)) 
+f = Figure()
+ax = Axis(f[3:8, 3:8]; yscale=log10,
+    xlabel="10⁴/T (K⁻¹)", ylabel="σ (S/m)",
+    yticks=LogTicks(WilkinsonTicks(6; k_min=5)),
+    backgroundcolor=(:magenta, 0.05))
 
-xts = inv.([700, 900, 1100, 1300, 1500] .+ 273.) .* 1e4
+xts = inv.([700, 900, 1100, 1300, 1500] .+ 273.0) .* 1e4
 
-ax2 = Axis(f[3:8,3:8], yscale = log10, xaxisposition = :top, yaxisposition =:right ,
-xlabel = "T (ᴼC)", xgridvisible = false, xtickformat = x -> string.(round.((1e4./x) .- 273)), xticklabelsize = 10)
+ax2 = Axis(f[3:8, 3:8]; yscale=log10, xaxisposition=:top, yaxisposition=:right,
+    xlabel="T (ᴼC)", xgridvisible=false, xtickformat=x -> string.(round.((1e4 ./ x) .- 273)),
+    xticklabelsize=10, backgroundcolor=(:magenta, 0.05))
 ax2.xticks = xts
 hidespines!(ax2)
 hideydecorations!(ax2)
 linkyaxes!(ax, ax2)
 
-T = (700:1600) .+ 273. 
-m = SEO3(T) 
-logsig = forward(m, []).σ 
+T = (700:1600) .+ 273.0
+m = SEO3(T)
+logsig = forward(m, []).σ
 
-lines!(ax, inv.(T) .* 1e4, 10 .^ logsig) 
-lines!(ax2, inv.(T) .* 1e4, 10 .^ logsig, alpha = 0) 
+lines!(ax, inv.(T) .* 1e4, 10 .^ logsig)
+lines!(ax2, inv.(T) .* 1e4, 10 .^ logsig; alpha=0)
 nothing # hide
 ```
 
@@ -64,34 +65,35 @@ The distribution with temperature looks like (compare with fig. 2a of [Wang et a
 ```
 
 ```@example cond_plts
-f = Figure() 
-ax = Axis(f[1,1], yscale = log10,  
-xlabel = "10⁴/T (K⁻¹)", ylabel = "σ (S/m)", 
-yticks = LogTicks(WilkinsonTicks(9, k_min=8)), 
-backgroundcolor = (:magenta, 0.05)) 
+f = Figure()
+ax = Axis(f[1, 1]; yscale=log10,
+    xlabel="10⁴/T (K⁻¹)", ylabel="σ (S/m)",
+    yticks=LogTicks(WilkinsonTicks(9; k_min=8)),
+    backgroundcolor=(:magenta, 0.05))
 
-xts = inv.([300, 600, 900, 1200, 1500] .+ 273.) .* 1e4
+xts = inv.([300, 600, 900, 1200, 1500] .+ 273.0) .* 1e4
 
-ax2 = Axis(f[1,1], yscale = log10, xaxisposition = :top, yaxisposition =:right ,
-xlabel = "T (ᴼC)", xgridvisible = false, xtickformat = x -> string.(round.((1e4./x) .- 273)), xticklabelsize = 10)
+ax2 = Axis(f[1, 1]; yscale=log10, xaxisposition=:top, yaxisposition=:right,
+    xlabel="T (ᴼC)", xgridvisible=false, xtickformat=x -> string.(round.((1e4 ./ x) .- 273)),
+    xticklabelsize=10, backgroundcolor=(:magenta, 0.05))
 ax2.xticks = xts
 hidespines!(ax2)
 hideydecorations!(ax2)
 linkyaxes!(ax, ax2)
 
-T = (500:1400) .+ 273. 
-Ch2o = [0., 0.01, 0.03, 0.1]' .* 1e4 
-m = Wang2006(T, Ch2o) 
-logsig = forward(m, []).σ 
+T = (500:1400) .+ 273.0
+Ch2o = [0.0, 0.01, 0.03, 0.1]' .* 1e4
+m = Wang2006(T, Ch2o)
+logsig = forward(m, []).σ
 
-for i in eachindex(Ch2o) 
-    w = Ch2o[i] 
-    lines!(ax, inv.(T) .* 1e4, 10 .^ logsig[:, i], label = "$w") 
-    lines!(ax2, inv.(T) .* 1e4, 10 .^ logsig[:, i], alpha = 0) 
-end 
+for i in eachindex(Ch2o)
+    w = Ch2o[i]
+    lines!(ax, inv.(T) .* 1e4, 10 .^ logsig[:, i]; label="$w")
+    lines!(ax2, inv.(T) .* 1e4, 10 .^ logsig[:, i]; alpha=0)
+end
 ylims!(ax, 1e-8, 1)
 ylims!(ax2, 1e-8, 1)
-f[1,2] = Legend(f, ax, "water conc. (ppm)") 
+f[1, 2] = Legend(f, ax, "water conc. (ppm)")
 
 nothing # hide
 ```
@@ -117,34 +119,35 @@ The distribution with temperature looks like (compare with fig. 6 of [Yoshino et
 ```
 
 ```@example cond_plts
-f = Figure() 
-ax = Axis(f[1,1], yscale = log10,  
-xlabel = "10⁴/T (K⁻¹)", ylabel = "σ (S/m)", 
-yticks = LogTicks(WilkinsonTicks(6, k_min=5)), 
-backgroundcolor = (:magenta, 0.05)) 
+f = Figure()
+ax = Axis(f[1, 1]; yscale=log10,
+    xlabel="10⁴/T (K⁻¹)", ylabel="σ (S/m)",
+    yticks=LogTicks(WilkinsonTicks(6; k_min=5)),
+    backgroundcolor=(:magenta, 0.05))
 
-xts = inv.([600, 800, 1000, 1200, 1400, 1600] .+ 273.) .* 1e4
+xts = inv.([600, 800, 1000, 1200, 1400, 1600] .+ 273.0) .* 1e4
 
-ax2 = Axis(f[1,1], yscale = log10, xaxisposition = :top, yaxisposition =:right ,
-xlabel = "T (ᴼC)", xgridvisible = false, xtickformat = x -> string.(round.((1e4./x) .- 273)), xticklabelsize = 8)
+ax2 = Axis(f[1, 1]; yscale=log10, xaxisposition=:top, yaxisposition=:right,
+    xlabel="T (ᴼC)", xgridvisible=false, xtickformat=x -> string.(round.((1e4 ./ x) .- 273)),
+    xticklabelsize=8, backgroundcolor=(:magenta, 0.05))
 ax2.xticks = xts
 hidespines!(ax2)
 hideydecorations!(ax2)
 linkyaxes!(ax, ax2)
 
-T = (600:1600) .+ 273. 
-Ch2o = [0., 400, 600, 2000]' 
-m = Yoshino2009(T, Ch2o) 
-logsig = forward(m, []).σ 
+T = (600:1600) .+ 273.0
+Ch2o = [0.0, 400, 600, 2000]'
+m = Yoshino2009(T, Ch2o)
+logsig = forward(m, []).σ
 
-for i in eachindex(Ch2o) 
-    w = Ch2o[i] 
-    lines!(ax, inv.(T) .* 1e4, 10 .^ logsig[:, i], label = "$w") 
-    lines!(ax2, inv.(T) .* 1e4, 10 .^ logsig[:, i], alpha = 0) 
-end 
+for i in eachindex(Ch2o)
+    w = Ch2o[i]
+    lines!(ax, inv.(T) .* 1e4, 10 .^ logsig[:, i]; label="$w")
+    lines!(ax2, inv.(T) .* 1e4, 10 .^ logsig[:, i]; alpha=0)
+end
 ylims!(ax, 1e-7, 1)
 ylims!(ax2, 1e-7, 1)
-f[1,2] = Legend(f, ax, "water conc. (ppm)") 
+f[1, 2] = Legend(f, ax, "water conc. (ppm)")
 
 nothing # hide
 ```
@@ -170,34 +173,35 @@ The distribution with temperature looks like (compare with fig. 3 of [Poe et al.
 ```
 
 ```@example cond_plts
-f = Figure() 
-ax = Axis(f[1,1], yscale = log10,  
-xlabel = "10⁴/T (K⁻¹)", ylabel = "σ (S/m)", 
-yticks = LogTicks(WilkinsonTicks(6, k_min=5)), 
-backgroundcolor = (:magenta, 0.05)) 
+f = Figure()
+ax = Axis(f[1, 1]; yscale=log10,
+    xlabel="10⁴/T (K⁻¹)", ylabel="σ (S/m)",
+    yticks=LogTicks(WilkinsonTicks(6; k_min=5)),
+    backgroundcolor=(:magenta, 0.05))
 
-xts = inv.([300, 600, 900, 1200, 1500] .+ 273.) .* 1e4
+xts = inv.([300, 600, 900, 1200, 1500] .+ 273.0) .* 1e4
 
-ax2 = Axis(f[1,1], yscale = log10, xaxisposition = :top, yaxisposition =:right ,
-xlabel = "T (ᴼC)", xgridvisible = false, xtickformat = x -> string.(round.((1e4./x) .- 273)), xticklabelsize = 8)
+ax2 = Axis(f[1, 1]; yscale=log10, xaxisposition=:top, yaxisposition=:right,
+    xlabel="T (ᴼC)", xgridvisible=false, xtickformat=x -> string.(round.((1e4 ./ x) .- 273)),
+    xticklabelsize=8, backgroundcolor=(:magenta, 0.05))
 ax2.xticks = xts
 hidespines!(ax2)
 hideydecorations!(ax2)
 linkyaxes!(ax, ax2)
 
-T = (200:1600) .+ 273. 
-Ch2o = [0., 400, 600, 2000]' 
-m = Poe2010(T, Ch2o) 
-logsig = forward(m, []).σ 
+T = (200:1600) .+ 273.0
+Ch2o = [0.0, 400, 600, 2000]'
+m = Poe2010(T, Ch2o)
+logsig = forward(m, []).σ
 
-for i in eachindex(Ch2o) 
-    w = Ch2o[i] 
-    lines!(ax, inv.(T) .* 1e4, 10 .^ logsig[:, i], label = "$w") 
-    lines!(ax2, inv.(T) .* 1e4, 10 .^ logsig[:, i], alpha = 0) 
-end 
+for i in eachindex(Ch2o)
+    w = Ch2o[i]
+    lines!(ax, inv.(T) .* 1e4, 10 .^ logsig[:, i]; label="$w")
+    lines!(ax2, inv.(T) .* 1e4, 10 .^ logsig[:, i]; alpha=0)
+end
 ylims!(ax, 1e-6, 10)
 ylims!(ax2, 1e-6, 10)
-f[1,2] = Legend(f, ax, "water conc. (ppm)") 
+f[1, 2] = Legend(f, ax, "water conc. (ppm)")
 
 nothing # hide
 ```
@@ -223,34 +227,35 @@ The distribution with temperature looks like:
 ```
 
 ```@example cond_plts
-f = Figure() 
-ax = Axis(f[1,1], yscale = log10,  
-xlabel = "10⁴/T (K⁻¹)", ylabel = "σ (S/m)", 
-yticks = LogTicks(WilkinsonTicks(6, k_min=5)), 
-backgroundcolor = (:magenta, 0.05)) 
+f = Figure()
+ax = Axis(f[1, 1]; yscale=log10,
+    xlabel="10⁴/T (K⁻¹)", ylabel="σ (S/m)",
+    yticks=LogTicks(WilkinsonTicks(6; k_min=5)),
+    backgroundcolor=(:magenta, 0.05))
 
-xts = inv.([300, 600, 900, 1200, 1500] .+ 273.) .* 1e4
+xts = inv.([300, 600, 900, 1200, 1500] .+ 273.0) .* 1e4
 
-ax2 = Axis(f[1,1], yscale = log10, xaxisposition = :top, yaxisposition =:right ,
-xlabel = "T (ᴼC)", xgridvisible = false, xtickformat = x -> string.(round.((1e4./x) .- 273)), xticklabelsize = 8)
+ax2 = Axis(f[1, 1]; yscale=log10, xaxisposition=:top, yaxisposition=:right,
+    xlabel="T (ᴼC)", xgridvisible=false, xtickformat=x -> string.(round.((1e4 ./ x) .- 273)),
+    xticklabelsize=8, backgroundcolor=(:magenta, 0.05))
 ax2.xticks = xts
 hidespines!(ax2)
 hideydecorations!(ax2)
 linkyaxes!(ax, ax2)
 
-T = (200:1600) .+ 273. 
-Ch2o = [0., 400, 600, 2000]' 
-m = Jones2012(T, Ch2o) 
-logsig = forward(m, []).σ 
+T = (200:1600) .+ 273.0
+Ch2o = [0.0, 400, 600, 2000]'
+m = Jones2012(T, Ch2o)
+logsig = forward(m, []).σ
 
-for i in eachindex(Ch2o) 
-    w = Ch2o[i] 
-    lines!(ax, inv.(T) .* 1e4, 10 .^ logsig[:, i], label = "$w") 
-    lines!(ax2, inv.(T) .* 1e4, 10 .^ logsig[:, i], alpha = 0) 
-end 
+for i in eachindex(Ch2o)
+    w = Ch2o[i]
+    lines!(ax, inv.(T) .* 1e4, 10 .^ logsig[:, i]; label="$w")
+    lines!(ax2, inv.(T) .* 1e4, 10 .^ logsig[:, i]; alpha=0)
+end
 ylims!(ax, 1e-6, 10)
 ylims!(ax2, 1e-6, 10)
-f[1,2] = Legend(f, ax, "water conc. (ppm)") 
+f[1, 2] = Legend(f, ax, "water conc. (ppm)")
 
 nothing # hide
 ```
@@ -276,34 +281,35 @@ The distribution with temperature looks like (compare with fig. 4 of [Gardés et
 ```
 
 ```@example cond_plts
-f = Figure() 
-ax = Axis(f[1,1], yscale = log10,  
-xlabel = "10⁴/T (K⁻¹)", ylabel = "σ (S/m)", 
-yticks = LogTicks(WilkinsonTicks(6, k_min=5)), 
-backgroundcolor = (:magenta, 0.05)) 
+f = Figure()
+ax = Axis(f[1, 1]; yscale=log10,
+    xlabel="10⁴/T (K⁻¹)", ylabel="σ (S/m)",
+    yticks=LogTicks(WilkinsonTicks(6; k_min=5)),
+    backgroundcolor=(:magenta, 0.05))
 
-xts = inv.([600, 800, 1000, 1200, 1400, 1600] .+ 273.) .* 1e4
+xts = inv.([600, 800, 1000, 1200, 1400, 1600] .+ 273.0) .* 1e4
 
-ax2 = Axis(f[1,1], yscale = log10, xaxisposition = :top, yaxisposition =:right ,
-xlabel = "T (ᴼC)", xgridvisible = false, xtickformat = x -> string.(round.((1e4./x) .- 273)), xticklabelsize = 8)
+ax2 = Axis(f[1, 1]; yscale=log10, xaxisposition=:top, yaxisposition=:right,
+    xlabel="T (ᴼC)", xgridvisible=false, xtickformat=x -> string.(round.((1e4 ./ x) .- 273)),
+    xticklabelsize=8, backgroundcolor=(:magenta, 0.05))
 ax2.xticks = xts
 hidespines!(ax2)
 hideydecorations!(ax2)
 linkyaxes!(ax, ax2)
 
-T = (600:1600) .+ 273. 
-Ch2o = [0., 400, 600, 2000]' 
-m = Jones2012(T, Ch2o) 
-logsig = forward(m, []).σ 
+T = (600:1600) .+ 273.0
+Ch2o = [0.0, 400, 600, 2000]'
+m = Jones2012(T, Ch2o)
+logsig = forward(m, []).σ
 
-for i in eachindex(Ch2o) 
-    w = Ch2o[i] 
-    lines!(ax, inv.(T) .* 1e4, 10 .^ logsig[:, i], label = "$w") 
-    lines!(ax2, inv.(T) .* 1e4, 10 .^ logsig[:, i], alpha = 0) 
-end 
+for i in eachindex(Ch2o)
+    w = Ch2o[i]
+    lines!(ax, inv.(T) .* 1e4, 10 .^ logsig[:, i]; label="$w")
+    lines!(ax2, inv.(T) .* 1e4, 10 .^ logsig[:, i]; alpha=0)
+end
 ylims!(ax, 1e-10, 10)
 ylims!(ax2, 1e-10, 10)
-f[1,2] = Legend(f, ax, "water conc. (ppm)") 
+f[1, 2] = Legend(f, ax, "water conc. (ppm)")
 
 nothing # hide
 ```
@@ -316,6 +322,4 @@ nothing # hide
 f # hide
 ```
 
-
 ## Melt
-

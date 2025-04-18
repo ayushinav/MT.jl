@@ -5,11 +5,12 @@
 We support the following rock physics models to obtain the electrical conductivity of the rock:
 
 ### Minerals
+
 [SEO3: A new model of olivine electrical conductivity](https://doi.org/10.1111/j.1365-246X.2006.03041.x)
 
   - [UHO2014](@ref UHO2014) : [Toward a unified hydrous olivine electrical conductivity law](https://doi.org/10.1002/2014GC005496)
   - [Jones2012](@ref Jones2012) : [Calibrating laboratory-determined models of electrical conductivity of mantle minerals using geophysical and petrological observations](https://doi.org/10.1029/2012GC004055)
-  - [Poe2010](@ref Poe2010) : 
+  - [Poe2010](@ref Poe2010) :
   - [Wang2006](@ref Wang2006) : [The effect of water on the electrical conductivity of olivine](https://doi.org/10.1038/nature05256)
   - [Yoshino2009](@ref Yoshino2009) :[The effect of water on the electrical conductivity of olivine aggregates and its implications for the electrical structure of the upper mantle](https://doi.org/10.1016/j.epsl.2009.09.032)
   - [const_matrix](@ref const_matrix) : The solid matrix is assumed to be of constant bulk conductivity

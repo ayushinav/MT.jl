@@ -55,7 +55,6 @@ log_cond_mix = forward(mix1, [])
 !!! note
     
 
-
 ```
 
 mix_single = construct_mixing_models([1000 + 273.0, 2e4], [:T, :Ch2o_ol],

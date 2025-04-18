@@ -206,3 +206,9 @@ params_andrade_analytical = (
     viscous_type = HK2003,
     viscous_params = params_HK2003
 )
+
+const default_params_andrade_psp = deepcopy(params_andrade_psp)
+const default_params_eburgers_psp = deepcopy(params_eburgers_psp)
+const default_params_premelt_anelastic = deepcopy(params_premelt_anelastic)
+const default_params_xfit_mxw = deepcopy(params_xfit_mxw.fit1)
+const default_params_andrade_analytical = deepcopy(params_andrade_analytical)

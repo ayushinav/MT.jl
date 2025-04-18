@@ -21,6 +21,7 @@ Andrade model with pseudo-scaling per Jackson and Faul (2010)
     - `σ` : Shear stress (GPa)
     - `ϕ` : Porosity
     - `ρ` : Density (kg/m³)
+    - `f` : frequency
 
 ## Keyword Arguments
 
@@ -45,12 +46,11 @@ P = 2 .+ zero(T)
 dg = collect(3.0f0:4.0f-1:7.0f0)
 σ = collect(7.5f0:0.5f0:12.5f0) .* 1.0f-3
 ϕ = collect(1.0f-2:1.0f-3:2.0f-2)
-T_solidus = 1473 .+ zero(T)
 ρ = collect(3300.0f0:100.0f0:4300.0f0)
 
 f = [1.0f0] #10f0 .^ collect(-10:1:0)
 
-model = andrade_psp(T, P, dg, σ, ϕ, ρ, Ch2o_ol, T_solidus, f')
+model = andrade_psp(T, P, dg, σ, ϕ, ρ, Ch2o_ol, f')
 
 forward(model, [])
 ```
@@ -87,6 +87,7 @@ Extended Burgers model with pseudo-scaling per Jackson and Faul (2010)
     - `ρ` : Density (kg/m³)
     - `Ch2o_ol` : water concentration in olivine (in ppm)
     - `T_solidus` : Solidus temperature (K), only used when using `xfit_premelt` for viscosity calculations
+    - `f` : frequency
 
 ## Keyword Arguments
 
@@ -165,7 +166,7 @@ end
 eburgers_psp(T, P, dg, σ, ϕ, ρ, f) = eburgers_psp(T, P, dg, σ, ϕ, ρ, 0.0f0, 0.0f0, f) # TODO : args... ?
 
 """
-    xfit_premelt(T, P, dg, σ, ϕ, ρ, T_solidus, Ch2o_ol, f)
+    premelt_anelastic(T, P, dg, σ, ϕ, ρ, T_solidus, Ch2o_ol, f)
 
 Calculate anelastic properties stored in `RockPhyAnelastic` using the
 Master curve maxwell scaling per near-solidus parametrization of Yamauchi and Takei (2016),
@@ -181,6 +182,7 @@ with optional extension to include direct melt effects of Yamauchi and Takei (20
     - `ρ` : Density (kg/m³)
     - `Ch2o_ol` : water concentration in olivine (in ppm)
     - `T_solidus` : Solidus temperature (K)
+    - `f` : frequency
 
 ## Keyword Arguments
 
@@ -241,8 +243,8 @@ mutable struct premelt_anelastic{T1, T2, T3, T4, T5, T6, T7, T8, T9}
     f::T9
 end
 
-function premelt_anelastic(T, P, dg, σ, ϕ, ρ, f)
-    premelt_anelastic(T, P, dg, σ, ϕ, ρ, 0.0f0, 0.0f0, f)
+function premelt_anelastic(T, P, dg, σ, ϕ, ρ, T_solidus, f)
+    premelt_anelastic(T, P, dg, σ, ϕ, ρ, 0.0f0, T_solidus, f)
 end # TODO : args... ?
 
 """
@@ -261,6 +263,7 @@ Master curve maxwell scaling per McCarthy, Takei and Hiraga (2011)
     - `ρ` : Density (kg/m³)
     - `Ch2o_ol` : water concentration in olivine (in ppm)
     - `T_solidus` : Solidus temperature (K), only used when using `xfit_premelt` for viscosity calculations
+    - `f` : frequency
 
 ## Keyword Arguments
 
@@ -331,6 +334,9 @@ Master curve maxwell scaling per McCarthy, Takei and Hiraga (2011)
     - `σ` : Shear stress (GPa)
     - `ϕ` : Porosity
     - `ρ` : Density (kg/m³)
+    - `Ch2o_ol` : water concentration in olivine (in ppm), only used when using `HK2003` for viscosity calculations
+    - `T_solidus` : Solidus temperature (K), only used when using `xfit_premelt` for viscosity calculations
+    - `f` : frequency
 
 ## Keyword Arguments
 
@@ -379,18 +385,14 @@ forward(model, [])
     Geophysical Research Letters,
     https://doi.org/10.1029/2019GL083529
 """
-mutable struct andrade_analytical{T1, T2, T3, T4, T5, T6, T7}
+mutable struct andrade_analytical{T1, T2, T3, T4, T5, T6, T7, T8, T9}
     T::T1
     P::T2
     dg::T3
     σ::T4
     ϕ::T5
     ρ::T6
-    f::T7
+    Ch2o_ol::T7
+    T_solidus::T8
+    f::T9
 end
-
-const default_params_andrade_psp = deepcopy(params_andrade_psp)
-const default_params_eburgers_psp = deepcopy(params_eburgers_psp)
-const default_params_premelt_anelastic = deepcopy(params_premelt_anelastic)
-const default_params_xfit_mxw = deepcopy(params_xfit_mxw.fit1)
-const default_params_andrade_analytical = deepcopy(params_andrade_analytical)

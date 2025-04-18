@@ -31,11 +31,12 @@ resp = forward(m, ω)
 
 err_resp = MTResponse(
     0.1 .* resp.ρₐ,
-    180/π .* asin(0.1) .+ zero(ω)
-    )
+    180 / π .* asin(0.1) .+ zero(ω)
+)
 
-f, axs = plot_response(ω, resp, label= "observed", plt_type = :scatter)
-plot_response!(axs, ω, resp, errs = err_resp, label= "observed", plt_type = :errors, whiskerwidth = 10)
+f, axs = plot_response(ω, resp; label="observed", plt_type=:scatter)
+plot_response!(
+    axs, ω, resp; errs=err_resp, label="observed", plt_type=:errors, whiskerwidth=10)
 f
 ```
 
@@ -83,8 +84,9 @@ m_lm = MTModel(ρ_test, h_test);
 
 W_lm = diagm(inv.([err_resp_lm.ρₐ..., err_resp_lm.ϕ...])) .^ 2; # weight matrix
 
-alg_cache =  NonlinearAlg(; alg = TrustRegion, μ = 1.0)
-inverse!(m_lm, resp, ω, alg_cache; W =W_lm, max_iters= 20, verbose = true, response_trans_utils = (ρₐ=MT.log_tf, ϕ=MT.phi_scale_tf))
+alg_cache = NonlinearAlg(; alg=TrustRegion, μ=1.0)
+inverse!(m_lm, resp, ω, alg_cache; W=W_lm, max_iters=20, verbose=true,
+    response_trans_utils=(ρₐ=MT.log_tf, ϕ=MT.phi_scale_tf))
 ```
 
 ### LBFGS
@@ -127,28 +129,28 @@ resp_occam = forward(m_occam, ω);
 resp_lm = forward(m_lm, ω);
 resp_lbfgs = forward(m_lbfgs, ω);
 
-f, axs = plot_response(ω, resp, errs = err_resp, plt_type = :errors, whiskerwidth= 10,)
-plot_response!(axs, ω, resp, plt_type = :scatter, label= "true")
-plot_response!(axs, ω, resp_occam, label= "occam", plt_type = :plot, color = :magenta)
-plot_response!(axs, ω, resp_lm, label= "Levenberg-Marquadt", plt_type = :plot, linewidth= 2)
-plot_response!(axs, ω, resp_lbfgs, label= "LBFGS", plt_type = :plot, linewidth= 2)
+f, axs = plot_response(ω, resp; errs=err_resp, plt_type=:errors, whiskerwidth=10)
+plot_response!(axs, ω, resp; plt_type=:scatter, label="true")
+plot_response!(axs, ω, resp_occam; label="occam", plt_type=:plot, color=:magenta)
+plot_response!(axs, ω, resp_lm; label="Levenberg-Marquadt", plt_type=:plot, linewidth=2)
+plot_response!(axs, ω, resp_lbfgs; label="LBFGS", plt_type=:plot, linewidth=2)
 
-f[2,2] = Legend(f, axs[1])
+f[2, 2] = Legend(f, axs[1])
 f
 ```
 
 And a look at different models
 
 ```@example inverse_demo
-f, ax = plot_model(m, label = "true", linewidth = 3, color = "black")
-plot_model!(ax, m_occam, label = "occam", linewidth = 2, color = "blue")
-plot_model!(ax, m_lm, label = "Levenberg-Marquadt", linewidth = 2)
-plot_model!(ax, m_lbfgs, label = "LBFGS", linewidth = 2)
+f, ax = plot_model(m; label="true", linewidth=3, color="black")
+plot_model!(ax, m_occam; label="occam", linewidth=2, color="blue")
+plot_model!(ax, m_lm; label="Levenberg-Marquadt", linewidth=2)
+plot_model!(ax, m_lbfgs; label="LBFGS", linewidth=2)
 
 # axislegend(ax, position = :rb)
 ax.xscale = log10
 ax.yscale = log10
 
-f[1,2] = Legend(f, ax)
+f[1, 2] = Legend(f, ax)
 f
 ```

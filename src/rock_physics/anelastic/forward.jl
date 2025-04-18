@@ -41,6 +41,9 @@ function forward(m::eburgers_psp, p; params=MT.default_params_eburgers_psp)
         G, m, params_btype, JF10_visc, params_viscous,
         Symbol(viscous_type), melt_enhancement)
 
+    @show m.T
+    @show τ_maxwell
+
     J1_int_fn(x, ω) = x^(alf - 1) / (1 + (ω * x)^2)
     J2_int_fn(x, ω) = x^alf / (1 + (ω * x)^2)
 
@@ -68,23 +71,23 @@ function forward(m::eburgers_psp, p; params=MT.default_params_eburgers_psp)
 
     if DeltaP > 0 # TODO :check for bugs (?)
         function J1_int_fn2(x, ω, tau_p)
-            inv(x) * (exp(-log(x / tau_p) * inv(sig))^2) * 0.5f0 * inv(1 + (ω * x)^2)
+            inv(x) * (exp(-0.5f0 * log(x / tau_p) * inv(sig))^2) * inv(1 + (ω * x)^2)
         end
-
         int11 = broadcast(
             (omega, tau_p) -> integrate_s((x, omega) -> J1_int_fn2(x, omega, tau_p), omega,
-                (l=0.0f0, h=Inf, N=1, rule=Val{:quadgk}())),
+                (l=eps(typeof(omega))^40, h=Inf, N=1, rule=:quadgk);
+                rtol=1.0f16 * eps(eltype(ω))),
             ω,
             τ_P) # TODO : check this case
 
         @. J1 = J1 + DeltaP * int11 * inv(sig * sqrt(2.0f0π))
 
         function J2_int_fn2(x, ω, tau_p)
-            (exp(-log(x / tau_p) * inv(sig))^2) * 0.5f0 * inv(1 + (ω * x)^2)
+            (exp(-0.5f0 * log(x / tau_p) * inv(sig))^2) * inv(1 + (ω * x)^2)
         end
         int22 = broadcast(
-            (omega, tau_p) -> integrate_s((x, omega) -> J2_int_fn2(x, omega, tau_p), omega,
-                (l=0.0f0, h=Inf, N=1, rule=Val{:quadgk}())),
+            (omega, tau_p) -> integrate_s((x, omega) -> J2_int_fn2(x, omega, tau_p),
+                omega, (l=0.0f0, h=Inf, N=1, rule=:quadgk)),
             ω,
             τ_P) # TODO : check this case
 
@@ -151,7 +154,7 @@ function forward(m::premelt_anelastic, p; params=default_params_premelt_anelasti
 end
 
 function forward(m::xfit_mxw, p; params=default_params_xfit_mxw)
-    @unpack α_a, α_b, α_c, α_τn, α2, β1, β2, τ_cutoff, melt_alpha, ϕ_c, scaling_method, elastic_type, elastic_params, viscous_type, viscous_params = params
+    @unpack α_a, α_b, α_c, α_τn, α2, β1, β2, τ_cutoff, melt_alpha, ϕ_c, elastic_type, elastic_params, viscous_type, viscous_params = params
 
     resp_elastic = forward_for_anelastic(m, Val{elastic_type}(), elastic_params)
     @unpack G, K, Vp, Vs = resp_elastic

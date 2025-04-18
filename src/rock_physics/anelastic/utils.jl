@@ -44,7 +44,7 @@ function get_η_diff(m, viscous_type::Val{HK2003}, params_viscous)
 
     P = @. p_dep_calc * m.P
     x_ϕ_c_vec = get_melt_settings_for_x_ϕ_c(Val{melt_enhancement}())
-    fH2O = @. calc_fH2O(m.Ch2o, ch2o_o, P, m.T)
+    fH2O = @. calc_fH2O(m.Ch2o_ol, ch2o_o, P, m.T)
     ϵ_rate_diff = broadcast(
         (T, P, σ, d, ϕ, fH2O) -> sr_flow_law_calculation_HK2003(
             T, P * 1.0f9, σ, d, ϕ, fH2O, getfield(x_ϕ_c_vec, :diff), mechs, :diff),
@@ -60,8 +60,8 @@ function get_η_diff(m, viscous_type::Val{HK2003}, params_viscous)
 end
 
 function get_η_diff(m, viscous_type::Val{xfit_premelt}, params_viscous)
-    resp_xfit_premelt = forward(xfit_premelt(m.T, m.P, m.dg, m.σ, m.ϕ, m.Ch2o, m.T_solidus),
-        []; params=params_viscous)
+    resp_xfit_premelt = forward(
+        xfit_premelt(m.T, m.P, m.dg, m.σ, m.ϕ, m.T_solidus), []; params=params_viscous)
 
     return resp_xfit_premelt.η
     # requires T_solidus :)
@@ -134,18 +134,18 @@ function integrate_fn(fn::T, a::T1, b::T2, N::Int, ::Val{:simpson}) where {T, T1
     return I
 end
 
-function integrate_fn(fn, a::T1, b::T2, N::Int, ::Val{:quadgk}) where {T1, T2} # Defining the function for Simpson's rule dx= (b-a)/N;
+function integrate_fn(fn, a::T1, b::T2, N::Int, ::Val{:quadgk}; kwargs...) where {T1, T2} # Defining the function for Simpson's rule dx= (b-a)/N;
     # @show a, b, N
     # @show quadgk(fn, a, b)
-    return convert(typeof(a), first(quadgk(fn, a, b)))
+    return convert(typeof(a), first(quadgk(fn, a, b; kwargs...)))
 end
 
-function integrate_s(J_int_fn::F, ω::T, integration_params) where {F, T}
+function integrate_s(J_int_fn::F, ω::T, integration_params; kwargs...) where {F, T}
     @unpack l, h, N, rule = integration_params
 
     f(x) = J_int_fn(x, ω)
     # return integrate_fn(f, l, h, N, Val{:simpson}())
-    return integrate_fn(f, l, h, N, Val{rule}())
+    return integrate_fn(f, l, h, N, Val{rule}(); kwargs...)
 end
 
 # function integrate(J_int_fn, ω::T, integration_params) where {T <: AbstractVector{<: Any}}
