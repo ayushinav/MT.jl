@@ -14,8 +14,7 @@ end
 """
     SEO3(T)
 
-Electrical conductivity model for olivine dependent on temperature. \n
-For further reading look at the references below.
+Electrical conductivity model for olivine dependent on temperature.
 
 ## Arguments
 
@@ -42,7 +41,6 @@ end
     UHO2014(T, Ch2o_ol)
 
 Electrical conductivity model for olivine dependent on temperature and water concentration.
-For further reading look at the references below.
 
 ## Arguments
 
@@ -71,7 +69,6 @@ end
     Jones2012(T, Ch2o_ol)
 
 Electrical conductivity model for olivine dependent on temperature and water concentration.
-For further reading look at the references below.
 
 ## Arguments
 
@@ -101,7 +98,6 @@ end
     Poe2010(T, Ch2o_ol)
 
 Electrical conductivity model for olivine dependent on temperature and water concentration.
-For further reading look at the references below.
 
 ## Arguments
 
@@ -132,7 +128,6 @@ end
     Wang2006(T, Ch2o_ol)
 
 Electrical conductivity model for olivine dependent on temperature and water concentration.
-For further reading look at the references below.
 
 ## Arguments
 
@@ -160,7 +155,6 @@ end
     Yoshino2009(T, Ch2o_ol)
 
 Electrical conductivity model for olivine dependent on temperature and water concentration.
-For further reading look at the references below.
 
 ## Arguments
 
@@ -181,7 +175,7 @@ log_cond = forward(model, [])
     "The effect of water on the electrical conductivity of olivine aggregates and its implications for the electrical structure of the upper mantle,
     Earth and Planetary Science Letters",
     Volume 288, Issues 1–2, 2009, Pages 291-300, ISSN 0012-821X,
-    https://doi.org/10.1016/j.epsl.2009.09.032.
+    https://doi.org/10.1016/j.epsl.2009.09.032
 """
 mutable struct Yoshino2009{F1, F2} <: AbstractCondModel
     T::F1
@@ -216,7 +210,6 @@ end
     Ni2011(T, Ch2o_m)
 
 Electrical conductivity model for basaltic melt dependent on Temperature and water content in melt.
-For further reading look at the references below.
 
 ## Arguments
 
@@ -252,7 +245,6 @@ end
     Sifre2014(T, Ch2o_m, Cco2_m)
 
 Electrical conductivity model for melt dependent on Temperature, water content and CO₂ content in melt.
-For further reading look at the references below.
 
 ## Arguments
 
@@ -283,7 +275,6 @@ end
     Gaillard2008(T)
 
 Electrical conductivity model for melt dependent on Temperature.
-For further reading look at the references below.
 
 ## Usage
 

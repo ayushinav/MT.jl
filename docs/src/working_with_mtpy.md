@@ -47,7 +47,7 @@ st_keys = st_keys0[idx_sort] # station keys, we call st 0 as unknown_survey, st 
 
 At the time of writing this, I was not able to completely figure out how to export apparent resistivity and phase data along with the corresponding error bars. In the next section, we calculate these parameters using julia and demonstrate compatibility with `mtpy` functions and objects.
 
-```@example mtpy_tut
+```julia
 tf_arr = [];
 z_arr = [];
 zerr_arr = [];

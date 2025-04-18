@@ -276,6 +276,12 @@ git-tree-sha1 = "aebf55e6d7795e02ca500a689d326ac979aaf89e"
 uuid = "9718e550-a3fa-408a-8086-8db961cd8217"
 version = "0.1.1"
 
+[[deps.BenchmarkTools]]
+deps = ["Compat", "JSON", "Logging", "Printf", "Profile", "Statistics", "UUIDs"]
+git-tree-sha1 = "e38fbc49a620f5d0b660d7f543db1009fe0f8336"
+uuid = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+version = "1.6.0"
+
 [[deps.Bijectors]]
 deps = ["ArgCheck", "ChainRulesCore", "ChangesOfVariables", "Distributions", "DocStringExtensions", "Functors", "InverseFunctions", "IrrationalConstants", "LinearAlgebra", "LogExpFunctions", "MappedArrays", "Random", "Reexport", "Roots", "SparseArrays", "Statistics"]
 git-tree-sha1 = "803e3c6bfd5c2655eb040d252144b7519ce1e70e"
@@ -508,6 +514,12 @@ weakdeps = ["InverseFunctions"]
 git-tree-sha1 = "f749037478283d372048690eb3b5f92a79432b34"
 uuid = "2569d6c7-a4a2-43d3-a901-331e8e4be471"
 version = "0.2.3"
+
+[[deps.Conda]]
+deps = ["Downloads", "JSON", "VersionParsing"]
+git-tree-sha1 = "b19db3927f0db4151cb86d073689f2428e524576"
+uuid = "8f4d0f93-b110-5947-807f-2305c1781a2d"
+version = "1.10.2"
 
 [[deps.ConsoleProgressMonitor]]
 deps = ["Logging", "ProgressMeter"]
@@ -1264,6 +1276,20 @@ git-tree-sha1 = "a3f24677c21f5bbe9d2a714f95dcd58337fb2856"
 uuid = "82899510-4779-5014-852e-03e436cf321d"
 version = "1.0.0"
 
+[[deps.JET]]
+deps = ["CodeTracking", "InteractiveUtils", "JuliaInterpreter", "JuliaSyntax", "LoweredCodeUtils", "MacroTools", "Pkg", "PrecompileTools", "Preferences", "Test"]
+git-tree-sha1 = "a453c9b3320dd73f5b05e8882446b6051cb254c4"
+uuid = "c3a54625-cd67-489e-a8e7-0a5a0ff4e31b"
+version = "0.9.18"
+
+    [deps.JET.extensions]
+    JETCthulhuExt = "Cthulhu"
+    JETReviseExt = "Revise"
+
+    [deps.JET.weakdeps]
+    Cthulhu = "f68482b8-f384-11e8-15f7-abe071a5a75f"
+    Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
+
 [[deps.JLLWrappers]]
 deps = ["Artifacts", "Preferences"]
 git-tree-sha1 = "a007feb38b422fbdab534406aeca1b86823cb4d6"
@@ -1299,6 +1325,11 @@ deps = ["CodeTracking", "InteractiveUtils", "Random", "UUIDs"]
 git-tree-sha1 = "872cd273cb995ed873c58f196659e32f11f31543"
 uuid = "aa1ae85d-cabe-5617-a682-6adf51b2e16a"
 version = "0.9.44"
+
+[[deps.JuliaSyntax]]
+git-tree-sha1 = "937da4713526b96ac9a178e2035019d3b78ead4a"
+uuid = "70703baa-626e-46a2-a12c-08ffd08c73b4"
+version = "0.4.10"
 
 [[deps.KernelAbstractions]]
 deps = ["Adapt", "Atomix", "InteractiveUtils", "MacroTools", "PrecompileTools", "Requires", "StaticArrays", "UUIDs"]
@@ -1653,10 +1684,10 @@ uuid = "e80e1ace-859a-464e-9ed9-23947d8ae3ea"
 version = "1.11.0"
 
 [[deps.MT]]
-deps = ["CairoMakie", "ConcreteStructs", "DifferentiationInterface", "Distributions", "Enzyme", "InteractiveUtils", "LinearAlgebra", "LinearSolve", "NonlinearSolve", "Optimization", "OptimizationOptimJL", "ProgressMeter", "Revise", "Statistics", "Turing", "UnPack"]
+deps = ["BenchmarkTools", "CairoMakie", "ConcreteStructs", "DifferentiationInterface", "Distributions", "Enzyme", "InteractiveUtils", "JET", "LinearAlgebra", "LinearSolve", "NonlinearSolve", "Optimization", "OptimizationOptimJL", "ProgressMeter", "PyCall", "QuadGK", "ReTestItems", "Revise", "SpecialFunctions", "Statistics", "Turing", "UnPack"]
 path = ".."
 uuid = "333b7055-2ef7-4b1e-a2ef-5fb1688f630d"
-version = "0.4.3"
+version = "0.5.6"
 
 [[deps.MacroTools]]
 git-tree-sha1 = "72aebe0b5051e5143a079a4685a46da330a40472"
@@ -2151,6 +2182,10 @@ version = "2.4.0"
 deps = ["Unicode"]
 uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 
+[[deps.Profile]]
+deps = ["Printf"]
+uuid = "9abbd945-dff8-562f-b5e8-e1ebf5ef1b79"
+
 [[deps.ProgressLogging]]
 deps = ["Logging", "SHA", "UUIDs"]
 git-tree-sha1 = "80d919dee55b9c50e8d9e2da5eeafff3fe58b539"
@@ -2167,6 +2202,12 @@ version = "1.10.4"
 git-tree-sha1 = "1d36ef11a9aaf1e8b74dacc6a731dd1de8fd493d"
 uuid = "43287f4e-b6f4-7ad1-bb20-aadabca52c3d"
 version = "1.3.0"
+
+[[deps.PyCall]]
+deps = ["Conda", "Dates", "Libdl", "LinearAlgebra", "MacroTools", "Serialization", "VersionParsing"]
+git-tree-sha1 = "9816a3826b0ebf49ab4926e2b18842ad8b5c8f04"
+uuid = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
+version = "1.96.4"
 
 [[deps.QOI]]
 deps = ["ColorTypes", "FileIO", "FixedPointNumbers"]
@@ -2218,6 +2259,12 @@ weakdeps = ["FixedPointNumbers"]
 
     [deps.Ratios.extensions]
     RatiosFixedPointNumbersExt = "FixedPointNumbers"
+
+[[deps.ReTestItems]]
+deps = ["Dates", "Logging", "Pkg", "Serialization", "Sockets", "Test", "TestEnv"]
+git-tree-sha1 = "4d261a5368115671a6ff1c4845573813f046e1e9"
+uuid = "817f1d60-ba6b-4fd5-9520-3cf149f6a823"
+version = "1.31.0"
 
 [[deps.RealDot]]
 deps = ["LinearAlgebra"]
@@ -2722,6 +2769,12 @@ version = "0.1.7"
 deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
 uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
+[[deps.TestEnv]]
+deps = ["Pkg"]
+git-tree-sha1 = "2a57e05cb9854e7260c354f1bcdbe5190adba19f"
+uuid = "1e6cf692-eddd-4d53-88a5-2d735e33781b"
+version = "1.102.0"
+
 [[deps.ThreadingUtilities]]
 deps = ["ManualMemory"]
 git-tree-sha1 = "18ad3613e129312fe67789a71720c3747e598a61"
@@ -2845,6 +2898,11 @@ weakdeps = ["LLVM"]
 
     [deps.UnsafeAtomics.extensions]
     UnsafeAtomicsLLVM = ["LLVM"]
+
+[[deps.VersionParsing]]
+git-tree-sha1 = "58d6e80b4ee071f5efd07fda82cb9fbe17200868"
+uuid = "81def892-9a0e-5fdd-b105-ffc91e053289"
+version = "1.3.0"
 
 [[deps.WebP]]
 deps = ["CEnum", "ColorTypes", "FileIO", "FixedPointNumbers", "ImageCore", "libwebp_jll"]

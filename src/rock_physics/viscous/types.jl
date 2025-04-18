@@ -174,7 +174,6 @@ forward(model, [])
 J. Geophys. Res. Solid Earth, 
 https://doi.org/10.1002/2016JB013316
 """
-
 mutable struct xfit_premelt{T1, T2, T3, T4, T5, T6, T7}
     T::T1
     P::T2
@@ -188,5 +187,5 @@ end
 xfit_premelt(T, P, dg, σ, ϕ, T_solidus) = xfit_premelt(T, P, dg, σ, ϕ, T_solidus, 0.0f0)
 
 default_params(::Val{HZK2011}) = default_params_HZK2011
-default_params(::Val{anharmonic_poro}) = default_params_anharmonic_poro
+default_params(::Val{HK2003}) = default_params_HK2003
 default_params(::Val{xfit_premelt}) = default_params_xfit_premelt

@@ -49,7 +49,7 @@ function forward(m::SLB2005, p; params=(;))
 
     Vs = @. 4.77 + dV_P + dV_T
 
-    return RockphyElastic(0.0f0, 0.0f0, 0.0f0, Vs * 1.0f3)
+    return RockphyElastic(zero(m.T .+ m.P), zero(m.T .+ m.P), zero(m.T .+ m.P), Vs * 1.0f3)
 end
 
 function forward(::Type{M}) where {M <: AbstractElasticModel}

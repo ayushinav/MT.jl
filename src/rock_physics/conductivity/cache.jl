@@ -35,6 +35,7 @@ params_Jones2012 = (
     r = 0.86f0,  # unitless
     H = 0.91f0,  # eV, activation enthalpy
     a = 0.09f0,  # unitless
+    params_SEO3 = params_SEO3
 )
 
 params_Poe2010 = (
@@ -145,8 +146,8 @@ params_Sifre2014 = (
     
     
 params_Gaillard2008 = (
-    params.S = 3440, # S/m, pre-exponential conductivity
-    params.H = 31.9 # KJ, activation enthalpy
+    S = 3440, # S/m, pre-exponential conductivity
+    H = 31.9 # KJ, activation enthalpy
     )
 
 const default_params_SEO3 = deepcopy(params_SEO3)

@@ -42,7 +42,7 @@ We can also mix in melt and use the following mixing schemes to get the bulk con
 
 Below we estimate the bulk conductivity of rock with solid phase conductivity governed by `SEO3` and melt by `Ni2011`. We'll assume a porosity of 0.1 and calculate the upper HS bounds for the matrix.
 
-```@example rp
+```
 
 mix1 = construct_mixing_models([1000 + 273.0, 2e4], [:T, :Ch2o_m],
     [0.1], [SEO3, Ni2011], [HS1962_plus()])
@@ -55,9 +55,8 @@ log_cond_mix = forward(mix1, [])
 !!! note
     
 
-Even when you have a single phase, the use of [`construct_mixing_models`](@ref construct_mixing_models) is recommended using `single_phase` mixing scheme. Make sure to then have `ϕ = 1.`.
 
-```@example rp
+```
 
 mix_single = construct_mixing_models([1000 + 273.0, 2e4], [:T, :Ch2o_ol],
     [1.0], [UHO2014], [single_phase()])
@@ -101,7 +100,7 @@ m_dist = RockphyModelDistribution(
 )
 ```
 
-```@example rp
+```julia
 r_dist = RockphyResponseDistribution((x, y) -> MultivariateNormal(x, y))
 
 m_cache = mcmc_cache(
