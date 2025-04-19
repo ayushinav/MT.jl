@@ -20,7 +20,8 @@ function forward(m::andrade_psp, p; params=default_params_andrade_psp)
     Ma = @. sqrt.(inv(J1^2 + J2^2))
     Va = @. sqrt.(Ma / m.ρ)
 
-    Vave = @. sum(Va) * Float32(inv(length(m.f)))
+    d_ = length(size(Va))
+    Vave = dropdims(sum(Va; dims=d_); dims=d_) * Float32(inv(length(m.f)))
 
     return RockPhyAnelastic(J1, J2, Qinv, Ma, Va, Vave)
 end
@@ -101,7 +102,8 @@ function forward(m::eburgers_psp, p; params=MT.default_params_eburgers_psp)
     Ma = sqrt.(inv.(J1 .^ 2 + J2 .^ 2))
     Va = sqrt.(Ma ./ m.ρ)
 
-    Vave = sum(Va; dims=2) * Float32(inv(length(m.f))) # TODO : dims should be last dims for freq
+    d_ = length(size(Va))
+    Vave = dropdims(sum(Va; dims=d_); dims=d_) * Float32(inv(length(m.f)))
 
     return MT.RockPhyAnelastic(J1, J2, Qinv, Ma, Va, Vave)
 end
@@ -148,7 +150,8 @@ function forward(m::premelt_anelastic, p; params=default_params_premelt_anelasti
     Ma = sqrt.(inv.(J1 .^ 2 + J2 .^ 2))
     Va = sqrt.(Ma ./ m.ρ)
 
-    Vave = sum(Va; dims=2) * Float32(inv(length(m.f))) # TODO : dims should be last dims for freq
+    d_ = length(size(Va))
+    Vave = dropdims(sum(Va; dims=d_); dims=d_) * Float32(inv(length(m.f)))
 
     return MT.RockPhyAnelastic(J1, J2, Qinv, Ma, Va, Vave)
 end
@@ -188,7 +191,8 @@ function forward(m::xfit_mxw, p; params=default_params_xfit_mxw)
     Ma = sqrt.(inv.(J1 .^ 2 + J2 .^ 2))
     Va = sqrt.(Ma ./ m.ρ)
 
-    Vave = sum(Va; dims=2) * Float32(inv(length(m.f)))
+    d_ = length(size(Va))
+    Vave = dropdims(sum(Va; dims=d_); dims=d_) * Float32(inv(length(m.f)))
 
     return RockPhyAnelastic(J1, J2, Qinv, Ma, Va, Vave)
 end
@@ -222,7 +226,8 @@ function forward(m::andrade_analytical, p; params=default_params_andrade_analyti
     Ma = sqrt.(inv.(J1 .^ 2 + J2 .^ 2))
     Va = sqrt.(Ma ./ m.ρ)
 
-    Vave = sum(Va; dims=2) * inv(length(m.f))
+    d_ = length(size(Va))
+    Vave = dropdims(sum(Va; dims=d_); dims=d_) * Float32(inv(length(m.f)))
 
     return RockPhyAnelastic(J1, J2, Qinv, Ma, Va, Vave)
 end

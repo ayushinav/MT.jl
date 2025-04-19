@@ -65,7 +65,6 @@ Modified Archie's law for mixing 2 phases
 "A Modified Archie’s Law for two conducting phases",
 Earth and Planetary Science Letters, 180(3–4), 369–383, doi: https://doi.org/10.1016/S0012-821X(00)00168-0
 """
-
 mutable struct MAL
     m
 end

@@ -19,9 +19,8 @@ pages = [
         "rp/elasticity.md",
         "rp/viscosity.md",
         "rp/anelasticity.md",
-        "rp/tutorial.md",
         "rp/combine_models.md",
-        "rp/initial_params.md"
+        "rp/stochastic_inverse.md"
     ],
     "API" => "api.md",
     "mtpy tutorial" => "working_with_mtpy.md"

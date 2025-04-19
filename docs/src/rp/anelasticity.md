@@ -4,7 +4,7 @@
 using MT, CairoMakie, UnPack
 ```
 
-## Andrade model
+## Andrade pseudoperiod model
 
 ```@docs; canonical = false
 andrade_psp
