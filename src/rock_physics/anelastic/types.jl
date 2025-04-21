@@ -1,3 +1,5 @@
+abstract type AbstractAnelasticModel <: AbstractRockphyModel end
+
 mutable struct RockPhyAnelastic{T1, T2, T3, T4, T5, T6} <: AbstractRockphyResponse
     J1::T1
     J2::T2
@@ -61,7 +63,7 @@ forward(model, [])
     Phys. Earth Planet. Inter.,
     https://doi.org/10.1016/j.pepi.2010.09.005
 """
-mutable struct andrade_psp{T1, T2, T3, T4, T5, T6, T7}
+mutable struct andrade_psp{T1, T2, T3, T4, T5, T6, T7} <: AbstractAnelasticModel
     T::T1
     P::T2
     dg::T3
@@ -151,7 +153,7 @@ forward(model, [])
     Towards a robust laboratory-based model for seismological application", Phys. Earth Planet. Inter.,
     https://doi.org/10.1016/j.pepi.2010.09.005
 """
-mutable struct eburgers_psp{T1, T2, T3, T4, T5, T6, T7, T8, T9}
+mutable struct eburgers_psp{T1, T2, T3, T4, T5, T6, T7, T8, T9} <: AbstractAnelasticModel
     T::T1
     P::T2
     dg::T3
@@ -231,7 +233,7 @@ forward(model, [])
     J. Geophys. Res. Solid Earth,
     https://doi.org/10.1029/2023JB027738
 """
-mutable struct premelt_anelastic{T1, T2, T3, T4, T5, T6, T7, T8, T9}
+mutable struct premelt_anelastic{T1, T2, T3, T4, T5, T6, T7, T8, T9} <: AbstractAnelasticModel
     T::T1
     P::T2
     dg::T3
@@ -308,7 +310,7 @@ forward(model, [])
  2. The universal scaling of polycrystalline materials", Journal of Geophy Research,
     http://dx.doi.org/10.1029/2011JB008384
 """
-mutable struct xfit_mxw{T1, T2, T3, T4, T5, T6, T7, T8, T9}
+mutable struct xfit_mxw{T1, T2, T3, T4, T5, T6, T7, T8, T9} <: AbstractAnelasticModel
     T::T1
     P::T2
     dg::T3
@@ -385,7 +387,7 @@ forward(model, [])
     Geophysical Research Letters,
     https://doi.org/10.1029/2019GL083529
 """
-mutable struct andrade_analytical{T1, T2, T3, T4, T5, T6, T7, T8, T9}
+mutable struct andrade_analytical{T1, T2, T3, T4, T5, T6, T7, T8, T9} <: AbstractAnelasticModel
     T::T1
     P::T2
     dg::T3

@@ -1,3 +1,4 @@
+abstract type AbstractViscousModel <: AbstractRockphyModel end
 
 mutable struct RockphyViscous{T1, T2} <: AbstractRockphyResponse
     ϵ_rate::T1
@@ -54,7 +55,7 @@ forward(model, [])
     Flow law parameters and crystallographic-preferred orientation", J. Geophys. Res.,
     https://doi.org/10.1029/2011JB008220
 """
-mutable struct HZK2011{T1, T2, T3, T4, T5}
+mutable struct HZK2011{T1, T2, T3, T4, T5} <: AbstractViscousModel
     T::T1
     P::T2
     dg::T3
@@ -116,7 +117,7 @@ forward(model, [])
     Inside the Subduction Factory, J. Eiler (Ed.).
     https://doi.org/10.1029/138GM06
 """
-mutable struct HK2003{T1, T2, T3, T4, T5, T6}
+mutable struct HK2003{T1, T2, T3, T4, T5, T6} <: AbstractViscousModel
     T::T1
     P::T2
     dg::T3
@@ -175,7 +176,7 @@ forward(model, [])
     J. Geophys. Res. Solid Earth,
     https://doi.org/10.1002/2016JB013316
 """
-mutable struct xfit_premelt{T1, T2, T3, T4, T5, T6}
+mutable struct xfit_premelt{T1, T2, T3, T4, T5, T6} <: AbstractViscousModel
     T::T1
     P::T2
     dg::T3
