@@ -42,6 +42,8 @@ include("rock_physics/anelastic/types.jl")
 include("rock_physics/anelastic/utils.jl")
 include("rock_physics/anelastic/forward.jl")
 
+include("rock_physics/utils.jl")
+include("rock_physics/mixing_phases_core.jl")
 include("rock_physics/mixing_phases.jl")
 include("rock_physics/combine_models.jl")
 include("rock_physics/pretty_printing.jl")
@@ -88,8 +90,9 @@ export Ni2011, Sifre2014, Gaillard2008
 export anharmonic, anharmonic_poro, SLB2005
 export HZK2011, HK2003, xfit_premelt
 export eburgers_psp, andrade_psp, andrade_analytical, premelt_anelastic, xfit_mxw
-export model_multiphase, construct_model_multiphase
-export construct_mixing_models, mixing_models, HS1962_plus, HS1962_minus, single_phase, MAL
+export HS1962_plus, HS1962_minus, single_phase, MAL
+export construct_model_2phase, model_2phase
+export construct_model_multi_rp, mixing_models
 export construct_model_multi_rp, model_multi_rp
 export mcmc_cache, rto_cache
 export stochastic_inverse, get_model_list

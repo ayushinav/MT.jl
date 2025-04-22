@@ -55,7 +55,3 @@ end
 function forward(::Type{M}) where {M <: AbstractElasticModel}
     return RockphyElastic
 end
-
-default_params(::Val{anharmonic}) = default_params_anharmonic
-default_params(::Val{anharmonic_poro}) = default_params_anharmonic_poro
-default_params(::Val{SLB2005}) = (;)

@@ -233,7 +233,8 @@ forward(model, [])
     J. Geophys. Res. Solid Earth,
     https://doi.org/10.1029/2023JB027738
 """
-mutable struct premelt_anelastic{T1, T2, T3, T4, T5, T6, T7, T8, T9} <: AbstractAnelasticModel
+mutable struct premelt_anelastic{T1, T2, T3, T4, T5, T6, T7, T8, T9} <:
+               AbstractAnelasticModel
     T::T1
     P::T2
     dg::T3
@@ -387,7 +388,8 @@ forward(model, [])
     Geophysical Research Letters,
     https://doi.org/10.1029/2019GL083529
 """
-mutable struct andrade_analytical{T1, T2, T3, T4, T5, T6, T7, T8, T9} <: AbstractAnelasticModel
+mutable struct andrade_analytical{T1, T2, T3, T4, T5, T6, T7, T8, T9} <:
+               AbstractAnelasticModel
     T::T1
     P::T2
     dg::T3
