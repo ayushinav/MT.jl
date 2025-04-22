@@ -26,19 +26,24 @@ function Base.show(io::IO, m::model) where {model <: AbstractRockphyResponse}
     end
 end
 
-# function Base.show(io::IO, m::model) where {model <: model_multiphase}
-#     if typeof(first(m.mixing_type)) <: MT.single_phase
-#         println("# Single phase composition")
-#         println(first(m.model_list))
-#     elseif typeof(first(m.mixing_type)) <: Union{MT.HS1962_plus, MT.HS1962_minus}
-#         println("# Two phase composition using ", first(m.mixing_type))
-#         # for i in 1:2
-#         println(1 - first(m.ϕ), " : ", m.model_list[1])
-#         println(first(m.ϕ), " : ", m.model_list[2])
-#         # end
-#     end
-#     println("\n #Parameters")
-#     for i in eachindex(m.p_names)
-#         println(m.p_names[i], " : ", m.params[i])
-#     end
-# end
+function Base.show(io::IO, m::model) where {model <: model_2phase}
+    println("Two phase composition using ", m.mix, "\n")
+
+    println("ϕ₁ → ", 1 - first(m.ϕ), " : ", m.m1)
+    println()
+    println("ϕ₂ → ", first(m.ϕ), " : ", m.m2)
+end
+
+function Base.show(io::IO, m::model) where {model <: model_multi_rp}
+    println("Multi rock physics composed of \n")
+
+    labels = (; cond="Conductivity model", elastic="Elastic model",
+        visc="Viscosity model", anelastic="Anelastic model")
+
+    for i in propertynames(m)
+        if !isnothing(getfield(m, i))
+            print(getfield(labels, i), " : ")
+            println(getfield(m, i))
+        end
+    end
+end

@@ -37,6 +37,20 @@ function forward(model::model_2phase{V, T1, T2, M},
     return RockphyCond(log10.(σ))
 end
 
+# following is needed for combine_models
+function from_nt(m::Type{T}, ps_nt::NamedTuple) where {T <: construct_model_2phase}
+
+    # fnames = fieldnames(T)
+    ϕ = getproperty(ps_nt, :ϕ)
+    m1 = m.types[1].parameters[1]
+    m2 = m.types[2].parameters[1]
+    mix = m.types[3]
+
+    model1 = MT.from_nt(m1, ps_nt)
+    model2 = MT.from_nt(m2, ps_nt)
+
+    return model_2phase(ϕ, model1, model2, mix())
+end
 #= ==============================================================================
 multi-phase (stochastic inverse would be hard with this)
 =#
