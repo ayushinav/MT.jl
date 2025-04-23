@@ -115,8 +115,10 @@ export normal_dist, uniform_dist
 export MTModelDistribution, MTResponseDistribution
 
 ## rock physics
-export RockphyCondDistribution, RockphyElasticDistribution, RockphyViscousDistribution, RockPhyAnelasticDistribution
-export SEO3Distribution, UHO2014Distribution, Jones2012Distribution, Poe2010Distribution, Yoshino2009Distribution, Wang2006Distribution, const_matrixDistribution
+export RockphyCondDistribution, RockphyElasticDistribution, RockphyViscousDistribution,
+       RockPhyAnelasticDistribution
+export SEO3Distribution, UHO2014Distribution, Jones2012Distribution, Poe2010Distribution,
+       Yoshino2009Distribution, Wang2006Distribution, const_matrixDistribution
 export Ni2011Distribution, Sifre2014Distribution, Gaillard2008Distribution
 export anharmonicDistribution, anharmonic_poroDistribution, SLB2005Distribution
 export HZK2011Distribution, HK2003Distribution, xfit_premeltDistribution

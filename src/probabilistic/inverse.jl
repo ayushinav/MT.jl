@@ -47,8 +47,9 @@ function stochastic_inverse(r_obs::resp1, err_resp::resp2, vars, alg_cache::mcmc
     end
 
     response_fields = Symbol[]
-    for k in fieldnames(typeof(alg_cache.likelihood)) # similarly, here it will be propertynames for likelihood being a NamedTuple
-        if typeof(getfield(alg_cache.likelihood, k)) <: Function
+    likelihood = to_dist_nt(alg_cache.likelihood)
+    for k in keys(likelihood) # similarly, here it will be propertynames for likelihood being a NamedTuple
+        if typeof(getfield(likelihood, k)) <: Function
             push!(response_fields, k)
         end
     end
@@ -56,7 +57,7 @@ function stochastic_inverse(r_obs::resp1, err_resp::resp2, vars, alg_cache::mcmc
     # putting trans_utils together for all the fields
 
     trans_utils_arr = []
-    for k in fieldnames(typeof(alg_cache.apriori))
+    for k in keys(apriori)
         if k in keys(model_trans_utils)
             push!(trans_utils_arr, model_trans_utils[k])
         else
@@ -64,25 +65,31 @@ function stochastic_inverse(r_obs::resp1, err_resp::resp2, vars, alg_cache::mcmc
         end
     end
 
-    transf_utils = (; zip([fieldnames(typeof(alg_cache.apriori))...], trans_utils_arr)...) # NamedTuple for trans_utils and defaults
+    transf_utils = (; zip(keys(apriori), trans_utils_arr)...) # NamedTuple for trans_utils and defaults
+    @show keys(transf_utils), model_fields
+    @show response_fields
 
     m_type = sample_type(alg_cache.apriori)
+    @show m_type
 
     if isempty(params)
-        params = default_params(Val{m_type}())
+        params = default_params(m_type)
     end
 
-    robs = (;
-        zip([fieldnames(typeof(r_obs))...],
-            [getfield(r_obs, k) for k in fieldnames(typeof(r_obs))])...)
+    @show to_resp_nt(r_obs)
+    @show to_resp_nt(err_resp)
 
-    mcmc_model = mcmc_turing(m_type, const_data, vars, robs, # ::NamedTuple
-        MT.to_nt(err_resp), # ::response
+    # robs = (;
+    #     zip([fieldnames(typeof(r_obs))...],
+    #         [getfield(r_obs, k) for k in fieldnames(typeof(r_obs))])...)
+
+    mcmc_model = mcmc_turing(m_type, const_data, vars, to_resp_nt(r_obs), # ::NamedTuple
+        to_resp_nt(err_resp), # ::response
         apriori, # ::NamedTuple
-        MT.to_nt(alg_cache.likelihood), # ::responseDistribution
-        params;
-        response_fields=Symbol.(response_fields), model_fields=Symbol.(model_fields),
-        model_trans_utils=transf_utils, response_trans_utils=response_trans_utils)
+        likelihood, # ::responseDistribution
+        params; response_fields=Symbol.(response_fields),
+        model_fields=Symbol.(model_fields), model_trans_utils=transf_utils,
+        response_trans_utils=response_trans_utils)
 
     if typeof(alg_cache.sampler) <: Turing.AdvancedVI.VariationalInference
         return vi(mcmc_model, alg_cache.sampler)

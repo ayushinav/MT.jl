@@ -48,13 +48,13 @@ Modified Archie's law for mixing 2 phases
 ## Usage
 
 ```julia
- model_mix = construct_mixing_models([1000. + 273., 2e4]
+model_mix = construct_mixing_models([1000. + 273., 2e4]
     [:T, :Ch2o_m]],
     Product([Uniform(0., 1.)]),
     [SEO3, Ni2011],
     [MAL(1.2)]
 )
- log_cond = forward(model_mix, [])
+log_cond = forward(model_mix, [])
 ```
 
 ## References
@@ -78,14 +78,7 @@ Single phase only conductivity. Assumes the rock matrix is composed of a single 
 """
 mutable struct single_phase <: phase_mixing end
 
-
-#=
-In our convention, ϕ[1] is the vol. fraction of the first phase, but HS requires
-vol fraction of fluid. It is intuitive to input vol. fraction as the melt fraction
-of fluids. This, however, goes opposite to the logic for the other number of phase.
-
-Nvm, we'll put this in the tutorial and docstrings.
-=#
+# mixing functions
 
 function mix_models(σs, ϕ, ::HS1962_plus)
     σ_max = maximum(σs)
@@ -130,4 +123,3 @@ function mix_models(σs, ϕ, ::single_phase)
     @assert length(σs) == 1
     return first(σs)
 end
-

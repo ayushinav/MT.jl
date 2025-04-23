@@ -67,4 +67,3 @@ mutable struct Gaillard2008Distribution{F <: Union{Distribution, AbstractArray}}
                AbstractRockphyModelDistribution
     T::F
 end
-

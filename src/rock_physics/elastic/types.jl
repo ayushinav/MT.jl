@@ -150,6 +150,6 @@ mutable struct SLB2005{T1, T2} <: AbstractElasticModel
     P::T2
 end
 
-default_params(::Val{anharmonic}) = default_params_anharmonic
-default_params(::Val{anharmonic_poro}) = default_params_anharmonic_poro
-default_params(::Val{SLB2005}) = (;)
+default_params(::Type{T}) where {T <: anharmonic} = default_params_anharmonic
+default_params(::Type{T}) where {T <: anharmonic_poro} = default_params_anharmonic_poro
+default_params(::Type{T}) where {T <: SLB2005} = (;)

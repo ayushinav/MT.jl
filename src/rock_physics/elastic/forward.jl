@@ -1,5 +1,5 @@
 
-function forward(m::anharmonic, p; params=default_params_anharmonic)
+function forward(m::anharmonic, p, params=default_params_anharmonic)
     @unpack T_K_ref, P_Pa_ref, Gu_0_ol, dG_dT, dG_dP, ν, Gu_0_crust, dG_dT_crust, dG_dP_crust, Gu_TP, Ku_TP = params
 
     Gu₀, dG_dT₀, dG_dP₀ = @. calc_Gu₀(
@@ -16,7 +16,7 @@ function forward(m::anharmonic, p; params=default_params_anharmonic)
     return RockphyElastic(Gu_tp, Ku_tp, Vp, Vs)
 end
 
-function forward(m::anharmonic_poro, p; params=default_params_anharmonic_poro)
+function forward(m::anharmonic_poro, p, params=default_params_anharmonic_poro)
     @unpack m_A, m_K, ν, p_anharmonic = params
 
     anh_p = forward(anharmonic(m.T, m.P, m.ρ), []; params=params.p_anharmonic)
@@ -43,7 +43,7 @@ function forward(m::anharmonic_poro, p; params=default_params_anharmonic_poro)
     return RockphyElastic(Gueff, Kueff, Vp, Vs)
 end
 
-function forward(m::SLB2005, p; params=(;))
+function forward(m::SLB2005, p, params=(;))
     dV_P = @. 0.0380f0 * m.P
     dV_T = @. -0.000378f0 * (m.T - 300)
 

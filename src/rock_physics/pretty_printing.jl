@@ -35,10 +35,24 @@ function Base.show(io::IO, m::model) where {model <: model_2phase}
 end
 
 function Base.show(io::IO, m::model) where {model <: model_multi_rp}
-    println("Multi rock physics composed of \n")
+    println("Multi rock physics model composed of \n")
 
     labels = (; cond="Conductivity model", elastic="Elastic model",
         visc="Viscosity model", anelastic="Anelastic model")
+
+    for i in propertynames(m)
+        if !isnothing(getfield(m, i))
+            print("* ", getfield(labels, i), " : ")
+            println(getfield(m, i))
+        end
+    end
+end
+
+function Base.show(io::IO, m::model) where {model <: multi_rp_response}
+    println("Multi rock physics response composed of :  \n")
+
+    labels = (; cond="Conductivity response", elastic="Elastic response",
+        visc="Viscosity response", anelastic="Anelastic response")
 
     for i in propertynames(m)
         if !isnothing(getfield(m, i))

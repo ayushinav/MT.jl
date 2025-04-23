@@ -185,6 +185,6 @@ mutable struct xfit_premelt{T1, T2, T3, T4, T5, T6} <: AbstractViscousModel
     T_solidus::T6
 end
 
-default_params(::Val{HZK2011}) = default_params_HZK2011
-default_params(::Val{HK2003}) = default_params_HK2003
-default_params(::Val{xfit_premelt}) = default_params_xfit_premelt
+default_params(::Type{T}) where {T <: HZK2011} = default_params_HZK2011
+default_params(::Type{T}) where {T <: HK2003} = default_params_HK2003
+default_params(::Type{T}) where {T <: xfit_premelt} = default_params_xfit_premelt

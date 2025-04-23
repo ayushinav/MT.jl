@@ -1,4 +1,4 @@
-function forward(m::andrade_psp, p; params=default_params_andrade_psp)
+function forward(m::andrade_psp, p, params=default_params_andrade_psp)
     @unpack n, β, τ_MR, E, G_UR, TR, PR, dR, Vstar, M, melt_alpha, ϕ_c, elastic_type, params_elastic, melt_enhancement = params
 
     resp_elastic = forward_for_anelastic(m, Val{elastic_type}(), params_elastic)
@@ -26,7 +26,7 @@ function forward(m::andrade_psp, p; params=default_params_andrade_psp)
     return RockPhyAnelastic(J1, J2, Qinv, Ma, Va, Vave)
 end
 
-function forward(m::eburgers_psp, p; params=MT.default_params_eburgers_psp)
+function forward(m::eburgers_psp, p, params=MT.default_params_eburgers_psp)
     @unpack integration_params, elastic_type, params_elastic, params_btype, viscous_type, params_viscous, JF10_visc, melt_enhancement = params
     @unpack alf, DeltaB, DeltaP, sig = params_btype
 
@@ -108,7 +108,7 @@ function forward(m::eburgers_psp, p; params=MT.default_params_eburgers_psp)
     return MT.RockPhyAnelastic(J1, J2, Qinv, Ma, Va, Vave)
 end
 
-function forward(m::premelt_anelastic, p; params=default_params_premelt_anelastic)
+function forward(m::premelt_anelastic, p, params=default_params_premelt_anelastic)
     @unpack params_xfit, elastic_type, elastic_params, viscous_params = params
     @unpack include_direct_melt_effect, β_B, poro_Λ, α_B, A_B, τ_pp = params_xfit
 
@@ -156,7 +156,7 @@ function forward(m::premelt_anelastic, p; params=default_params_premelt_anelasti
     return MT.RockPhyAnelastic(J1, J2, Qinv, Ma, Va, Vave)
 end
 
-function forward(m::xfit_mxw, p; params=default_params_xfit_mxw)
+function forward(m::xfit_mxw, p, params=default_params_xfit_mxw)
     @unpack α_a, α_b, α_c, α_τn, α2, β1, β2, τ_cutoff, melt_alpha, ϕ_c, elastic_type, elastic_params, viscous_type, viscous_params = params
 
     resp_elastic = forward_for_anelastic(m, Val{elastic_type}(), elastic_params)
@@ -197,7 +197,7 @@ function forward(m::xfit_mxw, p; params=default_params_xfit_mxw)
     return RockPhyAnelastic(J1, J2, Qinv, Ma, Va, Vave)
 end
 
-function forward(m::andrade_analytical, p; params=default_params_andrade_analytical)
+function forward(m::andrade_analytical, p, params=default_params_andrade_analytical)
     @unpack α, β, η_ss, viscosity_method, viscosity_mech, elastic_type, elastic_params, viscous_type, viscous_params = params
 
     resp_elastic = forward_for_anelastic(m, Val{elastic_type}(), elastic_params)
@@ -231,9 +231,3 @@ function forward(m::andrade_analytical, p; params=default_params_andrade_analyti
 
     return RockPhyAnelastic(J1, J2, Qinv, Ma, Va, Vave)
 end
-
-default_params(::Val{andrade_psp}) = default_params_andrade_psp
-default_params(::Val{eburgers_psp}) = default_params_eburgers_psp
-default_params(::Val{premelt_anelastic}) = default_params_premelt_anelastic
-default_params(::Val{xfit_mxw}) = default_params_xfit_mxw
-default_params(::Val{andrade_analytical}) = default_params_andrade_analytical

@@ -1,4 +1,4 @@
-function forward(m::HZK2011, p; params=default_params_HZK2011)
+function forward(m::HZK2011, p, params=default_params_HZK2011)
     @unpack mechs, p_dep_calc, melt_enhancement = params
 
     P = @. p_dep_calc * m.P
@@ -16,7 +16,7 @@ function forward(m::HZK2011, p; params=default_params_HZK2011)
     return RockphyViscous(ϵ_rate, η)
 end
 
-function forward(m::HK2003, p; params=default_params_HK2003)
+function forward(m::HK2003, p, params=default_params_HK2003)
     @unpack mechs, ch2o_o, p_dep_calc, melt_enhancement = params
 
     P = @. p_dep_calc * m.P
@@ -45,7 +45,7 @@ function forward(m::HK2003, p; params=default_params_HK2003)
     return RockphyViscous(ϵ_rate, η)
 end
 
-function forward(m::xfit_premelt, p; params=default_params_xfit_premelt)
+function forward(m::xfit_premelt, p, params=default_params_xfit_premelt)
     @unpack α, T_η, γ, B, Tr, Pr, η_r, H, V, M, dg_r = params
 
     Tprime = @. m.T / m.T_solidus

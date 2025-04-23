@@ -4,7 +4,7 @@ mutable struct construct_model_2phase{T1, T2, M}
     mix::M
 end
 
-mutable struct model_2phase{V, T1, T2, M}
+mutable struct model_2phase{V, T1, T2, M} # <: AbstractRockphyModel
     ϕ::V
     m1::T1
     m2::T2
@@ -24,9 +24,23 @@ function (model::construct_model_2phase)(ps::NamedTuple)
 end
 
 function forward(model::model_2phase{V, T1, T2, M},
-        p; params = default_params(Val{model_2phase{V, T1, T2, M}}())) where {V, M, T1 <: AbstractCondModel, T2 <: AbstractCondModel}
-    σ1 = MT.forward(model.m1, [], params = params.m1).σ
-    σ2 = MT.forward(model.m2, [], params = params.m2).σ
+        p) where {V, M, T1 <: AbstractCondModel, T2 <: AbstractCondModel}
+    σ1 = MT.forward(model.m1, []).σ
+    σ2 = MT.forward(model.m2, []).σ
+
+    @. σ1 = exp10(σ1)
+    @. σ2 = exp10(σ2)
+
+    σ = broadcast(
+        (sig1, sig2, phi) -> MT.mix_models([sig1, sig2], phi, model.mix), σ1, σ2, model.ϕ)
+
+    return RockphyCond(log10.(σ))
+end
+
+function forward(model::model_2phase{V, T1, T2, M}, p,
+        params) where {V, M, T1 <: AbstractCondModel, T2 <: AbstractCondModel}
+    σ1 = MT.forward(model.m1, [], params.m1).σ
+    σ2 = MT.forward(model.m2, [], params.m2).σ
 
     @. σ1 = exp10(σ1)
     @. σ2 = exp10(σ2)
@@ -52,11 +66,25 @@ function from_nt(m::Type{T}, ps_nt::NamedTuple) where {T <: construct_model_2pha
     return model_2phase(ϕ, model1, model2, mix())
 end
 
-function default_params(::Val{model_2phase{V, T1, T2, M}}) where {V, T1, T2, M}
-    (; zip(
-        [:m1, :m2],
-        [default_params(Val{T1}()), default_params(Val{T2}())]
-    )...)
+function default_params(::Type{model_2phase{V, T1, T2, M}}) where {V, T1, T2, M}
+    (; zip([:m1, :m2], [default_params(T1), default_params(T2)])...)
+end
+
+function from_nt(m::Type{T}, nt::NamedTuple) where {T <: construct_model_2phase}
+
+    # fnames = fieldnames(T)
+    ϕ = nt.ϕ
+    m1 = m.types[1].parameters[1]
+    m2 = m.types[2].parameters[1]
+    # m3 = m.types[3].parameters[1]
+    # m4 = m.types[4].parameters[1]
+    # m5 = m.types[5].parameters[1]
+    mix = m.types[3]
+
+    model1 = MT.from_nt(m1, nt)
+    model2 = MT.from_nt(m2, nt)
+
+    return model_2phase(ϕ, model1, model2, mix())
 end
 
 #= ==============================================================================

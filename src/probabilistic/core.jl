@@ -50,19 +50,12 @@ makes a `Turing.jl` model to perform MCMC sampling
   - `model_fields`: fields in `model` to draw inference on
   - `trans_utils`: to transform the model field variables to and from computational (inference) domain
 """
-@model function mcmc_turing(m_type,
-    const_data,
-    vars,
-    r_obs::NamedTuple,
-    err_resp,
-    mDist::mdist,
-    rDist::rdist,
-    params;
-    response_fields::Vector{Symbol}=[k for k in fieldnames(typeof(rDist))],
-    model_fields::Vector{Symbol}=[k for k in fieldnames(typeof(mDist))],
-    model_trans_utils::NamedTuple=(m=lin_tf, h=lin_tf),
-    response_trans_utils::NamedTuple=(ρₐ=lin_tf, ϕ=lin_tf)) where {mdist, rdist}
-    
+@model function mcmc_turing(
+        m_type, const_data, vars, r_obs::NamedTuple, err_resp, mDist::mdist, rDist::rdist,
+        params; response_fields::Vector{Symbol}=[k for k in fieldnames(typeof(rDist))],
+        model_fields::Vector{Symbol}=[k for k in fieldnames(typeof(mDist))],
+        model_trans_utils::NamedTuple=(m=lin_tf, h=lin_tf),
+        response_trans_utils::NamedTuple=(ρₐ=lin_tf, ϕ=lin_tf)) where {mdist, rdist}
     m0 = (; zip([keys(mDist)...], const_data)...)
 
     for k in model_fields

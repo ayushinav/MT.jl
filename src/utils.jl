@@ -2,17 +2,24 @@
 
 import LinearAlgebra: zero
 
-zero(x::resp) where {resp <: AbstractResponse} = typeof(x)([zero(getfield(x, k)) for k in fieldnames(resp)]...)
-zero(x::model) where {model <: AbstractModel} = typeof(x)([zero(getfield(x, k)) for k in fieldnames(model)]...)
+function zero(x::resp) where {resp <: AbstractResponse}
+    typeof(x)([zero(getfield(x, k)) for k in fieldnames(resp)]...)
+end
+function zero(x::model) where {model <: AbstractModel}
+    typeof(x)([zero(getfield(x, k)) for k in fieldnames(model)]...)
+end
 
 import Base: copy
-copy(x::resp) where {resp <: AbstractResponse} =typeof(x)([copy(getfield(x, k)) for k in fieldnames(resp)]...)
-copy(x::model) where {model <: AbstractModel} = typeof(x)([copy(getfield(x, k)) for k in fieldnames(model)]...)
-
+function copy(x::resp) where {resp <: AbstractResponse}
+    typeof(x)([copy(getfield(x, k)) for k in fieldnames(resp)]...)
+end
+function copy(x::model) where {model <: AbstractModel}
+    typeof(x)([copy(getfield(x, k)) for k in fieldnames(model)]...)
+end
 
 # NamedTuple manipulation
 
-@generated function from_nt(::Type{T}, nt::NamedTuple) where T
+@generated function from_nt(::Type{T}, nt::NamedTuple) where {T}
     fnames = fieldnames(T)
     args = [:(getproperty(nt, $(QuoteNode(f)))) for f in fnames]
     return :(T($(args...)))
@@ -29,34 +36,43 @@ function to_nt(s)
     NamedTuple{names}(vals)
 end
 
+to_resp_nt(d::T) where {T <: AbstractResponse} = to_nt(d)
+
+function to_resp_nt(d::T) where {T <: multi_rp_response}
+    return merge(to_nt(d.cond), to_nt(d.elastic), to_nt(d.visc), to_nt(d.anelastic))
+end
+
 # forward manipulation
 
-forward(m::Nothing, p; params = (;)) = nothing
+forward(m::Nothing, p, params=(;)) = nothing
+default_params(::Type{Nothing}) = (;)
 
-function forward_helper(::Type{T}, m0, vars, response_trans_utils, params) where T <: AbstractGeophyModel
+function forward_helper(
+        ::Type{T}, m0, vars, response_trans_utils, params) where {T <: AbstractGeophyModel}
     model = from_nt(T, m0)
-    forward(model, vars, response_trans_utils)
+    to_resp_nt(forward(model, vars, response_trans_utils))
 end
 
-function forward_helper(::Type{T}, m0, vars, response_trans_utils, params) where T <: AbstractRockphyModel
+function forward_helper(
+        ::Type{T}, m0, vars, response_trans_utils, params) where {T <: AbstractRockphyModel}
     model = from_nt(T, m0)
-    forward(model, vars, params = params)
+    to_resp_nt(forward(model, vars, params))
 end
 
-function forward_helper(::Type{T}, m0, vars, response_trans_utils, params) where T <: model_2phase
-    @show T
-    @show m0
+function forward_helper(
+        ::Type{T}, m0, vars, response_trans_utils, params) where {T <: model_2phase}
     m = construct_model_2phase(T.parameters[2], T.parameters[3], T.parameters[4]())
     model = m(m0)
-    forward(model, vars)
+    to_resp_nt(forward(model, vars, params))
 end
 
-# function forward_helper(::Type{T}, m0, vars, response_trans_utils, params) where T <: model_multi_rp
-#     m = construct_model_2phase(T.parameters[2], T.parameters[3], T.parameters[4]())
-#     model = m(m0)
-#     forward(model, vars)
-# end
-
+function forward_helper(
+        ::Type{T}, m0, vars, response_trans_utils, params) where {T <: model_multi_rp}
+    m = construct_model_multi_rp(
+        T.parameters[1], T.parameters[2], T.parameters[3], T.parameters[4])
+    model = m(m0)
+    to_resp_nt(forward(model, vars, params))
+end
 
 # Only occam uses the following
 
@@ -84,7 +100,6 @@ function inverse(t::rpresponse; abstract=false) where {rpresponse <: RockphyCond
         # return MTModel{vec_type, vec_type}
     end
 end
-
 
 function forward(t::mtmodel; abstract=false) where {mtmodel <: MTModel} # {<:AbstractVector{<:Any}, <:AbstractVector{<:Any}}}
     if abstract
