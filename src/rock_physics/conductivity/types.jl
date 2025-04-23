@@ -298,12 +298,12 @@ mutable struct Gaillard2008{F1} <: AbstractCondModel
     T::F1
 end
 
-default_params(::Val{SEO3}) = default_params_SEO3
-default_params(::Val{UHO2014}) = default_params_UHO2014
-default_params(::Val{Jones2012}) = default_params_Jones2012
-default_params(::Val{Poe2010}) = default_params_Poe2010
-default_params(::Val{Wang2006}) = default_params_Wang2006
-default_params(::Val{Yoshino2009}) = default_params_Yoshino2009
-default_params(::Val{Ni2011}) = default_params_Ni2011
-default_params(::Val{Sifre2014}) = default_params_Sifre2014
-default_params(::Val{Gaillard2008}) = default_params_Gaillard2008
+default_params(::Val{T}) where {T <:SEO3} = default_params_SEO3
+default_params(::Val{T}) where {T <:UHO2014} = default_params_UHO2014
+default_params(::Val{T}) where {T <:Jones2012} = default_params_Jones2012
+default_params(::Val{T}) where {T <:Poe2010} = default_params_Poe2010
+default_params(::Val{T}) where {T <:Wang2006} = default_params_Wang2006
+default_params(::Val{T}) where {T <:Yoshino2009} = default_params_Yoshino2009
+default_params(::Val{T}) where {T <:Ni2011} = default_params_Ni2011
+default_params(::Val{T}) where {T <:Sifre2014} = default_params_Sifre2014
+default_params(::Val{T}) where {T <:Gaillard2008} = default_params_Gaillard2008

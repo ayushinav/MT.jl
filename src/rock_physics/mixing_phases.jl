@@ -24,9 +24,9 @@ function (model::construct_model_2phase)(ps::NamedTuple)
 end
 
 function forward(model::model_2phase{V, T1, T2, M},
-        p) where {V, M, T1 <: AbstractCondModel, T2 <: AbstractCondModel}
-    σ1 = MT.forward(model.m1, []).σ
-    σ2 = MT.forward(model.m2, []).σ
+        p; params = default_params(Val{model_2phase{V, T1, T2, M}}())) where {V, M, T1 <: AbstractCondModel, T2 <: AbstractCondModel}
+    σ1 = MT.forward(model.m1, [], params = params.m1).σ
+    σ2 = MT.forward(model.m2, [], params = params.m2).σ
 
     @. σ1 = exp10(σ1)
     @. σ2 = exp10(σ2)
@@ -51,6 +51,14 @@ function from_nt(m::Type{T}, ps_nt::NamedTuple) where {T <: construct_model_2pha
 
     return model_2phase(ϕ, model1, model2, mix())
 end
+
+function default_params(::Val{model_2phase{V, T1, T2, M}}) where {V, T1, T2, M}
+    (; zip(
+        [:m1, :m2],
+        [default_params(Val{T1}()), default_params(Val{T2}())]
+    )...)
+end
+
 #= ==============================================================================
 multi-phase (stochastic inverse would be hard with this)
 =#
@@ -66,6 +74,7 @@ end
 
 construct_model_multi_phase2(m1) = m1
 construct_model_multi_phase2(m1, m::phase_mixing) = m1
+
 function construct_model_multi_phase2(m1, m2, m::phase_mixing)
     construct_model_multi_phase2(m1, m2, Nothing, Nothing, Nothing, m)
 end

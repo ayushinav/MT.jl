@@ -1,4 +1,5 @@
 module MT
+using InteractiveUtils
 using LinearAlgebra
 using CairoMakie
 using LinearSolve
@@ -48,6 +49,13 @@ include("rock_physics/mixing_phases.jl")
 include("rock_physics/combine_models.jl")
 include("rock_physics/pretty_printing.jl")
 
+include("probabilistic/rock_physics/conductivity.jl")
+include("probabilistic/rock_physics/elasticity.jl")
+include("probabilistic/rock_physics/viscosity.jl")
+include("probabilistic/rock_physics/anelasticity.jl")
+include("probabilistic/rock_physics/mixing_phases.jl")
+include("probabilistic/rock_physics/combine_models.jl")
+
 include("utils.jl")
 include("inverse/utils.jl")
 include("inverse/jacobian.jl")
@@ -57,6 +65,7 @@ include("inverse/nl_inv.jl")
 include("inverse/opt_inv.jl")
 include("probabilistic/respDistribution.jl")
 include("probabilistic/utils.jl")
+include("probabilistic/core.jl")
 include("probabilistic/inverse.jl")
 include("probabilistic/rto.jl")
 include("probabilistic/post_inv_utils.jl")
@@ -65,39 +74,63 @@ include("plots/plots.jl")
 include("plots/prob_utils.jl")
 
 # export μ
+
+# abstracts
 export AbstractModel, AbstractResponse
 export AbstractGeophyModel, AbstractGeophyResponse
 export AbstractModelDistribution, AbstractResponseDistribution
 export AbstractGeophyModelDistribution, AbstractGeophyResponseDistribution
-export RockphyModelDistribution, RockphyResponseDistribution
-export MTModel, MTResponse
+export AbstractRockphyModelDistribution, AbstractRockphyResponseDistribution
 export AbstractCondModel, AbstractElasticModel, AbstractViscousModel, AbstractAnelasticModel
+
+# geophysics
+export MTModel, MTResponse
+
+# rock physics
 export RockphyCond, RockphyElastic, RockphyViscous, RockPhyAnelastic
+export SEO3, UHO2014, Jones2012, Poe2010, Yoshino2009, Wang2006, const_matrix
+export Ni2011, Sifre2014, Gaillard2008
+export anharmonic, anharmonic_poro, SLB2005
+export HZK2011, HK2003, xfit_premelt
+export HS1962_plus, HS1962_minus, single_phase, MAL
+export construct_model_2phase, model_2phase
+export construct_model_multi_rp, model_multi_rp
+
+# forward
 export get_Z, get_appres, get_phase, forward!, forward
-# export zero, copy
-export plot_response, plot_response!
-export plot_model, plot_model!
+
+#inverse
 export sigmoid, d_sigmoid, inverse_sigmoid, transform_utils, default_tf, log_tf, lin_tf
 export mt_jacobian_cache, jacobian_mt, jacobian!
 export occam_cache, Occam, nl_cache, NonlinearAlg, opt_cache, OptAlg, linsolve!, occam_step!
 export inverse!
 export ∂, χ², linear_utils, inverse_utils
-export normal_dist, uniform_dist
-export MTModelDistribution, MTResponseDistribution
-export RockphyModelDistribution, RockphyResponseDistribution
-export SEO3, UHO2014, Jones2012, Poe2010, Yoshino2009, Wang2006, const_matrix
-export Ni2011, Sifre2014, Gaillard2008
-export anharmonic, anharmonic_poro, SLB2005
-export HZK2011, HK2003, xfit_premelt
-export eburgers_psp, andrade_psp, andrade_analytical, premelt_anelastic, xfit_mxw
-export HS1962_plus, HS1962_minus, single_phase, MAL
-export construct_model_2phase, model_2phase
-export construct_model_multi_rp, mixing_models
-export construct_model_multi_rp, model_multi_rp
+
+# probabilistic
 export mcmc_cache, rto_cache
-export stochastic_inverse, get_model_list
+export stochastic_inverse
+export normal_dist, uniform_dist
+
+## geophysics
+export MTModelDistribution, MTResponseDistribution
+
+## rock physics
+export RockphyCondDistribution, RockphyElasticDistribution, RockphyViscousDistribution, RockPhyAnelasticDistribution
+export SEO3Distribution, UHO2014Distribution, Jones2012Distribution, Poe2010Distribution, Yoshino2009Distribution, Wang2006Distribution, const_matrixDistribution
+export Ni2011Distribution, Sifre2014Distribution, Gaillard2008Distribution
+export anharmonicDistribution, anharmonic_poroDistribution, SLB2005Distribution
+export HZK2011Distribution, HK2003Distribution, xfit_premeltDistribution
+export construct_model_2phaseDistribution, model_2phaseDistribution
+
+# plots
+export plot_response, plot_response!
+export plot_model, plot_model!
+
+## post_prob
+export get_model_list
 export get_kde_image, get_kde_image!, get_mean_std_image, get_mean_std_image!
 
-export default_params
+## utils
+export default_params, sample_type
 
 end

@@ -13,7 +13,7 @@ function get_model_list(chains::chain,
         mDist::mdist;
         trans_utils=(m=lin_tf, h=lin_tf)) where {
         mdist <: AbstractModelDistribution, chain <: Chains}
-    model_type = sample(mDist)
+    model_type = sample_type(mDist)
 
     length_vec = zeros(Int64, length(propertynames(mDist)))
     for (i, k) in enumerate(propertynames(mDist))

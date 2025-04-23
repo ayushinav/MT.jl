@@ -29,9 +29,9 @@ end
 function Base.show(io::IO, m::model) where {model <: model_2phase}
     println("Two phase composition using ", m.mix, "\n")
 
-    println("ϕ₁ → ", 1 - first(m.ϕ), " : ", m.m1)
+    println("* ϕ₁ → ", 1 - first(m.ϕ), " : ", m.m1)
     println()
-    println("ϕ₂ → ", first(m.ϕ), " : ", m.m2)
+    println("* ϕ₂ → ", first(m.ϕ), " : ", m.m2)
 end
 
 function Base.show(io::IO, m::model) where {model <: model_multi_rp}
@@ -42,7 +42,7 @@ function Base.show(io::IO, m::model) where {model <: model_multi_rp}
 
     for i in propertynames(m)
         if !isnothing(getfield(m, i))
-            print(getfield(labels, i), " : ")
+            print("* ", getfield(labels, i), " : ")
             println(getfield(m, i))
         end
     end

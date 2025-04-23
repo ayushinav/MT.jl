@@ -24,25 +24,29 @@ function to perform sampling
 """
 function stochastic_inverse(r_obs::resp1, err_resp::resp2, vars, alg_cache::mcmc_cache;
         model_trans_utils::NamedTuple=(m=lin_tf, h=lin_tf), # need to take care of this
-        response_trans_utils::NamedTuple=(; ρₐ=lin_tf, ϕ=lin_tf),
+        response_trans_utils::NamedTuple=(; ρₐ=lin_tf, ϕ=lin_tf), params=(;),
         kwargs...) where {resp1 <: AbstractResponse, resp2 <: AbstractResponse}
-    model_fields = []
-    modelD = []
+    model_fields = Symbol[]
+    # modelD = []
     const_data = []
 
     # segregate the constants and the Distribution parts of the alg_cache
 
-    for k in fieldnames(typeof(alg_cache.apriori)) # make it properynames and make alg_cache.apriori a NamedTuple
-        if typeof(getfield(alg_cache.apriori, k)) <: Distribution # getfield will be replaced by getproperty
+    apriori = to_dist_nt(alg_cache.apriori)
+
+    # @show keys(apriori)
+
+    for k in keys(apriori) # make it properynames and make alg_cache.apriori a NamedTuple
+        if typeof(getfield(apriori, k)) <: Distribution # getfield will be replaced by getproperty
             push!(model_fields, k)
-            push!(modelD, getfield(alg_cache.apriori, k))
-            push!(const_data, rand(getfield(alg_cache.apriori, k)))
+            # push!(modelD, getfield(apriori, k))
+            push!(const_data, rand(getfield(apriori, k)))
         else
-            push!(const_data, getfield(alg_cache.apriori, k))
+            push!(const_data, getfield(apriori, k))
         end
     end
 
-    response_fields = Symbol.([])
+    response_fields = Symbol[]
     for k in fieldnames(typeof(alg_cache.likelihood)) # similarly, here it will be propertynames for likelihood being a NamedTuple
         if typeof(getfield(alg_cache.likelihood, k)) <: Function
             push!(response_fields, k)
@@ -62,16 +66,21 @@ function stochastic_inverse(r_obs::resp1, err_resp::resp2, vars, alg_cache::mcmc
 
     transf_utils = (; zip([fieldnames(typeof(alg_cache.apriori))...], trans_utils_arr)...) # NamedTuple for trans_utils and defaults
 
-    m_sample = MT.inverse(r_obs; abstract=true)(const_data...)
+    m_type = sample_type(alg_cache.apriori)
+
+    if isempty(params)
+        params = default_params(Val{m_type}())
+    end
 
     robs = (;
         zip([fieldnames(typeof(r_obs))...],
             [getfield(r_obs, k) for k in fieldnames(typeof(r_obs))])...)
 
-    mcmc_model = mcmc_turing(m_sample, const_data, vars, robs, # ::NamedTuple
-        err_resp, # ::response
-        alg_cache.apriori, # ::NamedTuple
-        alg_cache.likelihood; # ::responseDistribution
+    mcmc_model = mcmc_turing(m_type, const_data, vars, robs, # ::NamedTuple
+        MT.to_nt(err_resp), # ::response
+        apriori, # ::NamedTuple
+        MT.to_nt(alg_cache.likelihood), # ::responseDistribution
+        params;
         response_fields=Symbol.(response_fields), model_fields=Symbol.(model_fields),
         model_trans_utils=transf_utils, response_trans_utils=response_trans_utils)
 
