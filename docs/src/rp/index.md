@@ -52,7 +52,7 @@ println("size of η : ", size(resp.η))
 
 Notice that the dimensions of `T` and `dg` were `(11,1)` and `(1, 4)`  respectively and the output shapes are `(11, 4)`.
 
-Ofcoure, simple broadcasting rules dictate that if `T` were of `(11,1)` (or `(11,)`) and so were `dg`, then the output would be `(11, 1)` (or `(11,)`), eg.:
+Ofcourse, simple broadcasting rules dictate that if `T` were of `(11,1)` (or `(11,)`) and so were `dg`, then the output would be `(11, 1)` (or `(11,)`), eg.:
 
 ```@example rp_intro
 T = (600:100:1600) .+ 273.0

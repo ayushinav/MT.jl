@@ -1,7 +1,7 @@
 @testitem "fixed discretization" tags=[:mcmc] begin
     using Distributions, Turing
 
-    m_test = MTModel([100.0, 10.0, 1000.0], [1e3, 1e3])
+    m_test = MTModel(log10.([100.0, 10.0, 1000.0]), [1e3, 1e3])
     f = 10 .^ range(-4; stop=1, length=25)
     ω = vec(2π .* f)
 
@@ -27,9 +27,7 @@
     n_samples = 20
     mcache = mcmc_cache(modelD, respD, n_samples, NUTS())
 
-    log_tf2 = transform_utils([], log10, (x) -> 10^x, (x) -> inv(x * log(10)))
-
-    mcmc_chain = stochastic_inverse(r_obs, err_resp, ω, mcache; trans_utils=(m=log_tf,))
+    mcmc_chain = stochastic_inverse2(r_obs, err_resp, ω, mcache)
 
     model_list = get_model_list(mcmc_chain, modelD)
     W = diagm(inv.([err_resp.ρₐ..., err_resp.ϕ...])) .^ 2
@@ -53,7 +51,7 @@ end
 @testitem "variable discretization" tags=[:mcmc] begin
     using Distributions, Turing
 
-    m_test = MTModel([100.0, 10.0, 1000.0], [1e3, 1e3])
+    m_test = MTModel(log10.([100.0, 10.0, 1000.0]), [1e3, 1e3])
     f = 10 .^ range(-4; stop=1, length=25)
     ω = vec(2π .* f)
 
@@ -80,9 +78,7 @@ end
     n_samples = 20
     mcache = mcmc_cache(modelD, respD, n_samples, NUTS())
 
-    log_tf2 = transform_utils([], log10, (x) -> 10^x, (x) -> inv(x * log(10)))
-
-    mcmc_chain = stochastic_inverse(r_obs, err_resp, ω, mcache; trans_utils=(m=log_tf,))
+    mcmc_chain = stochastic_inverse(r_obs, err_resp, ω, mcache)
 
     model_list = get_model_list(mcmc_chain, modelD)
     W = diagm(inv.([err_resp.ρₐ..., err_resp.ϕ...])) .^ 2

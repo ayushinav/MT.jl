@@ -8,7 +8,7 @@
     nω = length(T)
 
     r_obs = forward(m, ω)
-    m_occam = MTModel(fill(100.0, 50), collect(range(0, 5e3; length=49)))
+    m_occam = MTModel(fill(2.0, 50), collect(range(0, 5e3; length=49)))
 
     err_ρ = 0.1 .* r_obs.ρₐ
     err_ϕ = asin(0.01) * 180 / π .* ones(length(ω))
@@ -22,7 +22,7 @@
         W=err_resp,
         χ2=1.0,
         max_iters=50,
-        verbose=false
+        verbose=true
     )
 
     @test ret_code.if_pass === true

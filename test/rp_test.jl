@@ -1,3 +1,5 @@
+using JET
+
 @testitem "conductivity tests" tags=[:rp] begin
     using MT
     methods_list = [
@@ -914,4 +916,27 @@ end
             )
         end
     end
+end
+
+@testitem "mixing_phases" tags=[:rp] begin
+    m1 = construct_model_2phase(SEO3, Ni2011, HS1962_plus())
+    ps_nt = (; T=[1200.0f0, 1400.0f0] .+ 273, P=3.0f0, ρ=3300.0f0, Ch2o_m=100.0f0, ϕ=0.1f0)
+    model = m1(ps_nt)
+    @inferred m1(ps_nt)
+    @inferred forward(model, [])
+end
+
+@testitem "combine models" tags=[:rp] begin
+    m = construct_model_multi_rp(SEO3, anharmonic, Nothing, Nothing)
+    ps_nt = (; T=[800.0f0, 1000.0f0] .+ 273, P=3.0f0, ρ=3300.0f0, Ch2o_m=1000.0f0, ϕ=0.1f0)
+    model = m(ps_nt)
+    resp = forward(model, [])
+    @inferred forward(model, [])
+
+    resp_SEO3 = forward(model.cond, [])
+    resp_anharmonic = forward(model.elastic, [])
+
+    resp_check = merge(MT.to_nt.([resp_SEO3, resp_anharmonic])...)
+
+    @test resp == resp_check
 end
