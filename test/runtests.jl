@@ -15,7 +15,7 @@ const RETESTITEMS_NWORKER_THREADS = parse(
     )
 )
 
-using MT
+using MT, LinearAlgebra
 
 @info "Running tests with $(RETESTITEMS_NWORKERS) workers and \
        $(RETESTITEMS_NWORKER_THREADS) threads for group $(GROUP)"

@@ -1,13 +1,21 @@
 const model_names_definition = (
     T="Temperature (K)", ρ="Density (kg/m³)", P="Pressure (GPa)",
-    ϕ="Porosity", Ch2o_m="Water concentration in melt (ppm)",
+    ϕ="Porosity", dg="grain size(μm)",
+    Ch2o_m="Water concentration in melt (ppm)",
+    Ch2o_ol="Water concentration in olivine (ppm)",
+    Cco2_m="CO₂ concentration in melt (ppm)")
+
+model_names_definition2 = (
+    T="Temperature (K)", ρ="Density (kg/m³)", P="Pressure (GPa)",
+    ϕ="Porosity", dg="grain size(μm)", σ = "Shear stress (GPa)", f="Frequency (Hz)",
+    Ch2o_m="Water concentration in melt (ppm)",
     Ch2o_ol="Water concentration in olivine (ppm)",
     Cco2_m="CO₂ concentration in melt (ppm)")
 
 function Base.show(io::IO, m::model) where {model <: AbstractRockphyModel}
     println("Model : ", typeof(m).name.name)
     for k in propertynames(m)
-        println(model_names_definition[k], " : ", getfield(m, k))
+        println(model_names_definition2[k], " : ", getfield(m, k))
     end
 end
 
@@ -26,7 +34,7 @@ function Base.show(io::IO, m::model) where {model <: AbstractRockphyResponse}
     end
 end
 
-function Base.show(io::IO, m::model) where {model <: model_2phase}
+function Base.show(io::IO, m::model) where {model <: two_phase_model}
     println("Two phase composition using ", m.mix, "\n")
 
     println("* ϕ₁ → ", 1 - first(m.ϕ), " : ", m.m1)
@@ -34,7 +42,7 @@ function Base.show(io::IO, m::model) where {model <: model_2phase}
     println("* ϕ₂ → ", first(m.ϕ), " : ", m.m2)
 end
 
-function Base.show(io::IO, m::model) where {model <: model_multi_rp}
+function Base.show(io::IO, m::model) where {model <: multi_rp_model}
     println("Multi rock physics model composed of \n")
 
     labels = (; cond="Conductivity model", elastic="Elastic model",

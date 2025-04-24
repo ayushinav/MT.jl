@@ -13,11 +13,11 @@ function calc_X̃(T, d, P, ϕ, params_anelastic)
 end
 
 function forward_for_anelastic(m, ::Val{anharmonic}, params)
-    return forward(anharmonic(m.T, m.P, m.ρ), []; params=params)
+    return forward(anharmonic(m.T, m.P, m.ρ), [], params)
 end
 
 function forward_for_anelastic(m, ::Val{anharmonic_poro}, params)
-    return forward(anharmonic_poro(m.T, m.P, m.ρ, m.ϕ), []; params=params)
+    return forward(anharmonic_poro(m.T, m.P, m.ρ, m.ϕ), [], params)
 end
 
 # eburgers_psp
@@ -61,7 +61,7 @@ end
 
 function get_η_diff(m, viscous_type::Val{xfit_premelt}, params_viscous)
     resp_xfit_premelt = forward(
-        xfit_premelt(m.T, m.P, m.dg, m.σ, m.ϕ, m.T_solidus), []; params=params_viscous)
+        xfit_premelt(m.T, m.P, m.dg, m.σ, m.ϕ, m.T_solidus), [], params_viscous)
 
     return resp_xfit_premelt.η
     # requires T_solidus :)

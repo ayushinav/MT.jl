@@ -1,7 +1,5 @@
-using JET
-
 @testitem "conductivity tests" tags=[:rp] begin
-    using MT
+    using JET
     methods_list = [
         SEO3,
         UHO2014,
@@ -197,24 +195,10 @@ using JET
             @test all(isapprox.(getfield(out_, k), getfield(outs[m], k), rtol=1e-2))
         end
     end
-
-    # mixing models
-    # mixing_list = [HS1962_plus(), HS1962_minus(), MAL(0.2)]
-    # mixing_outs = log10.([3.869f-4, 1.1502f-4, 2.8f-3])
-
-    # @testset "$(mixing_list[i])" for i in eachindex(mixing_list)
-    #     model = construct_mixing_models([1000.0 + 273.0, 2e4],
-    #         [:T, :Ch2o_m],
-    #         [0.1],
-    #         [SEO3, Ni2011],
-    #         [mixing_list[i]])
-
-    #     out_ = forward(model, [])
-    #     @test round(first(out_.σ); digits=2) ≈ round(mixing_outs[i]; digits=2)
-    # end
 end
 
 @testitem "elastic tests" tags=[:rp] begin
+    using JET
     T = collect(1273.0f0:30:1573.0f0)
     ρ = collect(3300.0f0:100.0f0:4300.0f0)
     ϕ = collect(1.0f-2:1.0f-3:2.0f-2)
@@ -366,6 +350,7 @@ end
 end
 
 @testitem "viscosity tests" tags=[:rp] begin
+    using JET
     T = collect(1073.0f0:30:1373.0f0)
     P = 2 .+ zero(T)
     dg = collect(3.0f0:4.0f-1:7.0f0)
@@ -376,7 +361,7 @@ end
     inps = (
         HZK2011=[T, P, dg, σ, ϕ],
         HK2003=[T, P, dg, σ, ϕ, zero(ϕ)],
-        xfit_premelt=[T, P, dg, σ, ϕ, zero(ϕ), T_solidus]
+        xfit_premelt=[T, P, dg, σ, ϕ, T_solidus]
     )
 
     methods_list = [HZK2011, HK2003, xfit_premelt]
@@ -477,6 +462,7 @@ end
 end
 
 @testitem "anelastic tests" tags=[:rp] begin
+    using JET
     T = collect(1073.0f0:30:1373.0f0)
     P = 2 .+ zero(T)
     dg = collect(3.0f0:4.0f-1:7.0f0)
@@ -491,7 +477,7 @@ end
         eburgers_psp=[T, P, dg, σ, ϕ, ρ, zero(ϕ), T_solidus, f'],
         premelt_anelastic=[T, P, dg, σ, ϕ, ρ, zero(ϕ), T_solidus, f'],
         xfit_mxw=[T, P, dg, σ, ϕ, ρ, zero(ϕ), T_solidus, f'],
-        andrade_analytical=[T, P, dg, σ, ϕ, ρ, f']
+        andrade_analytical=[T, P, dg, σ, ϕ, ρ, zero(ϕ), T_solidus, f']
     )
 
     methods_list = [
@@ -919,7 +905,8 @@ end
 end
 
 @testitem "mixing_phases" tags=[:rp] begin
-    m1 = construct_model_2phase(SEO3, Ni2011, HS1962_plus())
+    using JET
+    m1 = two_phase_modelType(SEO3, Ni2011, HS1962_plus())
     ps_nt = (; T=[1200.0f0, 1400.0f0] .+ 273, P=3.0f0, ρ=3300.0f0, Ch2o_m=100.0f0, ϕ=0.1f0)
     model = m1(ps_nt)
     @inferred m1(ps_nt)
@@ -927,10 +914,11 @@ end
 end
 
 @testitem "combine models" tags=[:rp] begin
-    m = construct_model_multi_rp(SEO3, anharmonic, Nothing, Nothing)
+    using JET
+    m = multi_rp_modelType(SEO3, anharmonic, Nothing, Nothing)
     ps_nt = (; T=[800.0f0, 1000.0f0] .+ 273, P=3.0f0, ρ=3300.0f0, Ch2o_m=1000.0f0, ϕ=0.1f0)
     model = m(ps_nt)
-    resp = forward(model, [])
+    resp = MT.to_resp_nt(forward(model, []))
     @inferred forward(model, [])
 
     resp_SEO3 = forward(model.cond, [])

@@ -130,18 +130,18 @@ params_Sifre2014 = (
     den_basalt = 2.8f0,  # g/cm^3, density of molten basalt [Lange and Carmichael, 1990]
 
     # H2O melt parameters
-    h2o_a = 88774f0,
-    h2o_b = 0.3880f0,
-    h2o_c = 73029f0,
-    h2o_d = 4.54f-5,
-    h2o_e = 5.5607f0,
+    a_h2o = 88774f0,
+    b_h2o = 0.3880f0,
+    c_h2o = 73029f0,
+    d_h2o = 4.54f-5,
+    e_h2o = 5.5607f0,
 
     # C2O melt parameters
-    c2o_a = 789166f0,
-    c2o_b = 0.1808f0,
-    c2o_c = 32820f0,
-    c2o_d = 5.50f-5,
-    c2o_e = 5.7956f0
+    a_c2o = 789166f0,
+    b_c2o = 0.1808f0,
+    c_c2o = 32820f0,
+    d_c2o = 5.50f-5,
+    e_c2o = 5.7956f0
 )
     
     

@@ -19,7 +19,7 @@ end
 function forward(m::anharmonic_poro, p, params=default_params_anharmonic_poro)
     @unpack m_A, m_K, ν, p_anharmonic = params
 
-    anh_p = forward(anharmonic(m.T, m.P, m.ρ), []; params=params.p_anharmonic)
+    anh_p = forward(anharmonic(m.T, m.P, m.ρ), [], p_anharmonic)
     @unpack G, K = anh_p
 
     Γ_G = @. melt_shear_moduli(m.ϕ, m_A, ν)
@@ -40,6 +40,7 @@ function forward(m::anharmonic_poro, p, params=default_params_anharmonic_poro)
     Vp = @. calc_Vp(K_eff, μ_eff, m.ρ)
     Vs = @. calc_Vs(μ_eff, m.ρ)
 
+    # return G, Γ_G, Γ_K, K_sk #RockphyElastic(Gueff, Kueff, Vp, Vs)
     return RockphyElastic(Gueff, Kueff, Vp, Vs)
 end
 

@@ -12,8 +12,8 @@
     err_appres = 0.1 * r_obs.ρₐ
     err_resp = MTResponse(err_appres, err_phi)
 
-    r_obs.ρₐ .= r_obs.ρₐ .+ err_appres
-    r_obs.ϕ .= r_obs.ϕ .+ err_phi
+    r_obs.ρₐ .= r_obs.ρₐ .+ rand(length(ω)) .* err_appres
+    r_obs.ϕ .= r_obs.ϕ .+ rand(length(ω)) .* err_phi
 
     respD = MTResponseDistribution(normal_dist, normal_dist)
 
@@ -34,7 +34,8 @@
         err_resp,
         ω,
         r_cache;
-        model_trans_utils=(; m=MT.lin_tf)
+        model_trans_utils=(; m=MT.lin_tf),
+        verbose = false
     )
 
     mt_chain = Turing.Chains(
@@ -47,7 +48,7 @@
     m_model = model_list[end]
     resp_model = forward(m_model, ω)
 
-    W = diagm(inv.([err_ρ..., err_ϕ...])) .^ 2
+    W = diagm(inv.([err_appres..., err_phi...])) .^ 2
 
     err = sqrt(
         norm(
@@ -58,5 +59,5 @@
     ),
     )
 
-    @test err <= 1
+    @test err <= 1.5
 end

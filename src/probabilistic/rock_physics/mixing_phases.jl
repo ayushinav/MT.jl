@@ -1,20 +1,61 @@
-mutable struct construct_model_2phaseDistribution{T1, T2, M}
+"""
+    two_phase_modelDistributionType(m1, m2, mix)
+
+Rock physics model distribution type to combine two phases.
+
+## Arguments
+ - `m1` : model distribution type corresponding to phase 1
+ - `m2` : model distribution type corresponding to phase 2
+ - `mix` : mixing type, available options are `HS_1962_plus()`, `HS1962_minus`, `MAL(m)`
+
+## Usage
+
+```julia
+two_phase_modelType(SEO3Distribution, Ni2011Distribution, HS1962_plus())
+```
+"""
+mutable struct two_phase_modelDistributionType{T1, T2, M}
     m1::Type{T1}
     m2::Type{T2}
     mix::M
 end
 
-mutable struct model_2phaseDistribution{V, T1, T2, M} <: AbstractRockphyModelDistribution
+"""
+    two_phase_modelDistribution(ϕ, m1, m2, mix)
+
+Rock physics model distribution to combine two phases, usually constructed through `two_phase_modelDistributionType`[@ref]
+
+## Arguments
+ - `ϕ` : distribution (or value) of vol. fraction of the **second** phase
+ - `m1` : model distribution corresponding to phase 1
+ - `m2` : model distribution corresponding to phase 2
+ - `mix` : mixing type, available options are `HS_1962_plus()`, `HS1962_minus`, `MAL(m)`
+
+## Usage
+
+```julia
+m = two_phase_modelType(SEO3Distribution, Ni2011Distribution, HS1962_plus())
+ps_nt_dist = (;
+    T=product_distribution(Uniform(1200.0f0, 1400.0f0)),
+    Ch2o_m=MvNormal([100.0f0], diagm([20.0f0])),
+    ϕ=[0.1f0]
+)
+model = m(ps_nt_dist)
+
+resp = forward(model)
+```
+"""
+mutable struct two_phase_modelDistribution{V, T1, T2, M} <: AbstractRockphyModelDistribution
     ϕ::V
     m1::T1
     m2::T2
     mix::M
 end
 
-construct_model_2phaseDistribution(m1) = m1
-construct_model_2phaseDistribution(m1, m::phase_mixing) = m1
+two_phase_modelDistributionType(m1) = m1
+two_phase_modelDistributionType(m1, m::phase_mixing) = m1
 
-function (model::construct_model_2phaseDistribution)(ps::NamedTuple)
+function (model::two_phase_modelDistributionType)(ps::NamedTuple)
     mix = model.mix
     ϕ = ps.ϕ
 
@@ -22,5 +63,5 @@ function (model::construct_model_2phaseDistribution)(ps::NamedTuple)
 
     v2 = from_nt(model.m2, ps)
 
-    return model_2phaseDistribution(ϕ, v1, v2, mix)
+    return two_phase_modelDistribution(ϕ, v1, v2, mix)
 end

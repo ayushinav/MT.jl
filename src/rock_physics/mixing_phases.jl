@@ -1,29 +1,65 @@
-mutable struct construct_model_2phase{T1, T2, M}
+"""
+    two_phase_modelType(m1, m2, mix)
+
+Rock physics model to combine two phases.
+
+## Arguments
+ - `m1` : model type corresponding to phase 1
+ - `m2` : model type corresponding to phase 2
+ - `mix` : mixing type, available options are `HS_1962_plus()`, `HS1962_minus`, `MAL(m)`
+
+## Usage
+
+```julia
+two_phase_modelType(SEO3, Ni2011, HS1962_plus())
+```
+"""
+mutable struct two_phase_modelType{T1, T2, M}
     m1::Type{T1}
     m2::Type{T2}
     mix::M
 end
 
-mutable struct model_2phase{V, T1, T2, M} # <: AbstractRockphyModel
+"""
+    two_phase_model(ϕ, m1, m2, mix)
+
+Rock physics model to combine two phases, usually constructed through `two_phase_modelType`[@ref]
+
+## Arguments
+ - `ϕ` : Vol. fraction of the **second** phase
+ - `m1` : model corresponding to phase 1
+ - `m2` : model corresponding to phase 2
+ - `mix` : mixing type, available options are `HS_1962_plus()`, `HS1962_minus`, `MAL(m)`
+
+## Usage
+
+```julia
+m = two_phase_modelType(SEO3, Ni2011, HS1962_plus())
+ps_nt = ps_nt = (; T=[800.0f0, 1000.0f0] .+ 273, P=3.0f0, ρ=3300.0f0, Ch2o_m=1000.0f0, ϕ=0.1f0)
+model = m(ps_nt)
+
+resp = forward(model)
+```
+"""
+mutable struct two_phase_model{V, T1, T2, M} # <: AbstractRockphyModel
     ϕ::V
     m1::T1
     m2::T2
     mix::M
 end
 
-construct_model_2phase(m1) = m1
-construct_model_2phase(m1, m::phase_mixing) = m1
-# construct_model_2phase(m1, m2, m::phase_mixing) = construct_model_2phase(m1, m2, m)
+two_phase_modelType(m1) = m1
+two_phase_modelType(m1, m::phase_mixing) = m1
 
-function (model::construct_model_2phase)(ps::NamedTuple)
+function (model::two_phase_modelType)(ps::NamedTuple)
     mix = model.mix
     ϕ = ps.ϕ
     v1 = from_nt(getproperty(model, :m1), ps)
     v2 = from_nt(getproperty(model, :m2), ps)
-    return model_2phase(ϕ, v1, v2, mix)
+    return two_phase_model(ϕ, v1, v2, mix)
 end
 
-function forward(model::model_2phase{V, T1, T2, M},
+function forward(model::two_phase_model{V, T1, T2, M},
         p) where {V, M, T1 <: AbstractCondModel, T2 <: AbstractCondModel}
     σ1 = MT.forward(model.m1, []).σ
     σ2 = MT.forward(model.m2, []).σ
@@ -37,7 +73,7 @@ function forward(model::model_2phase{V, T1, T2, M},
     return RockphyCond(log10.(σ))
 end
 
-function forward(model::model_2phase{V, T1, T2, M}, p,
+function forward(model::two_phase_model{V, T1, T2, M}, p,
         params) where {V, M, T1 <: AbstractCondModel, T2 <: AbstractCondModel}
     σ1 = MT.forward(model.m1, [], params.m1).σ
     σ2 = MT.forward(model.m2, [], params.m2).σ
@@ -51,44 +87,27 @@ function forward(model::model_2phase{V, T1, T2, M}, p,
     return RockphyCond(log10.(σ))
 end
 
-# following is needed for combine_models
-function from_nt(m::Type{T}, ps_nt::NamedTuple) where {T <: construct_model_2phase}
-
-    # fnames = fieldnames(T)
-    ϕ = getproperty(ps_nt, :ϕ)
-    m1 = m.types[1].parameters[1]
-    m2 = m.types[2].parameters[1]
-    mix = m.types[3]
-
-    model1 = MT.from_nt(m1, ps_nt)
-    model2 = MT.from_nt(m2, ps_nt)
-
-    return model_2phase(ϕ, model1, model2, mix())
-end
-
-function default_params(::Type{model_2phase{V, T1, T2, M}}) where {V, T1, T2, M}
+function default_params(::Type{two_phase_model{V, T1, T2, M}}) where {V, T1, T2, M}
     (; zip([:m1, :m2], [default_params(T1), default_params(T2)])...)
 end
 
-function from_nt(m::Type{T}, nt::NamedTuple) where {T <: construct_model_2phase}
+# following is needed for combine_models
 
-    # fnames = fieldnames(T)
+function from_nt(m::Type{T}, nt::NamedTuple) where {T <: two_phase_modelType}
+
     ϕ = nt.ϕ
     m1 = m.types[1].parameters[1]
     m2 = m.types[2].parameters[1]
-    # m3 = m.types[3].parameters[1]
-    # m4 = m.types[4].parameters[1]
-    # m5 = m.types[5].parameters[1]
     mix = m.types[3]
 
     model1 = MT.from_nt(m1, nt)
     model2 = MT.from_nt(m2, nt)
 
-    return model_2phase(ϕ, model1, model2, mix())
+    return two_phase_model(ϕ, model1, model2, mix())
 end
 
 #= ==============================================================================
-multi-phase (stochastic inverse would be hard with this)
+multi-phase (stochastic inverse looks hard with this) : Experimental
 =#
 
 mutable struct construct_model_multi_phase2{T1, T2, T3, T4, T5, M}

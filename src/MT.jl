@@ -92,9 +92,10 @@ export SEO3, UHO2014, Jones2012, Poe2010, Yoshino2009, Wang2006, const_matrix
 export Ni2011, Sifre2014, Gaillard2008
 export anharmonic, anharmonic_poro, SLB2005
 export HZK2011, HK2003, xfit_premelt
+export andrade_psp, eburgers_psp, premelt_anelastic, xfit_mxw, andrade_analytical
 export HS1962_plus, HS1962_minus, single_phase, MAL
-export construct_model_2phase, model_2phase
-export construct_model_multi_rp, model_multi_rp
+export two_phase_modelType, two_phase_model
+export multi_rp_modelType, multi_rp_model, multi_rp_response
 
 # forward
 export get_Z, get_appres, get_phase, forward!, forward
@@ -122,7 +123,9 @@ export SEO3Distribution, UHO2014Distribution, Jones2012Distribution, Poe2010Dist
 export Ni2011Distribution, Sifre2014Distribution, Gaillard2008Distribution
 export anharmonicDistribution, anharmonic_poroDistribution, SLB2005Distribution
 export HZK2011Distribution, HK2003Distribution, xfit_premeltDistribution
-export construct_model_2phaseDistribution, model_2phaseDistribution
+export andrade_pspDistribution, eburgers_pspDistribution, premelt_anelasticDistribution, xfit_mxwDistribution, andrade_analyticalDistribution
+export two_phase_modelDistributionType, two_phase_modelDistribution
+export multi_rp_modelDistributionType, multi_rp_modelDistribution
 
 # plots
 export plot_response, plot_response!

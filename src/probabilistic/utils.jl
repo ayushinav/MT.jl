@@ -33,7 +33,7 @@ for m in subtypes(AbstractAnelasticModel)
     eval(Meta.parse("sample_type(::Type{T}) where {T <:$dstring} = $mstring"))
 end
 
-function sample_type(d::model_2phaseDistribution{V, T1, T2, M}) where {V, T1, T2, M}
+function sample_type(d::two_phase_modelDistribution{V, T1, T2, M}) where {V, T1, T2, M}
     if typeof(V) <: Distribution
         v = typeof(rand(d.ϕ))
     else
@@ -42,26 +42,26 @@ function sample_type(d::model_2phaseDistribution{V, T1, T2, M}) where {V, T1, T2
     t1 = sample_type(T1)
     t2 = sample_type(T2)
     m = M
-    model_2phase{v, t1, t2, m}
+    two_phase_model{v, t1, t2, m}
 end
 
 sample_type(::Type{Nothing}) = Nothing
 
-function sample_type(d::model_multi_rpDistribution{T1, T2, T3, T4}) where {T1, T2, T3, T4}
-    model_multi_rp{sample_type(T1), sample_type(T2), sample_type(T3), sample_type(T4)}
+function sample_type(d::multi_rp_modelDistribution{T1, T2, T3, T4}) where {T1, T2, T3, T4}
+    multi_rp_model{sample_type(T1), sample_type(T2), sample_type(T3), sample_type(T4)}
 end
 
 # NamedTuple manipulation
 
 to_dist_nt(d::T) where {T <: AbstractModelDistribution} = to_nt(d)
 
-function to_dist_nt(d::T) where {T <: model_2phaseDistribution}
+function to_dist_nt(d::T) where {T <: two_phase_modelDistribution}
     m1 = MT.to_nt(d.m1)
     m2 = MT.to_nt(d.m2)
     return (; ϕ=d.ϕ, m1..., m2...)
 end
 
-function to_dist_nt(d::T) where {T <: model_multi_rpDistribution}
+function to_dist_nt(d::T) where {T <: multi_rp_modelDistribution}
     return merge(to_nt(d.cond), to_nt(d.elastic), to_nt(d.visc), to_nt(d.anelastic))
 end
 

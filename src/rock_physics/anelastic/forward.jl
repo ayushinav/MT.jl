@@ -42,9 +42,6 @@ function forward(m::eburgers_psp, p, params=MT.default_params_eburgers_psp)
         G, m, params_btype, JF10_visc, params_viscous,
         Symbol(viscous_type), melt_enhancement)
 
-    @show m.T
-    @show τ_maxwell
-
     J1_int_fn(x, ω) = x^(alf - 1) / (1 + (ω * x)^2)
     J2_int_fn(x, ω) = x^alf / (1 + (ω * x)^2)
 
