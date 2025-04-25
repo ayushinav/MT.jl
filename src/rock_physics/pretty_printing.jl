@@ -1,7 +1,7 @@
 const model_names_definition = (
     T="Temperature (K)", ρ="Density (kg/m³)", P="Pressure (GPa)",
-    ϕ="Porosity", dg="grain size(μm)", σ = "Shear stress (GPa)", f="Frequency (Hz)",
-    Ch2o_m="Water concentration in melt (ppm)",
+    ϕ="Porosity", dg="grain size(μm)", σ="Shear stress (GPa)",
+    f="Frequency (Hz)", Ch2o_m="Water concentration in melt (ppm)",
     Ch2o_ol="Water concentration in olivine (ppm)",
     Cco2_m="CO₂ concentration in melt (ppm)")
 

@@ -324,7 +324,6 @@ f # hide
 
 ## Melt
 
-- [Ni2011](@ref Ni2011) : Ni et al., 2011 : [Electrical conductivity of hydrous basaltic melts: implications for partial melting in the upper mantle](https://doi.org/10.1007/s00410-011-0617-4)
-- [Sifre2014](@ref Sifre2014) : Sifre et al., 2014 : [Electrical conductivity during incipient melting in the oceanic low-velocity zone](https://doi.org/10.1038/nature13245)
-- [Gaillard2008](@ref Gaillard2008) : Gaillard et al., 2008 : [Carbonatite Melts and Electrical Conductivity in the Asthenosphere](https://www.science.org/doi/10.1126/science.1164446)
-
+  - [Ni2011](@ref Ni2011) : Ni et al., 2011 : [Electrical conductivity of hydrous basaltic melts: implications for partial melting in the upper mantle](https://doi.org/10.1007/s00410-011-0617-4)
+  - [Sifre2014](@ref Sifre2014) : Sifre et al., 2014 : [Electrical conductivity during incipient melting in the oceanic low-velocity zone](https://doi.org/10.1038/nature13245)
+  - [Gaillard2008](@ref Gaillard2008) : Gaillard et al., 2008 : [Carbonatite Melts and Electrical Conductivity in the Asthenosphere](https://www.science.org/doi/10.1126/science.1164446)

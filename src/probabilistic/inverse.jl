@@ -34,12 +34,9 @@ function stochastic_inverse(r_obs::resp1, err_resp::resp2, vars, alg_cache::mcmc
 
     apriori = to_dist_nt(alg_cache.apriori)
 
-    @show keys(apriori)
-
-    for k in keys(apriori) # make it properynames and make alg_cache.apriori a NamedTuple
-        if typeof(getfield(apriori, k)) <: Distribution # getfield will be replaced by getproperty
+    for k in keys(apriori)
+        if typeof(getfield(apriori, k)) <: Distribution
             push!(model_fields, k)
-            # push!(modelD, getfield(apriori, k))
             push!(const_data, rand(getfield(apriori, k)))
         else
             push!(const_data, getfield(apriori, k))
@@ -66,11 +63,8 @@ function stochastic_inverse(r_obs::resp1, err_resp::resp2, vars, alg_cache::mcmc
     end
 
     transf_utils = (; zip(keys(apriori), trans_utils_arr)...) # NamedTuple for trans_utils and defaults
-    @show keys(transf_utils), model_fields
-    @show response_fields
 
     m_type = sample_type(alg_cache.apriori)
-    @show m_type
 
     if isempty(params)
         params = default_params(m_type)
@@ -78,10 +72,11 @@ function stochastic_inverse(r_obs::resp1, err_resp::resp2, vars, alg_cache::mcmc
 
     # @show to_resp_nt(r_obs)
     # @show to_resp_nt(err_resp)
-
-    # robs = (;
-    #     zip([fieldnames(typeof(r_obs))...],
-    #         [getfield(r_obs, k) for k in fieldnames(typeof(r_obs))])...)
+    msg = """
+    variables to be inferred : $(model_fields)
+    variables used for inference : $(response_fields)
+    """
+    @info msg
 
     mcmc_model = mcmc_turing(m_type, const_data, vars, to_resp_nt(r_obs), # ::NamedTuple
         to_resp_nt(err_resp), # ::response

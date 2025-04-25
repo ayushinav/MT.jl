@@ -1,5 +1,3 @@
-#! format: off
-
 abstract type phase_mixing end
 
 """
@@ -10,10 +8,10 @@ Hashim-Strikman upper bound for mixing 2 phases
 ## Usage
 
 ```julia
-model_mix = construct_mixing_models([1000.0 + 273.0, 2e4], [:T, :Ch2o_m],
-    Product([Uniform(0.0, 1.0)]), [SEO3, Ni2011], [HS1962_plus()])
-log_cond = forward(model_mix, [])
+m = two_phase_modelType(Yoshino2009, Sifre2014, MAL(0.2))
 ```
+
+Check out the relevant rock physics documentation.
 
 ## References
 
@@ -30,10 +28,10 @@ Hashim-Strikman lower bound for mixing 2 phases
 ## Usage
 
 ```julia
-model_mix = construct_mixing_models(
-    [1000.0 + 273.0, 2e4], [:T, :Ch2o_m], [0.1], [SEO3, Ni2011], [HS1962_minus()])
-log_cond = forward(model_mix, [])
+m = two_phase_modelType(Yoshino2009, Sifre2014, MAL(0.2))
 ```
+
+Check out the relevant rock physics documentation.
 
 ## References
 
@@ -50,20 +48,16 @@ Modified Archie's law for mixing 2 phases
 ## Usage
 
 ```julia
-model_mix = construct_mixing_models([1000. + 273., 2e4]
-    [:T, :Ch2o_m]],
-    Product([Uniform(0., 1.)]),
-    [SEO3, Ni2011],
-    [MAL(1.2)]
-)
-log_cond = forward(model_mix, [])
+m = two_phase_modelType(Yoshino2009, Sifre2014, MAL(0.2))
 ```
+
+Check out the relevant rock physics documentation.
 
 ## References
 
-- Glover, P. W. J., Hole, M. J., & Pous, J. (2000),
-"A Modified Archie’s Law for two conducting phases",
-Earth and Planetary Science Letters, 180(3–4), 369–383, doi: https://doi.org/10.1016/S0012-821X(00)00168-0
+    - Glover, P. W. J., Hole, M. J., & Pous, J. (2000),
+    "A Modified Archie’s Law for two conducting phases", Earth and Planetary Science Letters, 180(3–4), 369–383, 
+    doi: https://doi.org/10.1016/S0012-821X(00)00168-0
 """
 mutable struct MAL <: phase_mixing
     m

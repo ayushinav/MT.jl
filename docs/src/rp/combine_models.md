@@ -3,9 +3,11 @@
 ```@setup multi_rp
 using MT, CairoMakie
 ```
+
 We provide the feature to model multiple rock physics simultaneously. This is useful because often we want to model, say electrical conductivity and p-wave velocity, for the same temperatures, melt fraction, water content and other parameters. This utility showcases itself particularly when we want to perform the stochastic inversion of rock physics properties. For now, lets understand how to get the responses from multi rock physics models.
 
 !!! info
+    
     Please note that this bears close resemblance with [Mixing phases](mixing_phases.md) tutorial.
 
 We first need to define the rock physics we want to model. To model electrical conductivity using `SEO3` and elastic properties using `anharmonic`, we use [`multi_rp_modelType`](@ref)
@@ -17,18 +19,20 @@ m = multi_rp_modelType(SEO3, anharmonic, Nothing, Nothing)
 The `multi_rp_modelType` function requires exactly 4 parameters, first of which defines the conductivity model, followed by elastic, viscous and anelastic models in that order. To exclude the physics of any kind, pass `Nothing` in its place, eg., in the above example, we have `SEO3` for conductivity and `anharmonic` for elastic. Since we did not want to model viscous and anelastic responses, we passed `Nothing` in their places.
 
 Now, we define the parameters required to define the model.
+
 ```@example multi_rp
 T = (600:1600) .+ 273.0f0
 P = 3.0f0
 ρ = 3300.0f0
 ϕ = 0.1f0
 
-ps_nt = (; T= T, P= P, ρ = ρ, ϕ = ϕ)
+ps_nt = (; T=T, P=P, ρ=ρ, ϕ=ϕ)
 model = m(ps_nt)
 nothing # hide
 ```
 
 and then as usual get the response
+
 ```@example multi_rp
 resp = forward(model, [])
 nothing # hide
@@ -66,8 +70,8 @@ for i in eachindex(resp_fields)
 
     r_ = getfield(resp_nt, resp_fields[i])
     if i == 1
-        lines!(ax, inv.(T) .* 1e4, 10. .^r_)
-        lines!(ax2, inv.(T) .* 1e4, 10. .^r_; alpha=0)
+        lines!(ax, inv.(T) .* 1e4, 10.0 .^ r_)
+        lines!(ax2, inv.(T) .* 1e4, 10.0 .^ r_; alpha=0)
         ax.yscale = log10
         ax2.yscale = log10
     else
@@ -88,30 +92,34 @@ f # hide
 
 ## Bonus example !!
 
-Sooner or later, you would want to also mix phases in estimating conductivity. The logic for constructing the model type and the model is also same. 
+Sooner or later, you would want to also mix phases in estimating conductivity. The logic for constructing the model type and the model is also same.
 We first need to define the mixing type
+
 ```@example multi_rp
 m_mix = two_phase_modelType(SEO3, Gaillard2008, HS1962_plus())
 ```
+
 and then construct the multi rock physics type
 
 ```@example multi_rp
 m = multi_rp_modelType(typeof(m_mix), anharmonic, Nothing, Nothing)
 ```
 
-and then throw in the parameters 
+and then throw in the parameters
+
 ```@example multi_rp
 T = (600:1600) .+ 273.0f0
 P = 3.0f0
 ρ = 3300.0f0
 ϕ = 0.1f0
 
-ps_nt = (; T= T, P= P, ρ = ρ, ϕ = ϕ)
+ps_nt = (; T=T, P=P, ρ=ρ, ϕ=ϕ)
 model = m(ps_nt)
 nothing # hide
 ```
 
 and then as usual get the response
+
 ```@example multi_rp
 resp = forward(model, [])
 nothing # hide
@@ -149,15 +157,14 @@ for i in eachindex(resp_fields)
 
     r_ = getfield(resp_nt, resp_fields[i])
     if i == 1
-        lines!(ax, inv.(T) .* 1e4, 10. .^r_)
-        lines!(ax2, inv.(T) .* 1e4, 10. .^r_; alpha=0)
+        lines!(ax, inv.(T) .* 1e4, 10.0 .^ r_)
+        lines!(ax2, inv.(T) .* 1e4, 10.0 .^ r_; alpha=0)
         ax.yscale = log10
         ax2.yscale = log10
     else
         lines!(ax, inv.(T) .* 1e4, r_)
         lines!(ax2, inv.(T) .* 1e4, r_; alpha=0)
     end
-
 end
 nothing # hide
 ```

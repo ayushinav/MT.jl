@@ -176,8 +176,8 @@ returns a `figure` and an `axis` with the plot of geophysical model parameterize
 
 Checkout relevant documentation
 """
-function plot_model(model::m_type; half_space_thickness=1.25 * sum(model.h),
-        kwargs...) where {m_type}
+function plot_model(
+        model::m_type; half_space_thickness=1.25 * sum(model.h), kwargs...) where {m_type}
     fig = Figure()
     ax = Axis(fig[1, 1])
 

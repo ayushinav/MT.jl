@@ -46,30 +46,12 @@ function sample_type(d::two_phase_modelDistribution{V, T1, T2, M}) where {V, T1,
 end
 
 function sample_type(::Type{two_phase_modelDistribution{V, T1, T2, M}}) where {V, T1, T2, M}
-    @show V, T1, T2, M
-    # if typeof(V) <: Distribution
-    #     v = Vector{Float64}
-    # else
-    #     v = V
-    # end
-    v= Vector{Float64}
+    v = Vector{Float64}
     t1 = sample_type(T1)
     t2 = sample_type(T2)
     m = M
     two_phase_model{v, t1, t2, m}
 end
-
-# function sample_type(d::Type{two_phase_modelDistribution{V, T1, T2, M}}) where {V, T1, T2, M}
-#     if typeof(V) <: Distribution
-#         v = typeof(rand(d.ϕ))
-#     else
-#         v = V
-#     end
-#     t1 = sample_type(T1)
-#     t2 = sample_type(T2)
-#     m = M
-#     two_phase_model{v, t1, t2, m}
-# end
 
 sample_type(::Type{Nothing}) = Nothing
 
@@ -90,7 +72,8 @@ function to_dist_nt(d::T) where {T <: two_phase_modelDistribution}
 end
 
 function to_dist_nt(d::T) where {T <: multi_rp_modelDistribution}
-    return merge(to_dist_nt(d.cond), to_dist_nt(d.elastic), to_dist_nt(d.visc), to_dist_nt(d.anelastic))
+    return merge(to_dist_nt(d.cond), to_dist_nt(d.elastic),
+        to_dist_nt(d.visc), to_dist_nt(d.anelastic))
 end
 
 to_dist_nt(d::T) where {T <: AbstractResponseDistribution} = to_nt(d)

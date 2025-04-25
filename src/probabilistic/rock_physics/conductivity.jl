@@ -10,7 +10,7 @@ Model Distribution for `SEO3`[@ref].
 
 ## Arguments
 
-- `T` : Temperature of olivine (in K)
+  - `T` : Temperature of olivine (in K)
 
 ## Usage
 
@@ -28,8 +28,8 @@ Model Distribution for `UHO2014`[@ref].
 
 ## Arguments
 
-- `T` : Temperature of olivine (in K)
-- `Ch2o_ol` : Water concentration in olivine (in ppm)
+  - `T` : Temperature of olivine (in K)
+  - `Ch2o_ol` : Water concentration in olivine (in ppm)
 
 ## Usage
 
@@ -49,8 +49,8 @@ Model Distribution for `Jones2012`[@ref].
 
 ## Arguments
 
-- `T` : Temperature of olivine (in K)
-- `Ch2o_ol` : Water concentration in olivine (in ppm)
+  - `T` : Temperature of olivine (in K)
+  - `Ch2o_ol` : Water concentration in olivine (in ppm)
 
 ## Usage
 
@@ -70,8 +70,8 @@ Model Distribution for `Poe2010`[@ref].
 
 ## Arguments
 
-- `T` : Temperature of olivine (in K)
-- `Ch2o_ol` : Water concentration in olivine (in ppm)
+  - `T` : Temperature of olivine (in K)
+  - `Ch2o_ol` : Water concentration in olivine (in ppm)
 
 ## Usage
 
@@ -91,8 +91,8 @@ Model Distribution for `Wang2006`[@ref].
 
 ## Arguments
 
-- `T` : Temperature of olivine (in K)
-- `Ch2o_ol` : Water concentration in olivine (in ppm)
+  - `T` : Temperature of olivine (in K)
+  - `Ch2o_ol` : Water concentration in olivine (in ppm)
 
 ## Usage
 
@@ -112,8 +112,8 @@ Model Distribution for `Yoshino2009`[@ref].
 
 ## Arguments
 
-- `T` : Temperature of olivine (in K)
-- `Ch2o_ol` : Water concentration in olivine (in ppm)
+  - `T` : Temperature of olivine (in K)
+  - `Ch2o_ol` : Water concentration in olivine (in ppm)
 
 ## Usage
 
@@ -133,7 +133,7 @@ Model Distribution for `const_matrix`[@ref].
 
 ## Arguments
 
-- `σ` : Conductivity of the phase
+  - `σ` : Conductivity of the phase
 
 ## Usage
 
@@ -151,8 +151,8 @@ Model Distribution for `Ni2011`[@ref].
 
 ## Arguments
 
-- `T` : Temperature of melt (in K)
-- `Ch2o_m` : Water concentration in melt (in ppm)
+  - `T` : Temperature of melt (in K)
+  - `Ch2o_m` : Water concentration in melt (in ppm)
 
 ## Usage
 
@@ -172,9 +172,9 @@ Model Distribution for `Sifre2014`[@ref].
 
 ## Arguments
 
-- `T` : Temperature of melt (in K)
-- `Ch2o_m` : Water concentration in melt (in ppm)
-- `Cco2_m` : CO₂ concentration in melt (in ppm)
+  - `T` : Temperature of melt (in K)
+  - `Ch2o_m` : Water concentration in melt (in ppm)
+  - `Cco2_m` : CO₂ concentration in melt (in ppm)
 
 ## Usage
 
@@ -195,7 +195,7 @@ Model Distribution for `Gaillard2008`[@ref].
 
 ## Arguments
 
-- `T` : Temperature of melt (in K)
+  - `T` : Temperature of melt (in K)
 
 ## Usage
 

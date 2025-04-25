@@ -42,7 +42,7 @@ new_params = (; params..., params_elastic=new_params_elastic)
 
 m = andrade_psp(T, P, dg, σ, ϕ, ρ, f')
 
-resp = forward(m, [],new_params);
+resp = forward(m, [], new_params);
 size(resp.J1)
 
 fig = Figure()
@@ -174,10 +174,10 @@ new_params = (; params..., params_elastic=new_params_elastic,
 
 m = eburgers_psp(T, P, dg, σ, ϕ, ρ, f')
 
-resp = forward(m, [],new_params);
+resp = forward(m, [], new_params);
 size(resp.J1)
 
-fig = Figure(size = (700, 400))
+fig = Figure(; size=(700, 400))
 ax = Axis(fig[1, 1]; xscale=log10, backgroundcolor=(:magenta, 0.05),
     ylabel="Shear Modulus (GPa)", xlabel="T(s)")
 

@@ -28,8 +28,9 @@ Probabilistic schemes supported:
 
 ## Rock physics
 
-We support multiple rock physics models : 
-* Conductivity models
-* Elasticity models
-* Viscosity models
-* Anelasticity models
+We support multiple rock physics models :
+
+  - Conductivity models
+  - Elasticity models
+  - Viscosity models
+  - Anelasticity models

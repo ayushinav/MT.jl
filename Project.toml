@@ -1,7 +1,7 @@
 name = "MT"
 uuid = "333b7055-2ef7-4b1e-a2ef-5fb1688f630d"
 authors = ["Abhinav Pratap Singh"]
-version = "0.5.7"
+version = "0.6.0"
 
 [deps]
 CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"

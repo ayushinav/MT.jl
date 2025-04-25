@@ -59,16 +59,12 @@ function (model::two_phase_modelDistributionType)(ps::NamedTuple)
     ϕ = ps.ϕ
 
     v1 = from_nt(model.m1, ps)
-
     v2 = from_nt(model.m2, ps)
 
     return two_phase_modelDistribution(ϕ, v1, v2, mix)
 end
 
 function from_nt(m::Type{T}, nt::NamedTuple) where {T <: two_phase_modelDistributionType}
-
-    # @show m.types[2].parameters[1]
-    # @show m.types[3] #[3].parameters[1]
     ϕ = nt.ϕ
     m1 = m.types[1].parameters[1]
     m2 = m.types[2].parameters[1]

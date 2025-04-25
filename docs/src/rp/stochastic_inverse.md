@@ -9,6 +9,7 @@ using MT, Distributions, Turing, CairoMakie
 Now that we know how to compute the rock physics responses, we move towards performing stochastic inversion for rock physics parameters given some rock conductivity and the corresponding uncertainty.
 
 !!! note
+    
     When performing stochastic inversion, make sure you output the vectors from the models, even if its a `(1,1)` or `(1,)` vector
 
 ```@example rp_si
@@ -21,10 +22,8 @@ err_resp = RockphyCond(0.01 .* abs.(resp.σ))
 Then create an *apriori* using corresponding distribution, here `Poe2010Distribution`. In the above, we want to infer only for temperature and water content in olivine, so we'll define the distribution as such.
 
 !!! note
-    Note the resemblance between [`Poe2010`]@ref and `Poe2010Distribution` 
-
-
-**PUT REF FOR Poe2010Distribution above !!**
+    
+    Note the resemblance between (`Poe2010`)[@ref] and (`Poe2010Distribution`)[@ref]
 
 ```@example rp_si
 mdist = Poe2010Distribution(MvNormal([1400.0], [400.0;]), [100.0])
@@ -52,17 +51,17 @@ mcmc_chain_posterior = stochastic_inverse(resp, err_resp, [], m_cache);
 
 ```@example rp_si
 f = Figure()
-ax = Axis(f[1,1], title = "T(K)")
+ax = Axis(f[1, 1]; title="T(K)")
 
 i = mcmc_chain_prior.name_map[1][1]
 
 dat_prior = mcmc_chain_prior[i][:]
 dat_posterior = mcmc_chain_posterior[i][:]
 
-density!(ax, dat_prior, label = "prior")
-density!(ax, dat_posterior, label = "posterior")
+density!(ax, dat_prior; label="prior")
+density!(ax, dat_posterior; label="posterior")
 
-f[1,2] = Legend(f, ax)
+f[1, 2] = Legend(f, ax)
 nothing # hide
 ```
 
@@ -78,9 +77,8 @@ f # hide
 
 Lets try to also infer the water content along with the temperature. Everything remains the same, except that now, in `ps_nt`, the vector corresponding to water content `Ch2o_ol` will be replaced by a corresponding distribution.
 
-
 ```@example rp_si
-mdist = Poe2010Distribution(MvNormal([1200.0], [400.0;]), Uniform(50., 150.))
+mdist = Poe2010Distribution(MvNormal([1200.0], [400.0;]), Uniform(50.0, 150.0))
 rdist = RockphyCondDistribution(MT.normal_dist)
 
 m_cache = mcmc_cache(mdist, rdist, 1000, Prior());
@@ -96,27 +94,27 @@ mcmc_chain_posterior = stochastic_inverse(resp, err_resp, [], m_cache);
 
 ```@example rp_si
 f = Figure()
-ax1 = Axis(f[1,1], title = "T(K)")
+ax1 = Axis(f[1, 1]; title="T(K)")
 
 i = mcmc_chain_prior.name_map[1][1]
 
 dat_prior = mcmc_chain_prior[i][:]
 dat_posterior = mcmc_chain_posterior[i][:]
 
-density!(ax1, dat_prior, label = "prior")
-density!(ax1, dat_posterior, label = "posterior")
+density!(ax1, dat_prior; label="prior")
+density!(ax1, dat_posterior; label="posterior")
 
-ax2 = Axis(f[1,2], title = "water conc. (ppm)")
+ax2 = Axis(f[1, 2]; title="water conc. (ppm)")
 
 i = mcmc_chain_prior.name_map[1][2]
 
 dat_prior = mcmc_chain_prior[i][:]
 dat_posterior = mcmc_chain_posterior[i][:]
 
-density!(ax2, dat_prior, label = "prior")
-density!(ax2, dat_posterior, label = "posterior")
+density!(ax2, dat_prior; label="prior")
+density!(ax2, dat_posterior; label="posterior")
 
-f[2,1:2] = Legend(f, ax2, orientation = :horizontal)
+f[2, 1:2] = Legend(f, ax2; orientation=:horizontal)
 nothing # hide
 ```
 
@@ -135,17 +133,17 @@ Lets combine `SEO3` with `Sifre2014` and also try to infer the porosity.
 ```@example rp_si
 # Creating synthetic data
 m = two_phase_modelType(SEO3, Sifre2014, HS1962_plus())
-ps_nt = (; T=[1400.0] .+ 273, Ch2o_m=[100.0], Cco2_m = [100.0], ϕ=[0.1])
+ps_nt = (; T=[1400.0] .+ 273, Ch2o_m=[100.0], Cco2_m=[100.0], ϕ=[0.1])
 model = m(ps_nt)
 resp = forward(model, [])
 err_resp = RockphyCond(0.01 .* abs.(resp.σ))
 
 m = two_phase_modelDistributionType(SEO3Distribution, Sifre2014Distribution, HS1962_plus())
-ps_nt_dist = (; 
-    T = MvNormal([1000.0], [400.0;]), 
-    Ch2o_m = product_distribution([Uniform(50., 150.)]), 
-    Cco2_m = [100.0], ϕ = product_distribution([Uniform(0.01, 0.2)])
-    )
+ps_nt_dist = (;
+    T=MvNormal([1000.0], [400.0;]),
+    Ch2o_m=product_distribution([Uniform(50.0, 150.0)]),
+    Cco2_m=[100.0], ϕ=product_distribution([Uniform(0.01, 0.2)])
+)
 mdist = m(ps_nt_dist)
 rdist = RockphyCondDistribution(MT.normal_dist)
 ```
@@ -168,18 +166,18 @@ f = Figure()
 labels = ["ϕ", "T (K)", "water conc. (ppm)"]
 
 for i in 1:3
-    axi = Axis(f[1,i], title = labels[i])
+    axi = Axis(f[1, i]; title=labels[i])
 
     idx = mcmc_chain_prior.name_map[1][i]
 
     dat_prior = mcmc_chain_prior[idx][:]
     dat_posterior = mcmc_chain_posterior[idx][:]
 
-    density!(axi, dat_prior, label = "prior")
-    density!(axi, dat_posterior, label = "posterior")
+    density!(axi, dat_prior; label="prior")
+    density!(axi, dat_posterior; label="posterior")
 end
 
-f[2,1:3] = Legend(f, f.content[end], orientation = :horizontal)
+f[2, 1:3] = Legend(f, f.content[end]; orientation=:horizontal)
 nothing # hide
 ```
 
@@ -219,12 +217,13 @@ ps_nt_dist = (;
     ϕ=product_distribution([Uniform(0.01, 0.2)])
 )
 
-m1 = multi_rp_modelDistributionType(SEO3Distribution, anharmonic_poroDistribution, Nothing, Nothing)
+m1 = multi_rp_modelDistributionType(
+    SEO3Distribution, anharmonic_poroDistribution, Nothing, Nothing)
 mdist = m1(ps_nt_dist)
 # rdist = RockphyCondDistribution(MT.normal_dist)
 rdist = MT.multi_rp_responseDistribution(
-    RockphyCondDistribution(normal_dist), 
-    RockphyElasticDistribution(normal_dist, normal_dist, normal_dist, normal_dist), 
+    RockphyCondDistribution(normal_dist),
+    RockphyElasticDistribution(normal_dist, normal_dist, normal_dist, normal_dist),
     Nothing, Nothing
 )
 nothing # hide
@@ -232,10 +231,12 @@ nothing # hide
 
 ```@example rp_si
 m_cache = mcmc_cache(mdist, rdist, 1000, Prior());
-mcmc_chain_prior = stochastic_inverse(resp, err_resp, [], m_cache, response_fields= [:Vp, :Vs, ]);
+mcmc_chain_prior = stochastic_inverse(
+    resp, err_resp, [], m_cache; response_fields=[:Vp, :Vs]);
 
 m_cache = mcmc_cache(mdist, rdist, 1000, NUTS());
-mcmc_chain_posterior = stochastic_inverse(resp, err_resp, [], m_cache, response_fields= [:Vp, :Vs, ]);
+mcmc_chain_posterior = stochastic_inverse(
+    resp, err_resp, [], m_cache; response_fields=[:Vp, :Vs]);
 ```
 
 ```@raw html
@@ -248,18 +249,18 @@ f = Figure()
 labels = ["T (K)", "ϕ"]
 
 for i in 1:2
-    axi = Axis(f[1,i], title = labels[i])
+    axi = Axis(f[1, i]; title=labels[i])
 
     idx = mcmc_chain_prior.name_map[1][i]
 
     dat_prior = mcmc_chain_prior[idx][:]
     dat_posterior = mcmc_chain_posterior[idx][:]
 
-    density!(axi, dat_prior, label = "prior")
-    density!(axi, dat_posterior, label = "posterior")
+    density!(axi, dat_prior; label="prior")
+    density!(axi, dat_posterior; label="posterior")
 end
 
-f[2,1:2] = Legend(f, f.content[end], orientation = :horizontal)
+f[2, 1:2] = Legend(f, f.content[end]; orientation=:horizontal)
 nothing # hide
 ```
 
@@ -272,6 +273,7 @@ f # hide
 ```
 
 ### Multi rock physics with two phase
+
 As a last example, lets take the two phases case above and see if we can do a better job at inference if we also had the `Vp`, `Vs` data
 
 ```@example rp_si
@@ -279,7 +281,7 @@ As a last example, lets take the two phases case above and see if we can do a be
 m_mix = two_phase_modelType(SEO3, Sifre2014, HS1962_plus())
 m = multi_rp_modelType(typeof(m_mix), anharmonic, Nothing, Nothing)
 
-ps_nt = (; T=[1200.0] .+ 273, Ch2o_m=[100.0], Cco2_m = [100.0], ϕ=[0.1], P = [3.0], ρ= [3300.0])
+ps_nt = (; T=[1200.0] .+ 273, Ch2o_m=[100.0], Cco2_m=[100.0], ϕ=[0.1], P=[3.0], ρ=[3300.0])
 
 model = m(ps_nt)
 resp = forward(model, [])
@@ -298,28 +300,32 @@ err_resp = multi_rp_response(
 # Defining apriori
 
 ps_nt_dist = (;
-    T = MvNormal([1000.0], [400.0;]), 
-    Ch2o_m = product_distribution([Uniform(50., 150.)]), 
-    Cco2_m = [100.0], ϕ = product_distribution([Uniform(0.01, 0.2)]),
+    T=MvNormal([1000.0], [400.0;]),
+    Ch2o_m=product_distribution([Uniform(50.0, 150.0)]),
+    Cco2_m=[100.0], ϕ=product_distribution([Uniform(0.01, 0.2)]),
     P=[3.0],
     ρ=[3300.0]
 )
 
-m_mixdist = two_phase_modelDistributionType(SEO3Distribution, Sifre2014Distribution, HS1962_plus())
-m = multi_rp_modelDistributionType(typeof(m_mixdist), anharmonicDistribution, Nothing, Nothing)
+m_mixdist = two_phase_modelDistributionType(
+    SEO3Distribution, Sifre2014Distribution, HS1962_plus())
+m = multi_rp_modelDistributionType(
+    typeof(m_mixdist), anharmonicDistribution, Nothing, Nothing)
 
 mdist = m(ps_nt_dist);
 rdist = MT.multi_rp_responseDistribution(
-    RockphyCondDistribution(normal_dist), 
-    RockphyElasticDistribution(normal_dist, normal_dist, normal_dist, normal_dist), 
+    RockphyCondDistribution(normal_dist),
+    RockphyElasticDistribution(normal_dist, normal_dist, normal_dist, normal_dist),
     Nothing, Nothing
 )
 
 m_cache = mcmc_cache(mdist, rdist, 1000, Prior());
-mcmc_chain_prior = stochastic_inverse(resp, err_resp, [], m_cache, response_fields= [:Vp, :Vs, ]);
+mcmc_chain_prior = stochastic_inverse(
+    resp, err_resp, [], m_cache; response_fields=[:Vp, :Vs]);
 
 m_cache = mcmc_cache(mdist, rdist, 1000, NUTS());
-mcmc_chain_posterior = stochastic_inverse(resp, err_resp, [], m_cache, response_fields= [:Vp, :Vs, ]);
+mcmc_chain_posterior = stochastic_inverse(
+    resp, err_resp, [], m_cache; response_fields=[:Vp, :Vs]);
 nothing # hide
 ```
 
@@ -333,18 +339,18 @@ f = Figure()
 labels = ["ϕ", "T (K)", "water conc. (ppm)"]
 
 for i in 1:3
-    axi = Axis(f[1,i], title = labels[i])
+    axi = Axis(f[1, i]; title=labels[i])
 
     idx = mcmc_chain_prior.name_map[1][i]
 
     dat_prior = mcmc_chain_prior[idx][:]
     dat_posterior = mcmc_chain_posterior[idx][:]
 
-    density!(axi, dat_prior, label = "prior")
-    density!(axi, dat_posterior, label = "posterior")
+    density!(axi, dat_prior; label="prior")
+    density!(axi, dat_posterior; label="posterior")
 end
 
-f[2,1:3] = Legend(f, f.content[end], orientation = :horizontal)
+f[2, 1:3] = Legend(f, f.content[end]; orientation=:horizontal)
 nothing # hide
 ```
 

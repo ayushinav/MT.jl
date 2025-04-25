@@ -9,7 +9,7 @@ pages = [
         "Interface" => "probabilistic_inverse.md",
         "MCMC with fixed discretization" => "tutorials/fixed_discretization.md",
         "MCMC with variable discretization" => "tutorials/variable_discretization.md",
-        "RTO-TKO" => "tutorials/rto.md",
+        "RTO-TKO" => "tutorials/rto.md"
     ],
     "Visualization" => "visualization.md",
     "Rock physics" => [
