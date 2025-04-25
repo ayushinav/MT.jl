@@ -14,7 +14,7 @@ For different temperatures, the distribution with oscillation period looks like 
 
 !!! tip
     
-    The following code is a nice beginner example on changing `params` values for rock physics models
+    The following code is a nice beginner example on [changing `params`](index.md#Changing-initial-parameters) values for rock physics models
 
 ```@raw html
 <details closed><summary>Code for this figure</summary>
@@ -30,8 +30,8 @@ dg = 3.1
 
 f = 10 .^ -collect(range(0, 3; length=100))
 
-params = default_params(Val{andrade_psp}())
-params_elastic = default_params(Val{anharmonic}())
+params = default_params(andrade_psp)
+params_elastic = default_params(anharmonic)
 @unpack T_K_ref, dG_dT, dG_dP, P_Pa_ref = params_elastic
 new_Gu_ol = 1e-9 * (params.G_UR * 1e9 - (900 + 273 - T_K_ref) * dG_dT -
              (0.2 * 1e9 - P_Pa_ref) * dG_dP)
@@ -42,7 +42,7 @@ new_params = (; params..., params_elastic=new_params_elastic)
 
 m = andrade_psp(T, P, dg, σ, ϕ, ρ, f')
 
-resp = forward(m, []; params=new_params);
+resp = forward(m, [],new_params);
 size(resp.J1)
 
 fig = Figure()
@@ -85,10 +85,6 @@ eburgers_psp
 ```
 
 For different temperatures, the distribution with oscillation period looks like (compare with Fig. 1 (a) and (b) of [Jackson and Faul, 2010](https://doi.org/10.1016/j.pepi.2010.09.005))
-
-!!! tip
-    
-    The following code is a nice example on changing `params` values for rock physics models
 
 ```@raw html
 <details closed><summary>Code for this figure</summary>
@@ -142,11 +138,15 @@ nothing # hide
 fig # hide
 ```
 
-Similar figures for different `params can be obtained (compare with Fig. 1 (c) and (d) of [Jackson and Faul, 2010](https://doi.org/10.1016/j.pepi.2010.09.005)):
-
 !!! warn
     
     Use of `peak` coefficients is highly discouraged because these involve integrals that can be unstable in their limits. Note that the figures are skewed and the weird behaviour increases at lower temperatures.
+
+Similar figures for different `params can be obtained (compare with Fig. 1 (c) and (d) of [Jackson and Faul, 2010](https://doi.org/10.1016/j.pepi.2010.09.005)):
+
+!!! tip
+    
+    The following code is a nice example on [changing `params`](index.md#Changing-initial-parameters) values for rock physics models
 
 ```@raw html
 <details closed><summary>Code for this figure</summary>
@@ -160,8 +160,8 @@ dg = 3.1
 ϕ = 0.0
 ρ = 3300.0
 
-params = default_params(Val{eburgers_psp}())
-params_elastic = default_params(Val{anharmonic}())
+params = default_params(eburgers_psp)
+params_elastic = default_params(anharmonic)
 @unpack T_K_ref, dG_dT, dG_dP, P_Pa_ref = params_elastic
 new_Gu_ol = 1e-9 *
             (MT.params_JF10.s6585_bg_peak.G_UR * 1e9 - (900 + 273 - T_K_ref) * dG_dT -
@@ -174,10 +174,10 @@ new_params = (; params..., params_elastic=new_params_elastic,
 
 m = eburgers_psp(T, P, dg, σ, ϕ, ρ, f')
 
-resp = forward(m, []; params=new_params);
+resp = forward(m, [],new_params);
 size(resp.J1)
 
-fig = Figure()
+fig = Figure(size = (700, 400))
 ax = Axis(fig[1, 1]; xscale=log10, backgroundcolor=(:magenta, 0.05),
     ylabel="Shear Modulus (GPa)", xlabel="T(s)")
 

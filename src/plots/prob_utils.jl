@@ -327,6 +327,8 @@ function get_mean_std_image!(ax,
     if isnothing(plot_kwargs)
         mean_kwargs = (mean_kwargs..., label="mean", color=:blue)
 
+        ci = Int(100confidence_interval)
+
         std_plus_kwargs = (std_plus_kwargs..., label="upper bound", color=:green)
 
         std_minus_kwargs = (std_minus_kwargs..., label="lower bound", color=:green)

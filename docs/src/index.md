@@ -20,10 +20,16 @@ Deterministic schemes supported:
   - Nonlinear schemes using NonlinearSolve.jl
   - Nonlinear schemes using Optimization.jl
 
-Probabilistic schemes supported:'
+Probabilistic schemes supported:
 
   - MCMC with fixed grids
   - MCMC with flexible grids
   - RTO-TKO
 
 ## Rock physics
+
+We support multiple rock physics models : 
+* Conductivity models
+* Elasticity models
+* Viscosity models
+* Anelasticity models

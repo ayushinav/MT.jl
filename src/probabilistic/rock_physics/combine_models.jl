@@ -12,17 +12,20 @@ end
 Rock physics model distribution type to capture multiple rock physics model distribution
 
 ## Arguments
- - `cond` : conductivity rock physics modeldistribution  type, subtype of `AbstractCondModelDistributionType`
- - `elastic` : elastic rock physics distribution model type, subtype of `AbstractElasticModelDistributionType`
- - `visc` : viscous rock physics distribution model type, subtype of `AbstractViscousModelDistributionType`
- - `anelastic` : anelastic rock physics distribution model type, subtype of `AbstractAnelasticModelDistributionType`
+
+  - `cond` : conductivity rock physics modeldistribution  type, subtype of `AbstractCondModelDistributionType`
+  - `elastic` : elastic rock physics distribution model type, subtype of `AbstractElasticModelDistributionType`
+  - `visc` : viscous rock physics distribution model type, subtype of `AbstractViscousModelDistributionType`
+  - `anelastic` : anelastic rock physics distribution model type, subtype of `AbstractAnelasticModelDistributionType`
 
 ## Usage
-Similar to `multi_rp_modelDistributionType` but instead accepts `Distribution` 
+
+Similar to `multi_rp_modelDistributionType` but instead accepts `Distribution`
 or `Nothing`
 
 ```julia
-multi_rp_modelDistributionType()(SEO3Distribution, anharmonicDistribution, HK2003Distribution, Nothing)
+multi_rp_modelDistributionType()(
+    SEO3Distribution, anharmonicDistribution, HK2003Distribution, Nothing)
 ```
 
 Pass `Nothing` for the types you do not want responses of, eg. above
@@ -41,20 +44,19 @@ end
 Rock physics model to capture multiple rock physics model, susually constructed through `multi_rp_modelDistributionType`[@ref]
 
 ## Arguments
- - `cond` : conductivity rock physics modelDistribution
- - `elastic` : elastic rock physics modelDistribution
- - `visc` : viscous rock physics modelDistribution
- - `anelastic` : anelastic rock physics modelDistribution
+
+  - `cond` : conductivity rock physics modelDistribution
+  - `elastic` : elastic rock physics modelDistribution
+  - `visc` : viscous rock physics modelDistribution
+  - `anelastic` : anelastic rock physics modelDistribution
 
 ## Usage
+
 ```julia
-m = multi_rp_modelDistributionType()(SEO3Distribution, anharmonicDistribution, Nothing, Nothing)
-ps_nt_dist = (;
-    T=product_distribution(Uniform(1200.0f0, 1400.0f0)),
-    P=[3.0f0],
-    ρ=product_distribution(Uniform(80.0f0, 120.0f0)),
-    ϕ=[0.1f0]
-)
+m = multi_rp_modelDistributionType()(
+    SEO3Distribution, anharmonicDistribution, Nothing, Nothing)
+ps_nt_dist = (; T=product_distribution(Uniform(1200.0f0, 1400.0f0)), P=[3.0f0],
+    ρ=product_distribution(Uniform(80.0f0, 120.0f0)), ϕ=[0.1f0])
 model = m(ps_nt_dist)
 ```
 """

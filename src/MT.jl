@@ -123,7 +123,8 @@ export SEO3Distribution, UHO2014Distribution, Jones2012Distribution, Poe2010Dist
 export Ni2011Distribution, Sifre2014Distribution, Gaillard2008Distribution
 export anharmonicDistribution, anharmonic_poroDistribution, SLB2005Distribution
 export HZK2011Distribution, HK2003Distribution, xfit_premeltDistribution
-export andrade_pspDistribution, eburgers_pspDistribution, premelt_anelasticDistribution, xfit_mxwDistribution, andrade_analyticalDistribution
+export andrade_pspDistribution, eburgers_pspDistribution, premelt_anelasticDistribution,
+       xfit_mxwDistribution, andrade_analyticalDistribution
 export two_phase_modelDistributionType, two_phase_modelDistribution
 export multi_rp_modelDistributionType, multi_rp_modelDistribution
 

@@ -34,7 +34,7 @@ function stochastic_inverse(r_obs::resp1, err_resp::resp2, vars, alg_cache::mcmc
 
     apriori = to_dist_nt(alg_cache.apriori)
 
-    # @show keys(apriori)
+    @show keys(apriori)
 
     for k in keys(apriori) # make it properynames and make alg_cache.apriori a NamedTuple
         if typeof(getfield(apriori, k)) <: Distribution # getfield will be replaced by getproperty
@@ -76,8 +76,8 @@ function stochastic_inverse(r_obs::resp1, err_resp::resp2, vars, alg_cache::mcmc
         params = default_params(m_type)
     end
 
-    @show to_resp_nt(r_obs)
-    @show to_resp_nt(err_resp)
+    # @show to_resp_nt(r_obs)
+    # @show to_resp_nt(err_resp)
 
     # robs = (;
     #     zip([fieldnames(typeof(r_obs))...],

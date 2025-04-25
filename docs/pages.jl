@@ -10,17 +10,17 @@ pages = [
         "MCMC with fixed discretization" => "tutorials/fixed_discretization.md",
         "MCMC with variable discretization" => "tutorials/variable_discretization.md",
         "RTO-TKO" => "tutorials/rto.md",
-        "rock physics" => "rock_physics.md"
     ],
     "Visualization" => "visualization.md",
     "Rock physics" => [
-        "rp/index.md",
-        "rp/conductivity.md",
-        "rp/elasticity.md",
-        "rp/viscosity.md",
-        "rp/anelasticity.md",
-        "rp/combine_models.md",
-        "rp/stochastic_inverse.md"
+        "Introduction" => "rp/index.md",
+        "Conductivity models" => "rp/conductivity.md",
+        "Elasticity models" => "rp/elasticity.md",
+        "Viscosity models" => "rp/viscosity.md",
+        "Anelasticity models" => "rp/anelasticity.md",
+        "Mixing phases" => "rp/mixing_phases.md",
+        "Multi rock physics" => "rp/combine_models.md",
+        "Stochastic inverse" => "rp/stochastic_inverse.md"
     ],
     "API" => "api.md",
     "mtpy tutorial" => "working_with_mtpy.md"

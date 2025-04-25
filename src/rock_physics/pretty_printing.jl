@@ -1,12 +1,5 @@
 const model_names_definition = (
     T="Temperature (K)", ρ="Density (kg/m³)", P="Pressure (GPa)",
-    ϕ="Porosity", dg="grain size(μm)",
-    Ch2o_m="Water concentration in melt (ppm)",
-    Ch2o_ol="Water concentration in olivine (ppm)",
-    Cco2_m="CO₂ concentration in melt (ppm)")
-
-model_names_definition2 = (
-    T="Temperature (K)", ρ="Density (kg/m³)", P="Pressure (GPa)",
     ϕ="Porosity", dg="grain size(μm)", σ = "Shear stress (GPa)", f="Frequency (Hz)",
     Ch2o_m="Water concentration in melt (ppm)",
     Ch2o_ol="Water concentration in olivine (ppm)",
@@ -15,7 +8,7 @@ model_names_definition2 = (
 function Base.show(io::IO, m::model) where {model <: AbstractRockphyModel}
     println("Model : ", typeof(m).name.name)
     for k in propertynames(m)
-        println(model_names_definition2[k], " : ", getfield(m, k))
+        println(model_names_definition[k], " : ", getfield(m, k))
     end
 end
 

@@ -111,7 +111,7 @@ function plot_response(vars, resp::response; errs=zero(resp), plt_type=:plot,
     f = Figure()
     axs = [Axis(f[i, 1]) for i in eachindex(k)]
 
-    plot_response!(axs, vars, resp; kwargs...)
+    plot_response!(axs, vars, resp; errs=errs, plt_type=plt_type, kwargs...)
 
     return f, axs
 end
@@ -176,12 +176,12 @@ returns a `figure` and an `axis` with the plot of geophysical model parameterize
 
 Checkout relevant documentation
 """
-function plot_model(
-        model::m_type; half_space_thickness=1.25 * sum(model.h), kwargs...) where {m_type}
+function plot_model(model::m_type; half_space_thickness=1.25 * sum(model.h),
+        kwargs...) where {m_type}
     fig = Figure()
     ax = Axis(fig[1, 1])
 
-    plot_model!(ax, args...; kwargs...)
+    plot_model!(ax, model; half_space_thickness=half_space_thickness, kwargs...)
     ax.yreversed = true
 
     fig, ax

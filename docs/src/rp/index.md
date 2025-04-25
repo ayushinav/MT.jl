@@ -122,10 +122,10 @@ println("size of Vave (one of the outputs, averaged over frequency) : ", size(re
 
 ## Changing initial parameters
 
-A lot of rock physics models have empirical constants on defined physical laws from lab experiments. The `forward` function has a keyword argument `params` which has default value for these constants. These default parameters can be observed by `default_params` function dispatched on the `Val` object of the rock physics type, eg:
+A lot of rock physics models have empirical constants on defined physical laws from lab experiments. The `forward` function has a keyword argument `params` which has default value for these constants. These default parameters can be observed by `default_params` function dispatched on the rock physics type, eg:
 
 ```@example rp_intro
-default_ps_SEO3 = default_params(Val{SEO3}())
+default_ps_SEO3 = default_params(SEO3)
 ```
 
 These default values are used by default for all the rock physics models. The `forward` function implicitly calls these default parameters
@@ -141,7 +141,7 @@ Above is same as :
 ```@example rp_intro
 T = 1000 + 273.0
 m = SEO3(T)
-forward(m, []; params=default_ps_SEO3)
+forward(m, [], default_ps_SEO3)
 ```
 
 If you want to use different values for certain laws, you need to create another `params` object, eg. Let's change `S_bfe` and `S_bmg` to different values :
@@ -155,7 +155,7 @@ and then we should see a different output
 ```@example rp_intro
 T = 1000 + 273.0
 m = SEO3(T)
-forward(m, []; params=new_params_SEO3)
+forward(m, [], new_params_SEO3)
 ```
 
 Notice the change in outputs from `forward`.

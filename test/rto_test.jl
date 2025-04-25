@@ -35,7 +35,7 @@
         ω,
         r_cache;
         model_trans_utils=(; m=MT.lin_tf),
-        verbose = false
+        verbose=false
     )
 
     mt_chain = Turing.Chains(

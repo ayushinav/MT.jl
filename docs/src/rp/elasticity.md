@@ -4,7 +4,7 @@
 using MT, CairoMakie
 ```
 
-### Anharmonic scaling
+## Anharmonic scaling
 
 ```@docs; canonical = false
 anharmonic
@@ -66,7 +66,7 @@ nothing # hide
 f # hide
 ```
 
-### Anharmonic (porous) scaling
+## Anharmonic (porous) scaling
 
 ```@docs; canonical = false
 anharmonic
@@ -186,7 +186,7 @@ nothing # hide
 f # hide
 ```
 
-### SLB2005
+## SLB2005
 
 ```@docs; canonical = false
 SLB2005

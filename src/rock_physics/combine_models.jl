@@ -11,12 +11,14 @@ end
 Rock physics model type to capture multiple rock physics models
 
 ## Arguments
- - `cond` : conductivity rock physics model type, subtype of `AbstractCondModel`
- - `elastic` : elastic rock physics model type, subtype of `AbstractElasticModel`
- - `visc` : viscous rock physics model type, subtype of `AbstractViscousModel`
- - `anelastic` : anelastic rock physics model type, subtype of `AbstractAnelasticModel`
+
+  - `cond` : conductivity rock physics model type, subtype of `AbstractCondModel`
+  - `elastic` : elastic rock physics model type, subtype of `AbstractElasticModel`
+  - `visc` : viscous rock physics model type, subtype of `AbstractViscousModel`
+  - `anelastic` : anelastic rock physics model type, subtype of `AbstractAnelasticModel`
 
 ## Usage
+
 ```julia
 multi_rp_modelType()(SEO3, anharmonic, HK2003, Nothing)
 ```
@@ -34,19 +36,22 @@ end
 """
     multi_rp_model(con, elastic, visc, anelastic)
 
-Rock physics model to capture multiple rock physics models, 
+Rock physics model to capture multiple rock physics models,
 usually constructed through `multi_rp_modelType`[@ref]
 
 ## Arguments
- - `cond` : conductivity rock physics model
- - `elastic` : elastic rock physics model
- - `visc` : viscous rock physics model
- - `anelastic` : anelastic rock physics model
+
+  - `cond` : conductivity rock physics model
+  - `elastic` : elastic rock physics model
+  - `visc` : viscous rock physics model
+  - `anelastic` : anelastic rock physics model
 
 ## Usage
+
 ```julia
 m = multi_rp_modelType()(SEO3, anharmonic, Nothing, Nothing)
-ps_nt = ps_nt = (; T=[800.0f0, 1000.0f0] .+ 273, P=3.0f0, ρ=3300.0f0, Ch2o_m=1000.0f0, ϕ=0.1f0)
+ps_nt = ps_nt = (;
+    T=[800.0f0, 1000.0f0] .+ 273, P=3.0f0, ρ=3300.0f0, Ch2o_m=1000.0f0, ϕ=0.1f0)
 model = m(ps_nt)
 
 resp = forward(model)
