@@ -4,7 +4,7 @@
 using MT, CairoMakie
 ```
 
-For various rock physics models, we require the bulk propoerty by combing multiple phases. We allow the feature to mix multiple phases to get the bulk property.
+For various rock physics models, we require the bulk property by combing multiple phases. We allow the feature to mix multiple phases to get the bulk property.
 
 !!! todo
     
@@ -12,7 +12,7 @@ For various rock physics models, we require the bulk propoerty by combing multip
 
 Hashin-Shtrikman bounds, provided through [`HS1962_plus`](@ref) and [`HS1962_minus`](@ref), are often used to estimate the bulk conductivity when two phases are mixed. For conductivity, modified Archie's law is also provided through `MAL`[@ref].
 
-To get things started, we first need to define the phases we need to mix the models and the mixing law. This is conviniently done using [`two_phase_modelType`](@ref)
+To get things started, we first need to define the phases we need to mix the models and the mixing law. This is conveniently done using [`two_phase_modelType`](@ref)
 
 ```@example mix_phases
 m = two_phase_modelType(Yoshino2009, Sifre2014, HS1962_plus())
@@ -80,7 +80,7 @@ f # hide
 The above might seem complicated at the first sight but bears a very close analogy with the other rock physics types. Lets break it down bottom up :
 
   - We had `forward(model, [])` similar to any other rock physics type, the last step to get the responses is to call the `forward` function.
-  - Before that, we had `m(ps_nt)` where `ps_nt` had the parameters. This looks very much like `SEO3(1000. + 273)` or `anharmonic(T, P, ρ)`. Instead of passing the parameters as such, we now have to pass them through the `NamedTuple` called `ps_nt` because now, we do not know beforehand what parameters the mixed model weill depend on. Had we used `SEO3` with `Gaillard2008`, we would have only needed temperature (and obviously melt fraction).
+  - Before that, we had `m(ps_nt)` where `ps_nt` had the parameters. This looks very much like `SEO3(1000. + 273)` or `anharmonic(T, P, ρ)`. Instead of passing the parameters as such, we now have to pass them through the `NamedTuple` called `ps_nt` because now, we do not know beforehand what parameters the mixed model will depend on. Had we used `SEO3` with `Gaillard2008`, we would have only needed temperature (and obviously melt fraction).
   - Before that, in the very first step, we had `two_phase_modelType(Yoshino2009, Sifre2014, HS1962_plus())`. Now, we do not have a comparison step here but we do know that the output from this `m` is used in the similar fashion as `SEO3`, `Yoshino2009` or `Sifre2014`. The `two_phase_modelType` function allows us to create one of these "types". For two phase mixing, we require the two phases along with the mixing law. Once we know them, we can completely define the physics at play, similar to how `SEO3` or `Yoshino2009` defines it in their way.
 
 For different models, we have the distribution with melt fraction as (also a nice example of broadcasting) :

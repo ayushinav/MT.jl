@@ -35,7 +35,7 @@ Then defining the likelihood
 rdist = RockphyCondDistribution(MT.normal_dist)
 ```
 
-and putting everything together to perform the inference ussing `stochastic inverse`[@ref]
+and putting everything together to perform the inference ssing `stochastic inverse`[@ref]
 
 ```@example rp_si
 m_cache = mcmc_cache(mdist, rdist, 1000, Prior());
