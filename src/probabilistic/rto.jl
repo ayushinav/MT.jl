@@ -65,7 +65,7 @@ function stochastic_inverse(r_obs::resp1,
         alg_cache::rto_cache;
         model_trans_utils::NamedTuple=(m=sigmoid_tf, h=lin_tf),
         response_trans_utils::NamedTuple=(ρₐ=lin_tf, ϕ=lin_tf),
-        verbose=false) where {
+        verbose=true) where {
         resp1 <: AbstractGeophyResponse, resp2 <: AbstractGeophyResponse}
     W = Diagonal(vcat([inv.(getfield(err_resp, k)) .^ 2
                        for k in fieldnames(typeof(err_resp))]...))
@@ -84,7 +84,7 @@ function stochastic_inverse(r_obs::resp1,
     μ_chains = zeros(1, alg_cache.n_samples)
 
     i = 1
-    prog = Progress(alg_cache.n_samples; enabled=true)
+    (verbose) && (prog = Progress(alg_cache.n_samples; enabled=true))
 
     while i <= (alg_cache.n_samples)
 
@@ -201,7 +201,7 @@ function stochastic_inverse(r_obs::resp1,
 
         i += 1
 
-        next!(prog; showvalues=[(Symbol("#samples"), i)])
+        (verbose) && (next!(prog; showvalues=[(Symbol("#samples"), i)]))
     end
 
     idcs = broadcast(!isnan, view(m_chains, 1, :))

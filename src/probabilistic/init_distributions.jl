@@ -49,20 +49,20 @@ Has the same structure as `construct_mixing_models`(@ref construct_mixing_models
   - `model_list` : list of models to be used in mixing
   - `mixing_type` : Type of mixing model to be used
 """
-mutable struct RockphyModelDistribution{
-    T1 <: Union{Distribution, AbstractArray}, T2 <: Union{Distribution, AbstractArray}} <:
-               AbstractRockphyModelDistribution
-    params::T1 # vector of parameters 
-    p_names::Vector{<:Symbol} # Vector of symbols telling the parameters in vector 
-    ϕ::T2 # phase ratios
-    model_list::Vector{<:Type}
-    mixing_type::Vector
-    # add water and partition ratios
+# mutable struct RockphyModelDistribution{
+#     T1 <: Union{Distribution, AbstractArray}, T2 <: Union{Distribution, AbstractArray}} <:
+#                AbstractRockphyModelDistribution
+#     params::T1 # vector of parameters 
+#     p_names::Vector{<:Symbol} # Vector of symbols telling the parameters in vector 
+#     ϕ::T2 # phase ratios
+#     model_list::Vector{<:Type}
+#     mixing_type::Vector
+#     # add water and partition ratios
 
-    # @assert ϕ and model_lists have same length
-    # @assert p contains all the variables required by all models in model_list
-end
+#     # @assert ϕ and model_lists have same length
+#     # @assert p contains all the variables required by all models in model_list
+# end
 
-struct RockphyResponseDistribution{T} <: AbstractResponseDistribution
-    σ::T
-end
+# struct RockphyResponseDistribution{T} <: AbstractResponseDistribution
+#     σ::T
+# end

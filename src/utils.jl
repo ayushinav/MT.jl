@@ -4,40 +4,82 @@ import LinearAlgebra: zero
 
 function zero(x::resp) where {resp <: AbstractResponse}
     typeof(x)([zero(getfield(x, k)) for k in fieldnames(resp)]...)
-end;
+end
 function zero(x::model) where {model <: AbstractModel}
     typeof(x)([zero(getfield(x, k)) for k in fieldnames(model)]...)
-end;
-
-# zero(x::MTResponse) = MTResponse([zero(getfield(x, k)) for k in fieldnames(MTResponse)]...)
-# zero(x::MTModel) = MTModel([zero(getfield(x, k)) for k in fieldnames(MTResponse)]...)
+end
 
 import Base: copy
 function copy(x::resp) where {resp <: AbstractResponse}
     typeof(x)([copy(getfield(x, k)) for k in fieldnames(resp)]...)
-end;
+end
 function copy(x::model) where {model <: AbstractModel}
     typeof(x)([copy(getfield(x, k)) for k in fieldnames(model)]...)
-end;
+end
 
-# copy(x::MTResponse) = MTResponse([copy(getfield(x, k)) for k in fieldnames(MTResponse)]...)
-# copy(x::MTModel) = MTModel([copy(getfield(x, k)) for k in fieldnames(MTResponse)]...)
+# NamedTuple manipulation
 
-#=
- This works for now, dispatching on each model/response type, but can we make it general for all types? Something like
-    copy(x<:AbstractGeophyModel) = typeof(x)([copy(getfield(x, k)) for k in fieldnames(MTResponse)]...)
-Should work probably, but we'll look into. Also 
-=#
+@generated function from_nt(::Type{T}, nt::NamedTuple) where {T}
+    fnames = fieldnames(T)
+    args = [:(getproperty(nt, $(QuoteNode(f)))) for f in fnames]
+    return :(T($(args...)))
+end
 
-# probably only required in occam codes, maybe a generated function is needed?
+function from_nt(::Type{Nothing}; nt::NamedTuple)
+    (;)
+end
+
+function to_nt(s)
+    T = typeof(s)
+    names = fieldnames(T)
+    vals = ntuple(i -> getfield(s, names[i]), length(names))
+    NamedTuple{names}(vals)
+end
+
+to_resp_nt(d::T) where {T <: AbstractResponse} = to_nt(d)
+
+function to_resp_nt(d::T) where {T <: multi_rp_response}
+    return merge(to_nt(d.cond), to_nt(d.elastic), to_nt(d.visc), to_nt(d.anelastic))
+end
+
+# forward manipulation
+
+forward(m::Nothing, p, params=(;)) = nothing
+default_params(::Type{Nothing}) = (;)
+
+function forward_helper(
+        ::Type{T}, m0, vars, response_trans_utils, params) where {T <: AbstractGeophyModel}
+    model = from_nt(T, m0)
+    to_resp_nt(forward(model, vars, response_trans_utils))
+end
+
+function forward_helper(
+        ::Type{T}, m0, vars, response_trans_utils, params) where {T <: AbstractRockphyModel}
+    model = from_nt(T, m0)
+    to_resp_nt(forward(model, vars, params))
+end
+
+function forward_helper(
+        ::Type{T}, m0, vars, response_trans_utils, params) where {T <: two_phase_model}
+    m = two_phase_modelType(T.parameters[2], T.parameters[3], T.parameters[4]())
+    model = m(m0)
+    to_resp_nt(forward(model, vars, params))
+end
+
+function forward_helper(
+        ::Type{T}, m0, vars, response_trans_utils, params) where {T <: multi_rp_model}
+    m = multi_rp_modelType(
+        T.parameters[1], T.parameters[2], T.parameters[3], T.parameters[4])
+    model = m(m0)
+    to_resp_nt(forward(model, vars, params))
+end
+
+# Only occam uses the following
 
 function zero_abstract(m::mtresponse) where {mtresponse <: MTResponse{
         <:AbstractVector{<:Any}, <:AbstractVector{<:Any}}}
     MTResponse{AbstractVector, AbstractVector}(zero(m.ρₐ), zero(m.ϕ))
 end
-
-# this probably does it for all 1D, 2D, 3D models and their corresponding responses? Atleast 1d for sure, some brainstorming maybe required for 2D and 3D.
-# Again, can we make a generated function here? Do we need to?
 
 function inverse(t::mtresponse; abstract=false) where {mtresponse <: MTResponse}
     if abstract
@@ -57,16 +99,6 @@ function inverse(t::rpresponse; abstract=false) where {rpresponse <: RockphyCond
         return mixing_models{vec_type, vec_type}
         # return MTModel{vec_type, vec_type}
     end
-end
-
-function sample(d::mtdist) where {mtdist <: MTModelDistribution}
-    vec_type = typeof(rand(d.m))
-    return MTModel{vec_type, vec_type}
-end
-
-function sample(d::rpdist) where {rpdist <: AbstractRockphyModelDistribution}
-    vec_type = typeof(rand(d.params))
-    return mixing_models{vec_type, vec_type}
 end
 
 function forward(t::mtmodel; abstract=false) where {mtmodel <: MTModel} # {<:AbstractVector{<:Any}, <:AbstractVector{<:Any}}}

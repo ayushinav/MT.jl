@@ -1,133 +1,236 @@
-"""
-    construct_mixing_models(params, p_names, ϕ, model_list, mixing_type)
+#! format: off
 
-returns a `mixing_models` type containing all the variables for rock physics modeling
+"""
+    two_phase_modelType(m1, m2, mix)
+
+Rock physics model to combine two phases.
 
 ## Arguments
+ - `m1` : model type corresponding to phase 1
+ - `m2` : model type corresponding to phase 2
+ - `mix` : mixing type, available options are `HS_1962_plus()`, `HS1962_minus`, `MAL(m)`
 
-  - `params` : parameter values for rock physics models
+## Usage
 
-  - `p_names` : list of symbols, each associating with each value in `params`
-  - `ϕ` : vol fraction of different phases
-
-      + for `mixing_type` = `single_phase`, `ϕ` = `[1]` (total vol occupied by one phase)
-      + for `mixing_type` = `HS1962_plus` and `HS1962_minus`, `ϕ` is a vector of one element that can be varied but should be less than 1.
-        This is the vol melt fraction.
-  - `model_list` : list of model types required to build up the rock physics model and mixing them
-  - `mixing_type` : determines how to mix model types. Current mixing laws include
-
-      + `single_phase` : no mixing, when there's only a single phase
-      + `HS1962_plus` : mixing two phases to get the Hashim Strikman upper bound
-      + `HS1962_minus` : mixing two phases to get the Hashim Strikman lower bound
-      + `MAL` : mixing the two phases using the Modified Archie's Law
+```julia
+two_phase_modelType(SEO3, Ni2011, HS1962_plus())
+```
 """
-function construct_mixing_models(
-        params::Vector, p_names::Vector, ϕ::Vector, model_list::Vector, mixing_type::Vector)
-    var_list = vcat([[fieldnames(ir)...] for ir in model_list]...)
-    unique!(var_list)
-    f_ = reduce(&, [ir ∈ p_names for ir in var_list])
-    @assert f_==true """all the variables required by models are not included in `p_names`. \n
-    parameters mentioned : $p_names \n
-    all parameters required : $var_list \n
+mutable struct two_phase_modelType{T1, T2, M}
+    m1::Type{T1}
+    m2::Type{T2}
+    mix::M
+end
+
+"""
+    two_phase_model(ϕ, m1, m2, mix)
+
+Rock physics model to combine two phases, usually constructed through `two_phase_modelType`[@ref]
+
+## Arguments
+ - `ϕ` : Vol. fraction of the **second** phase
+ - `m1` : model corresponding to phase 1
+ - `m2` : model corresponding to phase 2
+ - `mix` : mixing type, available options are `HS_1962_plus()`, `HS1962_minus`, `MAL(m)`
+
+## Usage
+
+```julia
+m = two_phase_modelType(SEO3, Ni2011, HS1962_plus())
+ps_nt = ps_nt = (; T=[800.0f0, 1000.0f0] .+ 273, P=3.0f0, ρ=3300.0f0, Ch2o_m=1000.0f0, ϕ=0.1f0)
+model = m(ps_nt)
+
+resp = forward(model)
+```
+"""
+mutable struct two_phase_model{V, T1, T2, M} # <: AbstractRockphyModel
+    ϕ::V
+    m1::T1
+    m2::T2
+    mix::M
+end
+
+two_phase_modelType(m1) = m1
+two_phase_modelType(m1, m::phase_mixing) = m1
+
+function (model::two_phase_modelType)(ps::NamedTuple)
+    mix = model.mix
+    ϕ = ps.ϕ
+    v1 = from_nt(getproperty(model, :m1), ps)
+    v2 = from_nt(getproperty(model, :m2), ps)
+    return two_phase_model(ϕ, v1, v2, mix)
+end
+
+function forward(model::two_phase_model{V, T1, T2, M},
+        p) where {V, M, T1 <: AbstractCondModel, T2 <: AbstractCondModel}
+    σ1 = MT.forward(model.m1, []).σ
+    σ2 = MT.forward(model.m2, []).σ
+
+    @. σ1 = exp10(σ1)
+    @. σ2 = exp10(σ2)
+
+    σ = broadcast(
+        (sig1, sig2, phi) -> MT.mix_models([sig1, sig2], phi, model.mix), σ1, σ2, model.ϕ)
+
+    return RockphyCond(log10.(σ))
+end
+
+function forward(model::two_phase_model{V, T1, T2, M}, p,
+        params) where {V, M, T1 <: AbstractCondModel, T2 <: AbstractCondModel}
+    σ1 = MT.forward(model.m1, [], params.m1).σ
+    σ2 = MT.forward(model.m2, [], params.m2).σ
+
+    @. σ1 = exp10(σ1)
+    @. σ2 = exp10(σ2)
+
+    σ = broadcast(
+        (sig1, sig2, phi) -> MT.mix_models([sig1, sig2], phi, model.mix), σ1, σ2, model.ϕ)
+
+    return RockphyCond(log10.(σ))
+end
+
+function default_params(::Type{two_phase_model{V, T1, T2, M}}) where {V, T1, T2, M}
+    (; zip([:m1, :m2], [default_params(T1), default_params(T2)])...)
+end
+
+# following is needed for combine_models
+
+function from_nt(m::Type{T}, nt::NamedTuple) where {T <: two_phase_modelType}
+
+    ϕ = nt.ϕ
+    m1 = m.types[1].parameters[1]
+    m2 = m.types[2].parameters[1]
+    mix = m.types[3]
+
+    model1 = MT.from_nt(m1, nt)
+    model2 = MT.from_nt(m2, nt)
+
+    return two_phase_model(ϕ, model1, model2, mix())
+end
+
+function from_nt(m::Type{T}, nt::NamedTuple) where {T <: two_phase_model}
+
+    ϕ = nt.ϕ
+    m1 = T.parameters[2]
+    m2 = T.parameters[3]
+    mix = T.parameters[4]
+
+    model1 = MT.from_nt(m1, nt)
+    model2 = MT.from_nt(m2, nt)
+
+    return two_phase_model(ϕ, model1, model2, mix())
+end
+
+#= ==============================================================================
+multi-phase (stochastic inverse looks hard with this) : Experimental
+=#
+
+mutable struct construct_model_multi_phase2{T1, T2, T3, T4, T5, M}
+    m1::Type{T1}
+    m2::Type{T2}
+    m3::Type{T3}
+    m4::Type{T4}
+    m5::Type{T5}
+    mix::M
+end
+
+construct_model_multi_phase2(m1) = m1
+construct_model_multi_phase2(m1, m::phase_mixing) = m1
+
+function construct_model_multi_phase2(m1, m2, m::phase_mixing)
+    construct_model_multi_phase2(m1, m2, Nothing, Nothing, Nothing, m)
+end
+function construct_model_multi_phase2(m1, m2, m3, m::phase_mixing)
+    construct_model_multi_phase2(m1, m2, m3, Nothing, Nothing, m)
+end
+function construct_model_multi_phase2(m1, m2, m3, m4, m::phase_mixing)
+    construct_model_multi_phase2(m1, m2, m3, m4, Nothing, m)
+end
+
+# @inferred construct_model_multi_phase2(SEO3, Ni2011, HS1962_plus())
+# m1 = construct_model_multi_phase2(SEO3, Ni2011, HS1962_plus())
+
+# function from_nt(m::Type{T}, nt::NamedTuple) where T<:construct_model_multi_phase
+
+#     # fnames = fieldnames(T)
+#     ϕ = getproperty(ps_nt, :ϕ)
+#     m1 = m.types[1].parameters[1]
+#     m2 = m.types[2].parameters[1]
+#     m3 = m.types[3].parameters[1]
+#     m4 = m.types[4].parameters[1]
+#     m5 = m.types[5].parameters[1]
+#     mix = m.types[4]
+
+#     model1 = MT.from_nt(m1, ps_nt)
+#     model2 = MT.from_nt(m2, ps_nt)
+
+#     return model_multi_phase(ϕ, model1, model2, mix())
+
+# end
+
+mutable struct model_multi_phase2{V, T1, T2, T3, T4, T5, M}
+    ϕ::V
+    m1::T1
+    m2::T2
+    m3::T3
+    m4::T4
+    m5::T5
+    mix::M
+end
+
+function rearrange_ϕ(ϕ, model::construct_model_multi_phase2)
+    @assert sum(ϕ)≤1 "Σϕᵢ = $(sum(ϕ)) should be ≤ 1."
+
+    fnames = propertynames(model)[1:(end - 1)]
+    fnames = filter(f -> getfield(model, f) !== Nothing, fnames)
+    msg = """
+    Vol. frac of last component is defined automatically once the others are defined. 
+    Make sure the length of porosity parameter `ϕ` is one less than the length of number of components.
+    length of ϕ = $(length(ϕ))
+    length of components = $(length(fnames))
+    Check out the relevant documentation.
     """
 
-    if typeof(first(mixing_type)) <: Union{HS1962_plus, HS1962_minus, MAL}
-        @assert length(model_list)==2 "`$mixing_type` model allows for only 2 models to mix, the first one being the solid and the second melt"
-        @assert length(ϕ)==1 "only the fraction of the second component, ie melt, $(model_list[2]) is needed"
-        @assert length(params)==length(p_names) "mismatch between the number of parameter names and their values"
+    @assert length(ϕ)==(length(fnames) - 1) msg
 
-        return mixing_models(params, p_names, ϕ, model_list, mixing_type)
+    c = length(ϕ)
+    ϕ_vec = zeros(eltype(ϕ), 5)
 
-    elseif typeof(first(mixing_type)) <: single_phase
-        @assert length(model_list)==1 "single phase models require only one model in `model_list`"
-        @assert length(ϕ) == 1&&first(ϕ) == 1 "single phase models will have total fraction for the single phase"
-        return mixing_models(params, p_names, ϕ, model_list, mixing_type)
-
-        return mixing_models(params, p_names, ϕ, model_list, mixing_type)
-
-    else
-        @assert length(model_list)==(length(ϕ) + 1) """each phase and it's vol fraction should be provided, except for the last one, 
-        where the vol fraction for the last one is obtained from the remaining variables 1 - ∑ϕ"""
-        return mixing_models(params, p_names, ϕ, model_list, mixing_type)
-    end
+    ϕ_vec[1:c] .= ϕ
+    ϕ_vec[c + 1] = 1 - sum(ϕ)
+    return ϕ_vec
 end
 
-"""
-    mixing_models
+function (model::construct_model_multi_phase2)(ps::NamedTuple)
+    pnames = propertynames(model)
+    mix = getfield(model, pnames[end])
+    # ϕ = getfield(ps, :ϕ)
 
-constructs a `mixing_models` type which can then be used to do rock physics modeling. Should be called using `construct_mixing_models`
-"""
-mutable struct mixing_models{T1, T2} <: AbstractRockphyModel
-    params::T1 # vector of parameters 
-    p_names::Vector{Symbol} # Vector of symbols telling the parameters in vector
-    ϕ::T2 # phase ratios
-    model_list::Vector{<:Any}
-    mixing_type
-    # Ch2o::T4
-    # h2o_part::T5
+    # make ϕ according to different number of phases
+    ϕ_vec = rearrange_ϕ(ps.ϕ, model)
+
+    # pnames = pnames[2:3]
+    v1 = from_nt(getproperty(model, pnames[1]), ps)
+    v2 = from_nt(getproperty(model, pnames[2]), ps)
+    v3 = from_nt(getproperty(model, pnames[3]), ps)
+    v4 = from_nt(getproperty(model, pnames[4]), ps)
+    v5 = from_nt(getproperty(model, pnames[5]), ps)
+    return model_multi_phase2(ϕ_vec, v1, v2, v3, v4, v5, mix)
 end
 
-# we can have total water conc and the ratio by which it goes into different phases
-# this would just imply adding one more argument while calling `forward` for different rock physics types
+# model = m1(ps_nt)
 
-function forward(m::model, p) where {model <: mixing_models}
-    σs = [] #zeros(length(m.model_list))
+function MT.forward(model::model_multi_phase2{V, T1, T2, T3, T4, T5, M},
+        p) where {V, M <: Union{HS1962_minus, HS1962_plus, MAL},
+        T1 <: AbstractCondModel, T2, T3, T4, T5}
+    σ1 = MT.forward(model.m1, []).σ
+    σ2 = MT.forward(model.m2, []).σ
 
-    params = (; zip(m.p_names, m.params)...)
+    @. σ1 = exp10(σ1)
+    @. σ2 = exp10(σ2)
 
-    # water partition code
+    σ = broadcast(
+        (sig1, sig2, phi) -> MT.mix_models([sig1, sig2], phi, model.mix), σ1, σ2, model.ϕ)
 
-    for i in eachindex(m.model_list)
-        var_list = [(fieldnames(m.model_list[i]))...]
-        σ = forward(m.model_list[i](params[var_list]...), [])
-        push!(σs, σ)
-    end
-
-    σ_net = mix_models(σs, m.ϕ, first(m.mixing_type))
-
-    return RockphyCond([σ_net])
-end
-
-function mix_models(σs, ϕ, ::HS1962_plus)
-    σ_max = 10.0f0^maximum(σs)
-    σ_min = 10.0f0^minimum(σs)
-    phi = first(ϕ)
-
-    num = 3 * (1 - phi) * (σ_max - σ_min) # numerator
-    den = 3 * σ_max - phi * (σ_max - σ_min) # denominator
-    esig = σ_max * (1 - (num / den))
-
-    return log10(esig)
-end
-
-function mix_models(σs, ϕ, ::HS1962_minus)
-    σ_max = 10.0f0^maximum(σs)
-    σ_min = 10.0f0^minimum(σs)
-    phi = first(ϕ)
-
-    num = 3 * (phi) * (σ_max - σ_min) # numerator
-    den = 3 * σ_min + (1 - phi) * (σ_max - σ_min) # denominator
-    esig = σ_min * (1 + (num / den))
-
-    return log10(esig)
-end
-
-function mix_models(σs, ϕ, mal::MAL)
-    σ_fluid = 10.0f0^(σs[2])
-    σ_matrix = 10.0f0^(σs[1])
-
-    phi = first(ϕ)
-    sig = σ_fluid
-
-    if phi < 1
-        p = log10(1 - phi^mal.m) * inv(log10(1 - phi))
-        sig = σ_fluid * phi^mal.m + σ_matrix * (1 - phi)^p
-    end
-
-    return log10(sig)
-end
-
-function mix_models(σs, ϕ, ::single_phase)
-    @assert length(σs) == 1
-    return first(σs)
+    return RockphyCond(log10.(σ))
 end

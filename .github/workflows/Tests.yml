@@ -16,10 +16,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ["1.10"]
+        version: ["1.11"]
         group:
           - "forward"
           - "occam"
+          - "rp"
+          - "rto"
     steps:
       - uses: actions/checkout@v4
 
@@ -36,6 +38,3 @@ jobs:
       - uses: julia-actions/julia-processcoverage@v1
         with:
           directories: "src"
-
-    #   coverage-directories: "src,ext"
-    #   julia-runtest-depwarn: "yes"  # TensorBoardLogger has a global depwarn
