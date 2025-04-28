@@ -44,8 +44,7 @@ end
         kde_transformation_fn = identity,
         return_kde_mat=false,
         trans_utils=(m=lin_tf, h=lin_tf),
-        grid=(m=collect(-1:0.1:5), z=cumsum(mDist.h))) where {
-        C <: Chains, mdist <: MTModelDistribution{<:Distribution, <:AbstractArray}}
+        grid=(m=collect(-1:0.1:5), z=cumsum(mDist.h)))
 
 plots on `fig`, a heatmap of probability distributions sampled by a `chain` using kernel density estimation
 
@@ -94,7 +93,7 @@ function get_kde_image!(fig,
     kde_img = zeros(length(grid.m), h_length + 1)  # nₘ x nₕ
 
     for i in 1:h_length
-        kde_img[:, i] .= get_kde(pred[:, i], grid.m; K=K)
+        kde_img[:, i] .= get_kde(pred[:, i], grid.m; Κ=K)
         norm_factor = sum(kde_img[:, i])
         kde_img[:, i] .= kde_img[:, i] ./ norm_factor
     end
@@ -218,8 +217,7 @@ function get_kde_image!(fig,
 end
 
 """
-    get_kde_image!(fig,
-        chain,
+    get_kde_image(chain,
         mDist;
         hm_kwargs=(;),
         cb_kwargs=(;),
@@ -298,8 +296,8 @@ plots on `ax`, a bounds plot (using mean and std deviation) of probability distr
 Also check relevant tutorial page!
 """
 function get_mean_std_image!(ax,
-        chain,
-        mDist;
+        chain::C,
+        mDist::mdist;
         confidence_interval=0.95,
         half_space_depth=nothing,
         plot_kwargs=nothing,
@@ -338,7 +336,7 @@ function get_mean_std_image!(ax,
         std_minus_kwargs = (; plot_kwargs.std_minus_kwargs...)
     end
 
-    m_type = MT.sample(mDist)
+    m_type = sample_type(mDist)
 
     plot_model!(ax, m_type(trans_utils.m.tf.(μ_m), mDist.h); mean_kwargs...)
     plot_model!(ax, m_type(trans_utils.m.tf.(μ₊_m), mDist.h); std_plus_kwargs...)

@@ -23,7 +23,7 @@ function to perform sampling
   - `model_trans_utils`: A named tuple containing `transform_utils` for the fields of model that need to be scaled/modified. If not provided for any `model` field, the field won't be modified.
 """
 function stochastic_inverse(r_obs::resp1, err_resp::resp2, vars, alg_cache::mcmc_cache;
-        model_trans_utils::NamedTuple=(m=lin_tf, h=lin_tf), # need to take care of this
+        n_chains = 2, model_trans_utils::NamedTuple=(m=lin_tf, h=lin_tf), # need to take care of this
         response_trans_utils::NamedTuple=(; ρₐ=lin_tf, ϕ=lin_tf), params=(;),
         kwargs...) where {resp1 <: AbstractResponse, resp2 <: AbstractResponse}
     model_fields = Symbol[]
@@ -86,10 +86,20 @@ function stochastic_inverse(r_obs::resp1, err_resp::resp2, vars, alg_cache::mcmc
         model_fields=Symbol.(model_fields), model_trans_utils=transf_utils,
         response_trans_utils=response_trans_utils)
 
-    if typeof(alg_cache.sampler) <: Turing.AdvancedVI.VariationalInference
-        return vi(mcmc_model, alg_cache.sampler)
+    if typeof(alg_cache.sampler).name.module === Pigeons
+        n_rounds = Int(round(log2(alg_cache.n_samples)))
+        pt = pigeons(target = TuringLogPotential(mcmc_model),
+            n_chains = n_chains, # Λ ~ 6
+            n_rounds = n_rounds,   # low to speed up CI
+            record = [traces; round_trip; record_default()], kwargs...
+        )
+        return Chains(pt)
     else
-        return Turing.sample(
-            mcmc_model, alg_cache.sampler, alg_cache.n_samples; verbose=false, kwargs...)
+        if typeof(alg_cache.sampler) <: Turing.AdvancedVI.VariationalInference
+            return vi(mcmc_model, alg_cache.sampler)
+        else
+            return Turing.sample(
+                mcmc_model, alg_cache.sampler, alg_cache.n_samples; verbose=false, kwargs...)
+        end
     end
 end
