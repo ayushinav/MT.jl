@@ -7,6 +7,7 @@ using NonlinearSolve
 using Optimization, OptimizationOptimJL
 using Turing
 using Distributions
+using Pigeons
 using Statistics
 using SpecialFunctions
 using QuadGK

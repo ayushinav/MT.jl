@@ -9,22 +9,30 @@
 
 function to perform sampling
 
-### Returns
+## Returns
 
-    `AbstractMCMC.jl Chain` containing the vectors used for performing samping. Note that all the variables will be named `var_inf`, for variable inferred. 
-    The vector in each sample will be all the fields of the model being inferred on concatenated together.
+    `Chain` containing the samples. Note that all the variables will be named `m0`. If 
 
-### Variables
+## Arguments
 
   - `r_obs`: `response` that needs to inverted for
   - `err_resp`: `response` variable containing the errors associated with observed response
   - `vars`: variables that need to be passed into the `forward` function along with `model` to generate a `response`
   - `alg_cache`: to tell the compiler what type of stochastic inversion method is to be used
-  - `model_trans_utils`: A named tuple containing `transform_utils` for the fields of model that need to be scaled/modified. If not provided for any `model` field, the field won't be modified.
+
+### Optional Keyword Arguments
+
+  - `n_chains` : Number of chains to use
+  - `model_trans_utils`: A named tuple containing `transform_utils` for the fields of model that need to be scaled/modified,
+    defaults to no scaling.
+  - response_trans_utils`: A named tuple containing to scale/ modify the response.
+  - `response_fields` : fields of response to be used for inference
+  - `kwargs` : keyword arguments to be splatted into sampling function
 """
 function stochastic_inverse(r_obs::resp1, err_resp::resp2, vars, alg_cache::mcmc_cache;
-        model_trans_utils::NamedTuple=(m=lin_tf, h=lin_tf), # need to take care of this
-        response_trans_utils::NamedTuple=(; ρₐ=lin_tf, ϕ=lin_tf), params=(;),
+        n_chains=2, model_trans_utils::NamedTuple=(m=lin_tf, h=lin_tf), # need to take care of this
+        response_trans_utils::NamedTuple=(; ρₐ=lin_tf, ϕ=lin_tf),
+        params=(;), response_fields=Symbol[],
         kwargs...) where {resp1 <: AbstractResponse, resp2 <: AbstractResponse}
     model_fields = Symbol[]
     # modelD = []
@@ -43,11 +51,12 @@ function stochastic_inverse(r_obs::resp1, err_resp::resp2, vars, alg_cache::mcmc
         end
     end
 
-    response_fields = Symbol[]
     likelihood = to_dist_nt(alg_cache.likelihood)
-    for k in keys(likelihood) # similarly, here it will be propertynames for likelihood being a NamedTuple
-        if typeof(getfield(likelihood, k)) <: Function
-            push!(response_fields, k)
+    if response_fields == Symbol[]
+        for k in keys(likelihood) # similarly, here it will be propertynames for likelihood being a NamedTuple
+            if typeof(getfield(likelihood, k)) <: Function
+                push!(response_fields, k)
+            end
         end
     end
 
@@ -86,10 +95,18 @@ function stochastic_inverse(r_obs::resp1, err_resp::resp2, vars, alg_cache::mcmc
         model_fields=Symbol.(model_fields), model_trans_utils=transf_utils,
         response_trans_utils=response_trans_utils)
 
-    if typeof(alg_cache.sampler) <: Turing.AdvancedVI.VariationalInference
-        return vi(mcmc_model, alg_cache.sampler)
+    if typeof(alg_cache.sampler).name.module === Pigeons
+        n_rounds = Int(round(log2(alg_cache.n_samples)))
+        pt = pigeons(; target=TuringLogPotential(mcmc_model), n_chains=n_chains, # Λ ~ 6
+            n_rounds=n_rounds,   # low to speed up CI
+            record=[traces; round_trip; record_default()], kwargs...)
+        return Chains(pt)
     else
-        return Turing.sample(
-            mcmc_model, alg_cache.sampler, alg_cache.n_samples; verbose=false, kwargs...)
+        if typeof(alg_cache.sampler) <: Turing.AdvancedVI.VariationalInference
+            return vi(mcmc_model, alg_cache.sampler)
+        else
+            return Turing.sample(mcmc_model, alg_cache.sampler,
+                alg_cache.n_samples; verbose=false, kwargs...)
+        end
     end
 end
