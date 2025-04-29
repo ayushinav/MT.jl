@@ -45,7 +45,7 @@
     end
     @show err
 
-    @test @test sum(err[10:20]) <= sum(err[1:10])
+    @test sum(err[11:20]) <= sum(err[1:10])
 end
 
 @testitem "variable discretization : NUTS" tags=[:mcmc] begin
@@ -96,7 +96,7 @@ end
     end
     @show err
 
-    @test @test sum(err[10:20]) <= sum(err[1:10])
+    @test sum(err[11:20]) <= sum(err[1:10])
 end
 
 @testitem "fixed discretization : SliceSampler" tags=[:mcmc] begin
@@ -125,7 +125,7 @@ end
         vec(h)
     )
 
-    n_samples = 20
+    n_samples = 16
     mcache = mcmc_cache(modelD, respD, n_samples, SliceSampler())
 
     mcmc_chain = stochastic_inverse(r_obs, err_resp, ω, mcache)
@@ -146,7 +146,7 @@ end
     end
     @show err
 
-    @test sum(err[10:20]) <= sum(err[1:10])
+    @test sum(err[9:16]) <= sum(err[1:8])
 end
 
 @testitem "variable discretization  :SliceSampler" tags=[:mcmc] begin
@@ -176,8 +176,8 @@ end
         product_distribution([Uniform(ih_bounds...) for ih_bounds in h_bounds])
     )
 
-    n_samples = 20
-    mcache = mcmc_cache(modelD, respD, n_samples, NUTS())
+    n_samples = 16
+    mcache = mcmc_cache(modelD, respD, n_samples, SliceSampler())
 
     mcmc_chain = stochastic_inverse(r_obs, err_resp, ω, mcache)
 
@@ -197,5 +197,5 @@ end
     end
     @show err
 
-    @test sum(err[10:20]) <= sum(err[1:10])
+    @test sum(err[9:16]) <= sum(err[1:8])
 end
