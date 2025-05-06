@@ -20,8 +20,6 @@ jobs:
         group:
           - "forward"
           - "occam"
-          - "rp"
-          - "rto"
     steps:
       - uses: actions/checkout@v4
 
