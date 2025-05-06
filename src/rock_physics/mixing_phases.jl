@@ -93,6 +93,10 @@ function default_params(::Type{two_phase_model{V, T1, T2, M}}) where {V, T1, T2,
     (; zip([:m1, :m2], [default_params(T1), default_params(T2)])...)
 end
 
+function default_params(::Type{two_phase_modelType{T1, T2, M}}) where {T1, T2, M}
+    (; zip([:m1, :m2], [default_params(T1), default_params(T2)])...)
+end
+
 # following is needed for combine_models
 
 function from_nt(m::Type{T}, nt::NamedTuple) where {T <: two_phase_modelType}

@@ -47,6 +47,10 @@ include("rock_physics/utils.jl")
 include("rock_physics/mixing_phases_core.jl")
 include("rock_physics/mixing_phases.jl")
 include("rock_physics/combine_models.jl")
+
+include("rock_physics/tune_rp_models.jl")
+include("rock_physics/thermals.jl")
+
 include("rock_physics/pretty_printing.jl")
 
 include("probabilistic/rock_physics/conductivity.jl")
@@ -55,6 +59,7 @@ include("probabilistic/rock_physics/viscosity.jl")
 include("probabilistic/rock_physics/anelasticity.jl")
 include("probabilistic/rock_physics/mixing_phases.jl")
 include("probabilistic/rock_physics/combine_models.jl")
+include("probabilistic/rock_physics/tune_rp_models.jl")
 
 include("utils.jl")
 include("inverse/utils.jl")
