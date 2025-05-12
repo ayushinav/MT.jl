@@ -75,10 +75,10 @@ function forward_helper(
 end
 
 function forward_helper(
-    ::Type{T}, m0, vars, response_trans_utils, params) where {T <: tune_rp_modelType}
-m = tune_rp_modelType(m0.fn_list, T.parameters[2])
-model = from_nt(m, m0)
-to_resp_nt(forward(model, vars, params))
+        ::Type{T}, m0, vars, response_trans_utils, params) where {T <: tune_rp_modelType}
+    m = tune_rp_modelType(m0.fn_list, T.parameters[2])
+    model = from_nt(m, m0)
+    to_resp_nt(forward(model, vars, params))
 end
 
 # Only occam uses the following

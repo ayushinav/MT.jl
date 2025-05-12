@@ -4,7 +4,6 @@ mutable struct tune_rp_modelType{K, M} #<: AbstractRockphyModel
 end
 
 function (m::tune_rp_modelType{K, M})(ps_nt) where {K, M}
-
     for fn in m.fn_list
         nt = fn(ps_nt)
         ps_nt = (; ps_nt..., nt...)
@@ -13,7 +12,6 @@ function (m::tune_rp_modelType{K, M})(ps_nt) where {K, M}
 end
 
 function (m::tune_rp_modelType{K, M})(ps_nt) where {K, M <: two_phase_modelType}
-
     for fn in m.fn_list
         nt = fn(ps_nt)
         ps_nt = (; ps_nt..., nt...)
@@ -22,4 +20,3 @@ function (m::tune_rp_modelType{K, M})(ps_nt) where {K, M <: two_phase_modelType}
 end
 
 default_params(::Type{tune_rp_modelType{K, M}}) where {K, M} = default_params(M)
-

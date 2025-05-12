@@ -67,7 +67,8 @@ function sample_type(::multi_rp_modelDistribution{T1, T2, T3, T4}) where {T1, T2
     multi_rp_model{sample_type(T1), sample_type(T2), sample_type(T3), sample_type(T4)}
 end
 
-function sample_type(::Type{multi_rp_modelDistributionType{T1, T2, T3, T4}}) where {T1, T2, T3, T4}
+function sample_type(::Type{multi_rp_modelDistributionType{
+        T1, T2, T3, T4}}) where {T1, T2, T3, T4}
     multi_rp_model{sample_type(T1), sample_type(T2), sample_type(T3), sample_type(T4)}
 end
 
@@ -98,7 +99,6 @@ to_dist_nt(d::T) where {T <: AbstractResponseDistribution} = to_nt(d)
 function to_dist_nt(d::T) where {T <: multi_rp_responseDistribution}
     return merge(to_nt(d.cond), to_nt(d.elastic), to_nt(d.visc), to_nt(d.anelastic))
 end
-
 
 function to_dist_nt(d::tune_rp_modelDistribution)
     return (; d.ps_nt..., fn_list=d.fn_list)

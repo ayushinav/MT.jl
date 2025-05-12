@@ -102,6 +102,7 @@ export andrade_psp, eburgers_psp, premelt_anelastic, xfit_mxw, andrade_analytica
 export HS1962_plus, HS1962_minus, single_phase, MAL
 export two_phase_modelType, two_phase_model
 export multi_rp_modelType, multi_rp_model, multi_rp_response
+export tune_rp_modelType
 
 # forward
 export get_Z, get_appres, get_phase, forward!, forward
@@ -133,6 +134,7 @@ export andrade_pspDistribution, eburgers_pspDistribution, premelt_anelasticDistr
        xfit_mxwDistribution, andrade_analyticalDistribution
 export two_phase_modelDistributionType, two_phase_modelDistribution
 export multi_rp_modelDistributionType, multi_rp_modelDistribution
+export tune_rp_modelDistributionType, tune_rp_modelDistribution
 
 # plots
 export plot_response, plot_response!
