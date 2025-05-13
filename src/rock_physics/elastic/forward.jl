@@ -38,6 +38,7 @@ function forward(m::anharmonic_poro, p, params=default_params_anharmonic_poro)
     K_eff = @. K * (Γ_K + K_nr / (K_dr + 1.0f-10))
 
     Vp = @. calc_Vp(K_eff, μ_eff, m.ρ)
+    # @show μ_eff, K_eff
     Vs = @. calc_Vs(μ_eff, m.ρ)
 
     # return G, Γ_G, Γ_K, K_sk #RockphyElastic(Gueff, Kueff, Vp, Vs)

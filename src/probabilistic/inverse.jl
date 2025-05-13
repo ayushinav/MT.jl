@@ -30,9 +30,8 @@ function to perform sampling
   - `kwargs` : keyword arguments to be splatted into sampling function
 """
 function stochastic_inverse(r_obs::resp1, err_resp::resp2, vars, alg_cache::mcmc_cache;
-        n_chains=2, model_trans_utils::NamedTuple=(m=lin_tf, h=lin_tf), # need to take care of this
-        response_trans_utils::NamedTuple=(; ρₐ=lin_tf, ϕ=lin_tf),
-        params=(;), response_fields=Symbol[],
+        n_chains=2, model_trans_utils::NamedTuple=(;), # need to take care of this
+        response_trans_utils::NamedTuple=(;), params=(;), response_fields=Symbol[],
         kwargs...) where {resp1 <: AbstractResponse, resp2 <: AbstractResponse}
     model_fields = Symbol[]
     # modelD = []
@@ -84,6 +83,7 @@ function stochastic_inverse(r_obs::resp1, err_resp::resp2, vars, alg_cache::mcmc
     msg = """
     variables to be inferred : $(model_fields)
     variables used for inference : $(response_fields)
+    model type : $(m_type)
     """
     @info msg
 

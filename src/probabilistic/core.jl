@@ -58,8 +58,14 @@ makes a `Turing.jl` model to perform MCMC sampling
         response_trans_utils::NamedTuple=(ρₐ=lin_tf, ϕ=lin_tf)) where {mdist, rdist}
     m0 = (; zip([keys(mDist)...], const_data)...)
 
+    # @show m0
     for k in model_fields
+        # @show k
+        # @show getfield(mDist, k)
         m0[k] ~ getfield(mDist, k)
+        # @show m0[k]
+        # @show m0
+        broadcast!(getfield(model_trans_utils, k).tf, m0[k], m0[k])
     end
 
     r_sample = forward_helper(m_type, m0, vars, response_trans_utils, params)

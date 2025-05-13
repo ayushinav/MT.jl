@@ -48,6 +48,10 @@ include("rock_physics/utils.jl")
 include("rock_physics/mixing_phases_core.jl")
 include("rock_physics/mixing_phases.jl")
 include("rock_physics/combine_models.jl")
+
+include("rock_physics/tune_rp_models.jl")
+include("rock_physics/thermals.jl")
+
 include("rock_physics/pretty_printing.jl")
 
 include("probabilistic/rock_physics/conductivity.jl")
@@ -56,6 +60,7 @@ include("probabilistic/rock_physics/viscosity.jl")
 include("probabilistic/rock_physics/anelasticity.jl")
 include("probabilistic/rock_physics/mixing_phases.jl")
 include("probabilistic/rock_physics/combine_models.jl")
+include("probabilistic/rock_physics/tune_rp_models.jl")
 
 include("utils.jl")
 include("inverse/utils.jl")
@@ -97,6 +102,12 @@ export andrade_psp, eburgers_psp, premelt_anelastic, xfit_mxw, andrade_analytica
 export HS1962_plus, HS1962_minus, single_phase, MAL
 export two_phase_modelType, two_phase_model
 export multi_rp_modelType, multi_rp_model, multi_rp_response
+export tune_rp_modelType
+
+## thermals
+export solidus_Hirschmann2000, solidus_Katz2003
+export ΔT_h2o_Katz2003, ΔT_h2o_Blatter2022, ΔT_co2_Dasgupta2007, ΔT_co2_Dasgupta2013
+export get_Cco2_m, get_Ch2o_m, get_melt_fraction
 
 # forward
 export get_Z, get_appres, get_phase, forward!, forward
@@ -128,6 +139,7 @@ export andrade_pspDistribution, eburgers_pspDistribution, premelt_anelasticDistr
        xfit_mxwDistribution, andrade_analyticalDistribution
 export two_phase_modelDistributionType, two_phase_modelDistribution
 export multi_rp_modelDistributionType, multi_rp_modelDistribution
+export tune_rp_modelDistributionType, tune_rp_modelDistribution
 
 # plots
 export plot_response, plot_response!
