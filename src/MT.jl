@@ -104,6 +104,11 @@ export two_phase_modelType, two_phase_model
 export multi_rp_modelType, multi_rp_model, multi_rp_response
 export tune_rp_modelType
 
+## thermals
+export solidus_Hirschmann2000, solidus_Katz2003
+export ΔT_h2o_Katz2003, ΔT_h2o_Blatter2022, ΔT_co2_Dasgupta2007, ΔT_co2_Dasgupta2013
+export get_Cco2_m, get_Ch2o_m, get_melt_fraction
+
 # forward
 export get_Z, get_appres, get_phase, forward!, forward
 

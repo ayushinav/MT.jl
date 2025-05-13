@@ -20,6 +20,8 @@ pages = [
         "Anelasticity models" => "rp/anelasticity.md",
         "Mixing phases" => "rp/mixing_phases.md",
         "Multi rock physics" => "rp/combine_models.md",
+        "Solidus" => "rp/solidus.md",
+        "Tuning rock physics hyperparameters" => "rp/tune_rp.md",
         "Stochastic inverse" => "rp/stochastic_inverse.md"
     ],
     "API" => "api.md",

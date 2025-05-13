@@ -1,5 +1,5 @@
 """
-    solidus_Hirschmann2000(ps_nt, params)
+    solidus_Hirschmann2000(ps_nt)
 
 returns pressure-dependent dry solidus (in K)
 
@@ -30,7 +30,7 @@ function solidus_Hirschmann2000(ps_nt)
 end
 
 """
-    solidus_Katz2003(ps_nt, params)
+    solidus_Katz2003(ps_nt)
 
 returns pressure-dependent dry solidus (in K)
 
@@ -54,9 +54,9 @@ Katz, R. F., Spiegelman, M., & Langmuir, C. H. (2003) :
 A new parameterization of hydrous mantle melting. Geochemistry, Geophysics, Geosystems, 4(9), 1–19.
 https://doi.org/10.1029/2002GC000433
 """
-function solidus_Katz2003(ps_nt, params=default_params_Katz2003)
+function solidus_Katz2003(ps_nt)
     @unpack P = ps_nt
-    T_solidus = @. 273+1085.7f0+132.9f0*P -5.1f0*P*P
+    T_solidus = @. 273 + 1085.7f0 + 132.9f0 * P - 5.1f0 * P * P
     return (; T_solidus)
 end
 
@@ -151,7 +151,7 @@ function ΔT_co2_Dasgupta2007(ps_nt)
 end
 
 """
-    ΔT_co2_Blatter2022(ps_nt)
+    ΔT_co2_Dasgupta2013(ps_nt)
 
 updates solidus with the depressed one because of CO₂ in melt
 
@@ -174,11 +174,11 @@ ps_nt = (; P, T, Cco2_m)
 
 ## References
 
-Blatter D, Naif S, Key K, Ray A (2022) :
-A plume origin for hydrous melt at the lithosphere-asthenosphere boundary.
-Nature. 2022 Apr;604(7906):491-494. doi: 10.1038/s41586-022-04483-w
+Dasgupta, R., Mallik, A., Tsuno, K. et al. (2013) :
+Carbon-dioxide-rich silicate melt in the Earth’s upper mantle. 
+Nature 493, 211–215 (2013). https://doi.org/10.1038/nature11731
 """
-function ΔT_co2_Blatter2022(ps_nt)
+function ΔT_co2_Dasgupta2013(ps_nt)
     @unpack Cco2_m, T_solidus = ps_nt
 
     Cco2_m_ = @.Cco2_m * 1.0f-4
@@ -267,8 +267,6 @@ get_Cco2_m(ps_nt)
 function get_Cco2_m(ps_nt)
     @unpack ϕ, Cco2 = ps_nt
     Cco2_m = @. Cco2 * inv(ϕ)
-    # Cco2_ol = @. Cco2 * inv(1- ϕ)
-    # Cco2_ol = @. Cco2 - Cco2_m
     return (; Cco2_m)
 end
 
@@ -307,16 +305,11 @@ function get_melt_fraction_core(
         Ch2o_m = get_Ch2o_m((; ϕ=u, p.Ch2o, p.D)).Ch2o_m
         Cco2_m = get_Cco2_m((; ϕ=u, p.Cco2)).Cco2_m
 
-        # T_new = supress_solidus_Blatter2022((;Ch2o_m, Cco2_m, p.T_solidus, p.D)).T_solidus
-        # T_new1 = supress_solidus_Dasgupta2007((;Ch2o_m, Cco2_m, p.T_solidus)).T_solidus
-        # T_new2 = supress_solidus_Katz2003((;Ch2o_m, Cco2_m, p.T_solidus, p.P)).T_solidus
-        # ΔT = 2p.T_solidus - T_new1 - T_new2
         T_new_H2O = H2O_suppress_fn((; p..., Ch2o_m)).T_solidus
         T_new_CO2 = H2O_suppress_fn((; p..., Cco2_m)).T_solidus
         ΔT = 2p.T_solidus - T_new_H2O - T_new_CO2
         dTdF = -40 * p.P + 450
 
-        # return u - ΔT/dTdF
         return u * dTdF / ΔT - 1
     end
 
@@ -341,8 +334,8 @@ returns the melt fraction that is thermodynamically stable at given water conc. 
 
 ## Keyword Arguments
 
-  - `H2O_suppress_fn` : function to calculate supressed solidus due to presence of water, defaults to `ΔT_h2o_Blatter2022`
-  - `CO2_suppress_fn` : function to calculate supressed solidus due to presence of CO₂, defaults to `ΔT_co2_Blatter2022`
+  - `H2O_suppress_fn` : function to calculate suppressed solidus due to presence of water, defaults to `ΔT_h2o_Blatter2022`
+  - `CO2_suppress_fn` : function to calculate suppressed solidus due to presence of CO₂, defaults to `ΔT_co2_Dasgupta2013`
 
 ## Usage
 
@@ -358,7 +351,7 @@ get_melt_fraction(ps_nt)
 ```
 """
 function get_melt_fraction(
-        ps_nt; H2O_suppress_fn=ΔT_h2o_Blatter2022, CO2_suppress_fn=ΔT_co2_Blatter2022)
+        ps_nt; H2O_suppress_fn=ΔT_h2o_Blatter2022, CO2_suppress_fn=ΔT_co2_Dasgupta2013)
     @unpack Cco2, Ch2o, T_solidus, P, D = ps_nt
 
     if Ch2o ∈ keys(ps_nt)

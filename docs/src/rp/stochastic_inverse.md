@@ -78,7 +78,7 @@ f # hide
 Lets try to also infer the water content along with the temperature. Everything remains the same, except that now, in `ps_nt`, the vector corresponding to water content `Ch2o_ol` will be replaced by a corresponding distribution.
 
 ```@example rp_si
-mdist = Poe2010Distribution(MvNormal([1200.0], [400.0;]), Uniform(50.0, 150.0))
+mdist = Poe2010Distribution(MvNormal([1200.0], [400.0;]), product_distribution([Uniform(50.0, 150.0)]))
 rdist = RockphyCondDistribution(MT.normal_dist)
 
 m_cache = mcmc_cache(mdist, rdist, 1000, Prior());
@@ -232,11 +232,11 @@ nothing # hide
 ```@example rp_si
 m_cache = mcmc_cache(mdist, rdist, 1000, Prior());
 mcmc_chain_prior = stochastic_inverse(
-    resp, err_resp, [], m_cache; response_fields=[:Vp, :Vs]);
+    resp, err_resp, [], m_cache; response_fields=[:Vp, :Vs, :σ]);
 
 m_cache = mcmc_cache(mdist, rdist, 1000, NUTS());
 mcmc_chain_posterior = stochastic_inverse(
-    resp, err_resp, [], m_cache; response_fields=[:Vp, :Vs]);
+    resp, err_resp, [], m_cache; response_fields=[:Vp, :Vs, :σ]);
 ```
 
 ```@raw html
@@ -321,11 +321,11 @@ rdist = MT.multi_rp_responseDistribution(
 
 m_cache = mcmc_cache(mdist, rdist, 1000, Prior());
 mcmc_chain_prior = stochastic_inverse(
-    resp, err_resp, [], m_cache; response_fields=[:Vp, :Vs]);
+    resp, err_resp, [], m_cache; response_fields=[:Vp, :Vs, :σ]);
 
 m_cache = mcmc_cache(mdist, rdist, 1000, NUTS());
 mcmc_chain_posterior = stochastic_inverse(
-    resp, err_resp, [], m_cache; response_fields=[:Vp, :Vs]);
+    resp, err_resp, [], m_cache; response_fields=[:Vp, :Vs, :σ]);
 nothing # hide
 ```
 

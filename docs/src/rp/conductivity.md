@@ -20,14 +20,14 @@ The distribution with temperature looks like (compare with fig. 1B of [Constable
 
 ```@example cond_plts
 f = Figure()
-ax = Axis(f[1, 1]; yscale=log10,
+ax = Axis(f[1,1]; yscale=log10,
     xlabel="10⁴/T (K⁻¹)", ylabel="σ (S/m)",
     yticks=LogTicks(WilkinsonTicks(6; k_min=5)),
     backgroundcolor=(:magenta, 0.05))
 
 xts = inv.([700, 900, 1100, 1300, 1500] .+ 273.0) .* 1e4
 
-ax2 = Axis(f[3:8, 3:8]; yscale=log10, xaxisposition=:top, yaxisposition=:right,
+ax2 = Axis(f[1,1]; yscale=log10, xaxisposition=:top, yaxisposition=:right,
     xlabel="T (ᴼC)", xgridvisible=false, xtickformat=x -> string.(round.((1e4 ./ x) .- 273)),
     xticklabelsize=10, backgroundcolor=(:magenta, 0.05))
 ax2.xticks = xts
