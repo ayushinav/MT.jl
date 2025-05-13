@@ -175,7 +175,7 @@ ps_nt = (; P, T, Cco2_m)
 ## References
 
 Dasgupta, R., Mallik, A., Tsuno, K. et al. (2013) :
-Carbon-dioxide-rich silicate melt in the Earth’s upper mantle. 
+Carbon-dioxide-rich silicate melt in the Earth’s upper mantle.
 Nature 493, 211–215 (2013). https://doi.org/10.1038/nature11731
 """
 function ΔT_co2_Dasgupta2013(ps_nt)

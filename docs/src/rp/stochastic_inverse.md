@@ -78,7 +78,8 @@ f # hide
 Lets try to also infer the water content along with the temperature. Everything remains the same, except that now, in `ps_nt`, the vector corresponding to water content `Ch2o_ol` will be replaced by a corresponding distribution.
 
 ```@example rp_si
-mdist = Poe2010Distribution(MvNormal([1200.0], [400.0;]), product_distribution([Uniform(50.0, 150.0)]))
+mdist = Poe2010Distribution(
+    MvNormal([1200.0], [400.0;]), product_distribution([Uniform(50.0, 150.0)]))
 rdist = RockphyCondDistribution(MT.normal_dist)
 
 m_cache = mcmc_cache(mdist, rdist, 1000, Prior());
