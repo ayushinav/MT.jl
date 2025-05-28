@@ -20,9 +20,9 @@ import Base: show
 include("abstract_types.jl")
 include("probabilistic/init_distributions.jl")
 include("inverse/bounds_transformation.jl")
-include("models/mt.jl")
-include("response/1dmt.jl")
-include("forward/1dmt.jl")
+include("geophysics/mt/types.jl")
+include("geophysics/mt/forward.jl")
+include("geophysics/pretty_printing.jl")
 
 include("rock_physics/conductivity/cache.jl")
 include("rock_physics/conductivity/types.jl")

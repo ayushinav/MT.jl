@@ -6,11 +6,10 @@ const global μ = 4π * 1.0f-7; # Float32 will promote to Float64 without a prob
 returns a tuple of ρₐ and ϕ, given arrays of resistivity `ρ` and thickness `h` for the angular frequenciy `ω`.
 """
 
-pow10(x::T) where {T} = 10^x
 const default_mt_tf_fns = (ρₐ=lin_tf, ϕ=lin_tf)
 
 function get_Z(ρ::T1, h::T2, ω::T) where {T1, T2, T}
-    broadcast!(pow10, ρ, ρ)
+    broadcast!(exp10, ρ, ρ)
     k = sqrt(im * ω * μ / ρ[end])
     Z = ω * μ / k
 
