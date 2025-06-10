@@ -3,7 +3,8 @@ const model_names_definition = (
     ϕ="Porosity", dg="grain size(μm)", σ="Shear stress (GPa)",
     f="Frequency (Hz)", Ch2o_m="Water concentration in melt (ppm)",
     Ch2o_ol="Water concentration in olivine (ppm)",
-    Cco2_m="CO₂ concentration in melt (ppm)")
+    Cco2_m="CO₂ concentration in melt (ppm)",
+    T_solidus = "Solidus Temperature (K)")
 
 function Base.show(io::IO, m::model) where {model <: AbstractRockphyModel}
     println("Model : ", typeof(m).name.name)
