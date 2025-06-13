@@ -8,11 +8,11 @@ end
 """
     OptAlg(; alg = LBFGS, μ = 1.0, kwargs...)
 
-returns `nl_cache` that specifies which non linear solver to use for the inverse problem
+returns `opt_cache` that specifies which `Optimization.jl` solver to use for the inverse problem
 
 ## Keyword Arguments
 
-  - `alg`: `NonlinearSolve`[@ref] algorithm to be used, defaults to LBFGS
+  - `alg`: `Optimization`[@ref] algorithm to be used, defaults to LBFGS
   - `μ` : regularization weight
 """
 function OptAlg(; alg=LBFGS, μ=1.0)
@@ -20,50 +20,6 @@ function OptAlg(; alg=LBFGS, μ=1.0)
 end
 # ======================== using Optimization.jl ===============================
 
-"""
-    function inverse!(mₖ::model1,
-            robs::response,
-            vars::Vector{Float64},
-            alg_cache::opt_cache;
-            W=nothing,
-            L=nothing,
-            max_iters=30,
-            χ2=1.0,
-            response_fields::Vector{Symbol}=[k for k in fieldnames(typeof(robs))],
-            # model_fields::Vector{Symbol}=[k for k in fieldnames(typeof(mₖ))], # this will not be used but for the sake of generality for all inverse algs
-            model_trans_utils::transform_utils=pow_sigmoid_tf,
-            response_trans_utils::transform_utils=log_tf,
-            verbose::Bool=true,
-            mᵣ=nothing) where {
-            model1 <: AbstractGeophyModel, response <: AbstractGeophyResponse}
-
-updates `mₖ` using occam iteration to fit `robs` within a misfit of `χ2`, by default set to 1.0.
-
-### Variables:
-
-  - `mₖ`: Initial model guess, will be updated during the inverse process
-  - `robs`: response to invert for
-  - `vars`: variables required for forward modeling, eg., `ω` for MT
-  - `alg_cache::occam_cache`: deterimines the algorithm to be performed for inversion
-  - `W`: Weight matrix, will be `I` if nothing is provided
-  - `L`: Regularization matrix, defaults to derivative matrix, given by `∂`[@ref]
-  - `max_iters`: maximum number of iterations, defaults to 30
-  - `χ2`: threshold misfit, defaults to 1.0
-  - `response_fields`: choose data of response to perform inversion on, eg., ρₐ for MT, by default chooses all the data (ρₐ and ϕ)
-  - `model_fields`: will generally be fixed, see docs for details
-  - `model_trans_utils`: conversion to and from computational domain,
-  - `response_trans_utils`: for scaling the response parameters,
-  - `verbose`: whether to print updates after each iteration, defaults to true
-  - `mᵣ`: model in physical domain to be regularized against
-
-### Returns:
-
-return message in the form of `return_code` and updates `mₖ` in-place.
-
-### Example:
-
-`inverse!(m_occam, r_obs, ω, NonlinearAlg(; alg = LBFGS, μ = 1.0))`
-"""
 function inverse!(mₖ::model1,
         robs::response,
         vars::Vector{Float64},
@@ -75,8 +31,9 @@ function inverse!(mₖ::model1,
         response_fields::Vector{Symbol}=[k for k in fieldnames(typeof(robs))],
         model_trans_utils::transform_utils=sigmoid_tf,
         response_trans_utils::NamedTuple=(; ρₐ=lin_tf, ϕ=lin_tf),
-        verbose::Bool=true,
-        mᵣ=nothing) where {
+        mᵣ=nothing,
+        reg_term=nothing,
+        verbose::Union{Bool, Int}=true) where {
         model1 <: AbstractGeophyModel, response <: AbstractGeophyResponse}
     prec = eltype(mₖ.m)
     model_fields = [:m]

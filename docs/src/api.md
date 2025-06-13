@@ -7,3 +7,8 @@ Order = [:function]
 Modules = [MT]
 Order = [:type]
 ```
+
+```@autodocs
+Modules = [MT]
+Order = [:constant]
+```

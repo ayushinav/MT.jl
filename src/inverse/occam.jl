@@ -38,10 +38,10 @@ end
 
 performs a single step of occam inversion, using golden line search.
 
-### Variables:
+## Arguments
 
   - `mₖ`: Initial model guess, will be updated during the inverse process
-  - `robs`: response to invert for
+  - `respₖ₊₁`: response to invert for
   - `vars`: variables required for forward modeling, eg., `ω` for MT
   - `alg_cache`: deterimines the algorithm to be performed for inversion
   - `W`: Weight matrix, defaults to identity matrix `I`

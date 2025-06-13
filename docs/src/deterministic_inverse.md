@@ -4,6 +4,9 @@
 
 Inverse problems in geophysics are notoriously ill-posed with non-unique solutions. MT inversion is no different. Below we demonstrate how we can perform different non-linear inverse schemes on a synthetic dataset.
 
+!!! warn
+    Please note that following does not show superiority of any algorithm over other, different starting models, and regularization coefficients are used to get decent convergence.
+
 ## Demo
 
 We start with defining models:
@@ -58,15 +61,15 @@ alg_cache = Occam(; μgrid=[1e-2, 1e6])
 inverse!(m_occam, resp, ω, alg_cache; W=W, max_iters=50, verbose=true)
 ```
 
-### Levenberg-Marquardt
+### Trust-Region
 
 While Occam is implemented in the package, we borrow a few from other packages. One of them is `NonlinearSolve.jl`, where we have `Levenberg-Marquadt` scheme. Again, everything boils down to creating the `alg_cache`. You can use [other solvers](https://docs.sciml.ai/NonlinearSolve/stable/solvers/nonlinear_least_squares_solvers/) from the package as well.
 
 ```@example inverse_demo
 using NonlinearSolve
 
-h_test = 10 .^ range(0.0, 5.0; length=50)
-ρ_test = 2.0 .* ones(length(h_test) + 1)
+h_test = 10 .^ range(0.0, 4.0; length=50)
+ρ_test = 2.0 .+ randn(length(h_test) + 1)
 
 resp_trans_utils = (ρₐ=MT.log_tf, ϕ=MT.phi_scale_tf);
 
@@ -84,19 +87,23 @@ m_lm = MTModel(ρ_test, h_test);
 
 W_lm = diagm(inv.([err_resp_lm.ρₐ..., err_resp_lm.ϕ...])) .^ 2; # weight matrix
 
-alg_cache = NonlinearAlg(; alg=TrustRegion, μ=1.0)
-inverse!(m_lm, resp, ω, alg_cache; W=W_lm, max_iters=20, verbose=true,
-    response_trans_utils=(ρₐ=MT.log_tf, ϕ=MT.phi_scale_tf))
+alg_cache = NonlinearAlg(; alg=TrustRegion, μ=500.0)
+inverse!(m_lm, resp_lm, ω, alg_cache; W=W_lm, max_iters=100, verbose=10,
+    response_trans_utils=(ρₐ=MT.log_tf, ϕ=MT.phi_scale_tf));
 ```
 
 ### LBFGS
 
 Another popular algorithm is LBFGS, which we borrow from `Optimization.jl`. Again, create the `alg_cache` and it's good to go. `Optimization.jl` provides a [suite of solvers](https://docs.sciml.ai/Optimization/stable/#Overview-of-the-solver-packages-in-alphabetical-order), also by wrapping around a few others.
 
+!!! tip
+    Following is a good demonstration of domain transformation on the response side, check out
+    [domain transformation](domain_transformation.md) for more details.
+
 ```@example inverse_demo
 using Optimization, OptimizationOptimJL
 
-h_test = 10 .^ range(0.0, 5.0; length=50)
+h_test = 10 .^ range(0.0, 4.0; length=50)
 ρ_test = m_occam.m .+ 1 .* randn(length(h_test) + 1)
 
 resp_trans_utils = (ρₐ=MT.log_tf, ϕ=MT.phi_scale_tf);
@@ -115,8 +122,8 @@ m_lbfgs = MTModel(ρ_test, h_test);
 
 W_lbfgs = diagm(inv.([err_resp_lbfgs.ρₐ..., err_resp_lbfgs.ϕ...])) .^ 2; # weight matrix
 
-alg_cache = OptAlg(; alg=LBFGS, μ=1.0)
-inverse!(m_lbfgs, resp, ω, alg_cache; W=W_lbfgs, max_iters=50, verbose=true,
+alg_cache = OptAlg(; alg=LBFGS, μ=100.0)
+inverse!(m_lbfgs, resp_lbfgs, ω, alg_cache; W=W_lbfgs, max_iters=50, verbose=true,
     response_trans_utils=(ρₐ=MT.log_tf, ϕ=MT.phi_scale_tf))
 ```
 
@@ -132,7 +139,7 @@ resp_lbfgs = forward(m_lbfgs, ω);
 f, axs = plot_response(ω, resp; errs=err_resp, plt_type=:errors, whiskerwidth=10)
 plot_response!(axs, ω, resp; plt_type=:scatter, label="true")
 plot_response!(axs, ω, resp_occam; label="occam", plt_type=:plot, color=:magenta)
-plot_response!(axs, ω, resp_lm; label="Levenberg-Marquadt", plt_type=:plot, linewidth=2)
+plot_response!(axs, ω, resp_lm; label="Trust-Region", plt_type=:plot, linewidth=2)
 plot_response!(axs, ω, resp_lbfgs; label="LBFGS", plt_type=:plot, linewidth=2)
 
 f[2, 2] = Legend(f, axs[1])
@@ -143,8 +150,8 @@ And a look at different models
 
 ```@example inverse_demo
 f, ax = plot_model(m; label="true", linewidth=3, color="black")
-plot_model!(ax, m_occam; label="occam", linewidth=2, color="blue")
-plot_model!(ax, m_lm; label="Levenberg-Marquadt", linewidth=2)
+plot_model!(ax, m_occam; label="occam", linewidth=2, color="magenta")
+plot_model!(ax, m_lm; label="Trust-Region", linewidth=2)
 plot_model!(ax, m_lbfgs; label="LBFGS", linewidth=2)
 
 # axislegend(ax, position = :rb)
