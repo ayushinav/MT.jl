@@ -56,14 +56,22 @@ end
 function forward_helper(
         ::Type{T}, m0, vars, response_trans_utils, params) where {T <: AbstractRockphyModel}
     model = from_nt(T, m0)
-    to_resp_nt(forward(model, vars, params))
+    resp_nt = to_resp_nt(forward(model, vars, params))
+    for k in propertynames(resp_nt)
+        broadcast!(response_trans_utils[k].tf, resp_nt[k], resp_nt[k])
+    end
+    return resp_nt
 end
 
 function forward_helper(
         ::Type{T}, m0, vars, response_trans_utils, params) where {T <: two_phase_model}
     m = two_phase_modelType(T.parameters[2], T.parameters[3], T.parameters[4]())
     model = m(m0)
-    to_resp_nt(forward(model, vars, params))
+    resp_nt = to_resp_nt(forward(model, vars, params))
+    for k in propertynames(resp_nt)
+        broadcast!(response_trans_utils[k].tf, resp_nt[k], resp_nt[k])
+    end
+    return resp_nt
 end
 
 function forward_helper(
@@ -71,14 +79,22 @@ function forward_helper(
     m = multi_rp_modelType(
         T.parameters[1], T.parameters[2], T.parameters[3], T.parameters[4])
     model = m(m0)
-    to_resp_nt(forward(model, vars, params))
+    resp_nt = to_resp_nt(forward(model, vars, params))
+    for k in propertynames(resp_nt)
+        broadcast!(response_trans_utils[k].tf, resp_nt[k], resp_nt[k])
+    end
+    return resp_nt
 end
 
 function forward_helper(
         ::Type{T}, m0, vars, response_trans_utils, params) where {T <: tune_rp_modelType}
     m = tune_rp_modelType(m0.fn_list, T.parameters[2])
     model = from_nt(m, m0)
-    to_resp_nt(forward(model, vars, params))
+    resp_nt = to_resp_nt(forward(model, vars, params))
+    for k in propertynames(resp_nt)
+        broadcast!(response_trans_utils[k].tf, resp_nt[k], resp_nt[k])
+    end
+    return resp_nt
 end
 
 # Only occam uses the following

@@ -8,6 +8,6 @@ function Base.show(io::IO, m::model) where {model <: MTModel{<:AbstractVector, <
         h_ = round(m.h[i]; digits = 3)
         println("$i \t $m_ \t $h_")
     end
-    m_ = round(log10(m.m[end]); digits = 3)
+    m_ = round(m.m[end]; digits = 3)
     println("$(length(m.m)) \t $m_ \t ∞")
 end

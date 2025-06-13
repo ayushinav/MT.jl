@@ -2,9 +2,9 @@
 
 ## Introduction
 
-Throughout the framework, you will come across `transform_utils`, whether be it deterministic inverse, or probabilistic. Even in simple forward calculations, we have them embedded.
+Throughout the framework, you will come across `transform_utils` variables, whether be it deterministic inverse, or probabilistic. Even in simple forward calculations, we have them embedded.
 
-Firstly, let's understand its structure with the example of `log_tf`. A `transform_utils` type variable, say `trans_util` has 4 parameters, the second of which, referred by `tf` is used to move from one space to another. For consistency, we call this forward transformation, that is, it will move the variables to the log-space (on the base 10).
+Firstly, let's understand the structure of such a variable with the example of [`log_tf`](@ref). A `transform_utils` type variable, say `trans_util` has 4 parameters, the second of which, referred by `tf` is used to move from one space to another. For consistency, we call this forward transformation, that is, it will move the variables to the log-space (on the base 10).
 
 ```julia
 x = 10.0
@@ -15,17 +15,17 @@ Then we have inverse transformation given by `itf`, and it will allow you to get
 
 ```julia
 x = 2.0
-log_tf.tf(x) ## = 100.
+log_tf.itf(100) ## = 2.
 ```
 
 We, then also have `dtf`, which computes the derivative of the forward tramnsformation
 
 ```julia
 x = 10.0
-log_tf.tf(x) ## 
+log_tf.dtf(x) ## 0.004342944819032518
 ```
 
-We also have `p` which is a vector to parameterize these functions if needed, eg., `sigmoid_tf` has `p` which define the lower and upper bounds of the scaled sigmoid. This is used in bounding variables without putting an explicit constraint on them.
+We also have `p` which is a vector to parameterize these functions if needed, eg., [`sigmoid_tf`](@ref) has `p` which define the lower and upper bounds of the scaled sigmoid. This is used in bounding variables without putting an explicit constraint on them.
 
 ## Model transformation
 
@@ -43,4 +43,4 @@ Explain that this should mostly be used for bounding, example of regularization.
 
 Similar to `model_trans_utils`, a lot of functions, including `forward` have the option to pass in `response_trans_utils`. The working is fairly similar in the aspect that we transform the data. This can be useful in inversion schemes when we have data in different varying in different domains, eg. apparent resistivity varying smoothly on the log-scale and phase on the linear scale.
 
-Explain how data to be given should already be in the transformed space
+When performing inversion in a modified domain, care must be taken to modify so that data itself is in the right domain. eg., the response of MT includes app. resistivity and phase. It might be worthwhile to invert log(app. resistivity). We can pass `log_tf` for app. resisitvity to convert in into log-domain but the data also needs to be in the same domain. It won't be converted automatically behind the screen. A nice demonstration is shown in [using LBFGS for deterministic inversion](determinstic_inverse.md#LBFGS).

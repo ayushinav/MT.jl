@@ -14,17 +14,19 @@ that can be used to calculate forward response for 1d MT
 
 ## Usage
 ```jldoctest
-julia> m = [4., 2., 3.];
-julia> h = [1000., 100.];
+m = [4., 2., 3.]
+h = [1000., 100.]
+model = MTModel(m, h)
+print(model)
 
-julia> MTModel(m, h)
+# output
 
 1D MTModel : 
-Layer    log(ρ)  h
+Layer \t log(ρ)  h
 ____________________________
-1        4.0     1000.0
-2        2.0     100.0
-3        0.477   ∞
+1 \t 4.0 \t 1000.0
+2 \t 2.0 \t 100.0
+3 \t 3.0 \t ∞
 ```
 """
 mutable struct MTModel{T1 <: AbstractArray{<:Any}, T2 <: AbstractArray{<:Any}} <:

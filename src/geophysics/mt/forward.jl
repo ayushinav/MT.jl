@@ -52,9 +52,9 @@ end
 # dispatch on forward! for 1d model
 
 """
-`forward!(r::response, m::model, ω::Vector{T}) where T <: Union{Float32, Float64}`:
+`forward!(r, m, ω)
 
-updates response `r` type for the given model `m` at the frequencies  `ω`
+    updates response `r` type for the given model `m` at the frequencies  `ω`
 """
 function forward!(r::Tr,
         m::Tm,
