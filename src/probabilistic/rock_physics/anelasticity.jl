@@ -1,7 +1,7 @@
 struct RockPhyAnelasticDistribution{
-    T1 <:  Union{Function, Nothing}, T2 <:  Union{Function, Nothing},
-    T3 <:  Union{Function, Nothing}, T4 <:  Union{Function, Nothing},
-    T5 <:  Union{Function, Nothing}, T6 <:  Union{Function, Nothing}} <:
+    T1 <: Union{Function, Nothing}, T2 <: Union{Function, Nothing},
+    T3 <: Union{Function, Nothing}, T4 <: Union{Function, Nothing},
+    T5 <: Union{Function, Nothing}, T6 <: Union{Function, Nothing}} <:
        AbstractRockphyResponseDistribution
     J1::T1
     J2::T2

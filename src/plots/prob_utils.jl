@@ -132,7 +132,7 @@ function get_kde_image!(ax,
     m_length = length(rand(mDist.m))
     h_length = length(rand(mDist.h))
 
-    trans_utils_ = (; m = lin_tf, h = lin_tf, trans_utils...)
+    trans_utils_ = (; m=lin_tf, h=lin_tf, trans_utils...)
 
     broadcast!(trans_utils_.h.tf, view(pred, :, (m_length + 1):(m_length + h_length)),
         view(pred, :, (m_length + 1):(m_length + h_length)))
@@ -267,8 +267,8 @@ function get_mean_std_image!(ax,
 
     μ_m = mean(pred; dims=1)[:]
 
-    μ₊_m = [quantile(pred[:, i], 1 - (1 - confidence_interval)/2) for i in axes(pred, 2)]
-    μ₋_m = [quantile(pred[:, i], (1 - confidence_interval)/2) for i in axes(pred, 2)]
+    μ₊_m = [quantile(pred[:, i], 1 - (1 - confidence_interval) / 2) for i in axes(pred, 2)]
+    μ₋_m = [quantile(pred[:, i], (1 - confidence_interval) / 2) for i in axes(pred, 2)]
 
     # @show μ₋_m
     # @show μ₊_m
@@ -277,7 +277,8 @@ function get_mean_std_image!(ax,
 
     mean_kwargs = (; label="mean", color=:blue, mean_kwargs...)
 
-    std_plus_kwargs = (label="$(100* round(confidence_interval))% bounds", color=:green, std_plus_kwargs...)
+    std_plus_kwargs = (label="$(100* round(confidence_interval))% bounds",
+        color=:green, std_plus_kwargs...)
     std_minus_kwargs = (color=:green, std_minus_kwargs...)
 
     m_type = sample_type(mDist)
@@ -309,7 +310,7 @@ function get_mean_std_image!(ax,
     m_length = length(rand(mDist.m))
     h_length = length(rand(mDist.h))
 
-    trans_utils_ = (; m = lin_tf, h = lin_tf, trans_utils...)
+    trans_utils_ = (; m=lin_tf, h=lin_tf, trans_utils...)
 
     broadcast!(trans_utils_.h.tf, view(pred, :, (m_length + 1):(m_length + h_length)),
         view(pred, :, (m_length + 1):(m_length + h_length)))
@@ -324,14 +325,15 @@ function get_mean_std_image!(ax,
 
     μ_m = mean(m2; dims=1)[:]
 
-    μ₊_m = [quantile(m2[:, i], 1 - (1 - confidence_interval)/2) for i in axes(m2, 2)]
-    μ₋_m = [quantile(m2[:, i], (1 - confidence_interval)/2) for i in axes(m2, 2)]
+    μ₊_m = [quantile(m2[:, i], 1 - (1 - confidence_interval) / 2) for i in axes(m2, 2)]
+    μ₋_m = [quantile(m2[:, i], (1 - confidence_interval) / 2) for i in axes(m2, 2)]
 
     isnothing(half_space_depth) && (half_space_depth = sum(mDist.h) * 1.25)
-    
+
     mean_kwargs = (; label="mean", color=:blue, mean_kwargs...)
 
-    std_plus_kwargs = (label="$(100 * round(confidence_interval))% bounds", color=:green, std_plus_kwargs...)
+    std_plus_kwargs = (label="$(100 * round(confidence_interval))% bounds",
+        color=:green, std_plus_kwargs...)
     std_minus_kwargs = (color=:green, std_minus_kwargs...)
 
     lines!(ax, trans_utils_.m.tf.(μ_m), zs; mean_kwargs...)

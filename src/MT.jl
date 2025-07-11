@@ -113,7 +113,8 @@ export get_Cco2_m, get_Ch2o_m, get_melt_fraction
 export get_Z, get_appres, get_phase, forward!, forward
 
 #inverse
-export transform_utils, default_tf, log_tf, lin_tf, sigmoid_tf, log_sigmoid_tf, pow_tf, pow_sigmoid_tf, phi_scale_tf
+export transform_utils, default_tf, log_tf, lin_tf, sigmoid_tf, log_sigmoid_tf, pow_tf,
+       pow_sigmoid_tf, phi_scale_tf
 export mt_jacobian_cache, jacobian_mt, jacobian!
 export occam_cache, Occam, nl_cache, NonlinearAlg, opt_cache, OptAlg, linsolve!, occam_step!
 export inverse!

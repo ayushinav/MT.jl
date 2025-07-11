@@ -9,13 +9,14 @@ For now, we go with the same design as for `MTModel`.
 =#
 
 """
-create a model type for a given resistivity distribution 
+create a model type for a given resistivity distribution
 that can be used to calculate forward response for 1d MT
 
 ## Usage
+
 ```jldoctest
-m = [4., 2., 3.]
-h = [1000., 100.]
+m = [4.0, 2.0, 3.0]
+h = [1000.0, 100.0]
 model = MTModel(m, h)
 print(model)
 

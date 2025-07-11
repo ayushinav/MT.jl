@@ -21,8 +21,9 @@ m = MTModel(ρ, h)
 This `model` can then just be passed into `forward` function to get the `response`.
 
 !!! note
-  
-  Always use `Float64` or `Float32` types while defining the vectors for resistivities and thickness. This is done for performance while not imposing any serious constraints since most of the data is generally processed using `Float64` on most CPUs and `Float32` on most GPUs.
+    
+
+Always use `Float64` or `Float32` types while defining the vectors for resistivities and thickness. This is done for performance while not imposing any serious constraints since most of the data is generally processed using `Float64` on most CPUs and `Float32` on most GPUs.
 
 The model can then be plotted using
 

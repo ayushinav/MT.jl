@@ -100,8 +100,6 @@ function stochastic_inverse(r_obs::resp1, err_resp::resp2, vars, alg_cache::mcmc
     """
     @info msg
 
-
-
     mcmc_model = mcmc_turing(m_type, const_data, vars, to_resp_nt(r_obs), # ::NamedTuple
         to_resp_nt(err_resp), # ::response
         apriori, # ::NamedTuple

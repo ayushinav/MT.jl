@@ -49,7 +49,7 @@ Solving for
     
       - Usually, the prior of ``\mu``is a uniform distribution and we do not have to compute the log pdf term
       - Implementing the above from scratch might not be trivial because of ``L'L`` being non-invertible, and we do the optimization in the domain defined by $\xi = \sqrt{\mu}Lm$.
-      Such a variable will then have a standard normal distribution $\mathcal{N}(0, I)$ when $m \sim \mathcal{N}(0, \frac{1}{\mu}(L^T L))$
+        Such a variable will then have a standard normal distribution $\mathcal{N}(0, I)$ when $m \sim \mathcal{N}(0, \frac{1}{\mu}(L^T L))$
 
 ## Copy-Pasteable code
 
@@ -100,7 +100,8 @@ modelD = MTModelDistribution(
 
 n_samples = 100
 m_rto = MTModel(2 .* ones(length(z)), vec(h));
-r_cache = rto_cache(m_rto, [1e-2, 1e3], Occam(), n_samples, n_samples, 1.0, [:ρₐ, :ϕ], false);
+r_cache = rto_cache(
+    m_rto, [1e-2, 1e3], Occam(), n_samples, n_samples, 1.0, [:ρₐ, :ϕ], false);
 
 rto_chain = stochastic_inverse(
     r_obs,
@@ -111,7 +112,7 @@ rto_chain = stochastic_inverse(
 )
 
 mt_chain = Turing.Chains(
-    (rto_chain.value.data[:, 1:end-1, :]),
+    (rto_chain.value.data[:, 1:(end - 1), :]),
     [Symbol("m[$i]") for i in 1:length(z)]
 )
 ```
@@ -122,22 +123,25 @@ The obtained `mt_chain` contains the distributions that can be saved using [JLD2
 using JLD2
 JLD2.@save "file_path.jld2" mt_chain
 ```
+
 and plotted as :
 
 ```@example rto_tko
 fig = Figure()
-ax = Axis(fig[1,1], xscale = log10)
-hm = get_kde_image!(ax, mt_chain, modelD; kde_transformation_fn = log10, trans_utils = (; m = pow_tf), colormap = :thermal, colorrange = (-2., -1.5))
-Colorbar(fig[1,2], hm, label = "log pdf")
+ax = Axis(fig[1, 1]; xscale=log10)
+hm = get_kde_image!(ax, mt_chain, modelD; kde_transformation_fn=log10,
+    trans_utils=(; m=pow_tf), colormap=:thermal, colorrange=(-2.0, -1.5))
+Colorbar(fig[1, 2], hm; label="log pdf")
 
-mean_kws = (; color = :blue, linewidth = 2)
-std_kws = (; color = :red, linewidth = 2)
-get_mean_std_image!(ax, mt_chain, modelD, confidence_interval = 0.9; mean_kwargs = mean_kws, std_plus_kwargs= std_kws, std_minus_kwargs= std_kws)
+mean_kws = (; color=:blue, linewidth=2)
+std_kws = (; color=:red, linewidth=2)
+get_mean_std_image!(ax, mt_chain, modelD; confidence_interval=0.9, mean_kwargs=mean_kws,
+    std_plus_kwargs=std_kws, std_minus_kwargs=std_kws)
 ylims!(ax, [2500, 0])
 
-plot_model!(ax, m_test, color = :black, linestyle = :dash, label = "true")
-plot_model!(ax, m_occam, color = :green, label = "occam")
-Legend(fig[2,:], ax, orientation = :horizontal)
+plot_model!(ax, m_test; color=:black, linestyle=:dash, label="true")
+plot_model!(ax, m_occam; color=:green, label="occam")
+Legend(fig[2, :], ax; orientation=:horizontal)
 fig
 ```
 
@@ -158,9 +162,9 @@ ax2 = Axis(fig[1, 2])
 resp_post = forward(model_list[1], ω);
 for i in 1:(length(model_list) > 100 ? 100 : length(model_list))
     forward!(resp_post, model_list[i], ω)
-    plot_response!([ax1, ax2], ω, resp_post, alpha=0.4, color=:gray)
+    plot_response!([ax1, ax2], ω, resp_post; alpha=0.4, color=:gray)
 end
-plot_response!([ax1, ax2], ω, r_obs, errs=err_resp, plt_type=:errors, whiskerwidth=10)
+plot_response!([ax1, ax2], ω, r_obs; errs=err_resp, plt_type=:errors, whiskerwidth=10)
 plot_response!([ax1, ax2], ω, r_obs; plt_type=:scatter, label="true")
 ylims!(ax1, exp10.([1.2, 3.1]))
 ylims!(ax2, [12, 70])
@@ -169,4 +173,5 @@ fig
 ```
 
 !!! note
+    
     Samples from RTO-TKO can be usually filtered out to reject the samples that have a poor fit on the data. While we do not filter them here for the sake of brevity, we have explicitly defined the axes limits to exclude their response curves. Some of them are still there on the plot. This is done to make user aware that such samples might exist.

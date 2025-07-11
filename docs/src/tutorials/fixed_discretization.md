@@ -9,11 +9,12 @@ m = [m_1, m_2, m_3, ... , m_N] \\
 h = [h_1, h_2, h_3, ... , h_{N-1}]
 ```
 
-such that 
+such that
 
 ```math
 m\_i  \in \mathcal{D}_{m_i} \text{ ; where } \mathcal{D}_{m_i} = \textit{a priori} \text{ distribution for } m_i
 ```
+
 and $h_i$ is fixed.
 
 In the following example, we show how to perform MCMC inversion for such a case using a synthetic dataset. We assume a 6-layered earth, including the half-space where all layers have resistivities bounded between $10^{-1}$ and $10^5$, defined using a uniform distribution.
@@ -70,18 +71,20 @@ and plotted as :
 
 ```@example fixed_mcmc
 fig = Figure()
-ax = Axis(fig[1,1], xscale = log10)
-hm = get_kde_image!(ax, mt_chain, modelD; kde_transformation_fn = log10, trans_utils = (; m = pow_tf), colormap = :thermal, colorrange = (-3., 0))
-Colorbar(fig[1,2], hm, label = "log pdf")
+ax = Axis(fig[1, 1]; xscale=log10)
+hm = get_kde_image!(ax, mt_chain, modelD; kde_transformation_fn=log10,
+    trans_utils=(; m=pow_tf), colormap=:thermal, colorrange=(-3.0, 0))
+Colorbar(fig[1, 2], hm; label="log pdf")
 
-mean_kws = (; color = :blue, linewidth = 2)
-std_kws = (; color = :red, linewidth = 2)
-get_mean_std_image!(ax, mt_chain, modelD, confidence_interval = 0.9; mean_kwargs = mean_kws, std_plus_kwargs= std_kws, std_minus_kwargs= std_kws)
+mean_kws = (; color=:blue, linewidth=2)
+std_kws = (; color=:red, linewidth=2)
+get_mean_std_image!(ax, mt_chain, modelD; confidence_interval=0.9, mean_kwargs=mean_kws,
+    std_plus_kwargs=std_kws, std_minus_kwargs=std_kws)
 xlims!(ax, [1e-1, 1e5])
 ylims!(ax, [2500, 0])
 
-plot_model!(ax, m_test, color = :black, linestyle = :dash, label = "true")
-Legend(fig[2,:], ax, orientation = :horizontal)
+plot_model!(ax, m_test; color=:black, linestyle=:dash, label="true")
+Legend(fig[2, :], ax; orientation=:horizontal)
 fig
 ```
 
@@ -96,16 +99,16 @@ We can then easily check the fit of the response curves
 
 ```@example fixed_mcmc
 fig = Figure()
-ax1 = Axis(fig[1,1])
-ax2 = Axis(fig[1,2])
+ax1 = Axis(fig[1, 1])
+ax2 = Axis(fig[1, 2])
 
 resp_post = forward(model_list[1], ω);
 for i in 1:(length(model_list) > 100 ? 100 : length(model_list))
-   forward!(resp_post, model_list[i], ω);
-   plot_response!([ax1, ax2], ω, resp_post, alpha = 0.4, color = :gray)
+    forward!(resp_post, model_list[i], ω)
+    plot_response!([ax1, ax2], ω, resp_post; alpha=0.4, color=:gray)
 end
 
-plot_response!([ax1, ax2], ω, r_obs, errs= err_resp, plt_type=:errors, whiskerwidth=10)
+plot_response!([ax1, ax2], ω, r_obs; errs=err_resp, plt_type=:errors, whiskerwidth=10)
 plot_response!([ax1, ax2], ω, r_obs; plt_type=:scatter, label="true")
 
 fig

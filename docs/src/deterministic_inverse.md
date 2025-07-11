@@ -5,6 +5,7 @@
 Inverse problems in geophysics are notoriously ill-posed with non-unique solutions. MT inversion is no different. Below we demonstrate how we can perform different non-linear inverse schemes on a synthetic dataset.
 
 !!! warn
+    
     Please note that following does not show superiority of any algorithm over other, different starting models, and regularization coefficients are used to get decent convergence.
 
 ## Demo
@@ -97,6 +98,7 @@ inverse!(m_lm, resp_lm, ω, alg_cache; W=W_lm, max_iters=100, verbose=10,
 Another popular algorithm is LBFGS, which we borrow from `Optimization.jl`. Again, create the `alg_cache` and it's good to go. `Optimization.jl` provides a [suite of solvers](https://docs.sciml.ai/Optimization/stable/#Overview-of-the-solver-packages-in-alphabetical-order), also by wrapping around a few others.
 
 !!! tip
+    
     Following is a good demonstration of domain transformation on the response side, check out
     [domain transformation](domain_transformation.md) for more details.
 
