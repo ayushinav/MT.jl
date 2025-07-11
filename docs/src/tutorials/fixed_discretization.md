@@ -1,4 +1,4 @@
-## Fixed discretization
+# Fixed discretization
 
 Geophysical models generally have fixed discretization. This is mostly because the different numerical schemes such as finite difference and finite element are computationally expensive and allocating a grid prior to solving the corresponding PDEs saves some computational resources. We provide the capability to do MCMC inference on such fixed grids.
 
@@ -6,16 +6,26 @@ Let's denote the model parameters, eg., conductivity, by `m`, and the layer thic
 
 ```math
 m = [m_1, m_2, m_3, ... , m_N] \\
-h = [h_1, h_2, h_3, ... , h_{N_1}]
+h = [h_1, h_2, h_3, ... , h_{N-1}]
 ```
+
+such that 
+
+```math
+m\_i  \in \mathcal{D}_{m_i} \text{ ; where } \mathcal{D}_{m_i} = \textit{a priori} \text{ distribution for } m_i
+```
+and $h_i$ is fixed.
+
+In the following example, we show how to perform MCMC inversion for such a case using a synthetic dataset. We assume a 6-layered earth, including the half-space where all layers have resistivities bounded between $10^{-1}$ and $10^5$, defined using a uniform distribution.
 
 ## Copy-Pasteable code
 
-```julia
+```@example fixed_mcmc
 using MT
 using Distributions
 using Turing
 using LinearAlgebra
+using CairoMakie
 
 m_test = MTModel(log10.([100.0, 10.0, 1000.0]), [1e3, 1e3]);
 f = 10 .^ range(-4; stop=1, length=25);
@@ -23,16 +33,16 @@ f = 10 .^ range(-4; stop=1, length=25);
 
 r_obs = forward(m_test, ω);
 
-err_phi = asin(0.01) * 180 / π .* ones(length(ω));
-err_appres = 0.02 * r_obs.ρₐ;
+err_phi = asin(0.02) * 180 / π .* ones(length(ω));
+err_appres = 0.1 * r_obs.ρₐ;
 err_resp = MTResponse(err_appres, err_phi);
 
-r_obs.ρₐ .= r_obs.ρₐ .+ err_appres;
-r_obs.ϕ .= r_obs.ϕ .+ err_phi;
+r_obs.ρₐ .= r_obs.ρₐ .+ randn(size(f)) .* err_appres;
+r_obs.ϕ .= r_obs.ϕ .+ randn(size(f)) .* err_phi;
 
 respD = MTResponseDistribution(normal_dist, normal_dist);
 
-z = 10 .^ collect(range(1; stop=4, length=100));
+z = collect(0:500:2.5e3)
 h = diff(z);
 
 # fixed discretization
@@ -43,44 +53,62 @@ modelD = MTModelDistribution(
     vec(h)
 );
 
-n_samples = 50;
-mcache = mcmc_cache(modelD, respD, 50, NUTS());
+n_samples = 1000;
+mcache = mcmc_cache(modelD, respD, n_samples, NUTS());
 
 mt_chain = stochastic_inverse(r_obs, err_resp, ω, mcache)
 ```
 
-The obtained `mt_chain` contains the distributions that can be saved using [JLD2.jl](https://github.com/JuliaIO/JLD2.jl).
+The obtained `mt_chain` contains the *a posteriori* distributions that can be saved using [JLD2.jl](https://github.com/JuliaIO/JLD2.jl).
 
 ```julia
 using JLD2
 JLD2.@save "file_path.jld2" mt_chain
 ```
 
-**Note**:
+and plotted as :
 
-!!! note
-    
-    The returned chains will be sampled in the distribution specified by `modelD`. In the presented case, it will have values $\in [-1, 5]$ and we can get the values by `10. ^ value`.
+```@example fixed_mcmc
+fig = Figure()
+ax = Axis(fig[1,1], xscale = log10)
+hm = get_kde_image!(ax, mt_chain, modelD; kde_transformation_fn = log10, trans_utils = (; m = pow_tf), colormap = :thermal, colorrange = (-3., 0))
+Colorbar(fig[1,2], hm, label = "log pdf")
+
+mean_kws = (; color = :blue, linewidth = 2)
+std_kws = (; color = :red, linewidth = 2)
+get_mean_std_image!(ax, mt_chain, modelD, confidence_interval = 0.9; mean_kwargs = mean_kws, std_plus_kwargs= std_kws, std_minus_kwargs= std_kws)
+xlims!(ax, [1e-1, 1e5])
+ylims!(ax, [2500, 0])
+
+plot_model!(ax, m_test, color = :black, linestyle = :dash, label = "true")
+Legend(fig[2,:], ax, orientation = :horizontal)
+fig
+```
 
 The list of models can then be obtained from chains using
 
-```
-model_list = get_model_list(mt_chain, modelD)
+```@example fixed_mcmc
+model_list = get_model_list(mt_chain, modelD);
+nothing # hide
 ```
 
 We can then easily check the fit of the response curves
 
-```
-plt_resps = prepare_plot(r_obs, ω, alpha = 0.);
-resp_models = forward(model_list[1], ω);
+```@example fixed_mcmc
+fig = Figure()
+ax1 = Axis(fig[1,1])
+ax2 = Axis(fig[1,2])
 
-for i in 1:(length(model_list) > 50 ? 50 : length(model_list))
-   forward!(resp_models, model_list[i], ω);
-   prepare_plot!(resp_models, ω, alpha = 0.4); 
+resp_post = forward(model_list[1], ω);
+for i in 1:(length(model_list) > 100 ? 100 : length(model_list))
+   forward!(resp_post, model_list[i], ω);
+   plot_response!([ax1, ax2], ω, resp_post, alpha = 0.4, color = :gray)
 end
 
-prepare_plot!(r_obs, ω, d_err = err_resp, markersize = 3, color = :orange);
-plot_response(plt_resps)
+plot_response!([ax1, ax2], ω, r_obs, errs= err_resp, plt_type=:errors, whiskerwidth=10)
+plot_response!([ax1, ax2], ω, r_obs; plt_type=:scatter, label="true")
+
+fig
 ```
 
 The posterior distribution can then be obtained as:
