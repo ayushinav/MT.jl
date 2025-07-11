@@ -63,7 +63,7 @@ inverse!(m_occam, resp, ω, alg_cache; W=W, max_iters=50, verbose=true)
 
 ### Trust-Region
 
-While Occam is implemented in the package, we borrow a few from other packages. One of them is `NonlinearSolve.jl`, where we have `Levenberg-Marquadt` scheme. Again, everything boils down to creating the `alg_cache`. You can use [other solvers](https://docs.sciml.ai/NonlinearSolve/stable/solvers/nonlinear_least_squares_solvers/) from the package as well.
+While Occam is implemented in the package, we borrow a few from other packages. One of them is `NonlinearSolve.jl`, where we have `Trust-Region` scheme. Again, everything boils down to creating the `alg_cache`. You can use [other solvers](https://docs.sciml.ai/NonlinearSolve/stable/solvers/nonlinear_least_squares_solvers/) from the package as well.
 
 ```@example inverse_demo
 using NonlinearSolve

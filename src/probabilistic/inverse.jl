@@ -72,6 +72,19 @@ function stochastic_inverse(r_obs::resp1, err_resp::resp2, vars, alg_cache::mcmc
 
     transf_utils = (; zip(keys(apriori), trans_utils_arr)...) # NamedTuple for trans_utils and defaults
 
+    trans_utils_arr = []
+    for k in keys(to_resp_nt(r_obs))
+        if k in keys(response_trans_utils)
+            push!(trans_utils_arr, getfield(response_trans_utils, k))
+        else
+            push!(trans_utils_arr, lin_tf)
+        end
+    end
+
+    response_trans_utils = (; zip(keys(to_resp_nt(r_obs)), trans_utils_arr)...)
+
+    @show keys(response_trans_utils)
+
     m_type = sample_type(alg_cache.apriori)
 
     if isempty(params)
@@ -86,6 +99,8 @@ function stochastic_inverse(r_obs::resp1, err_resp::resp2, vars, alg_cache::mcmc
     model type : $(m_type)
     """
     @info msg
+
+
 
     mcmc_model = mcmc_turing(m_type, const_data, vars, to_resp_nt(r_obs), # ::NamedTuple
         to_resp_nt(err_resp), # ::response
