@@ -1,7 +1,7 @@
 #! format: off
-# minerals
 
-# minerals
+# ========================================================================================================== 
+# olivine
 
 params_SEO3 = (
     S_bfe = 5.06f24, 
@@ -111,6 +111,7 @@ const params_Yoshino2009 = (
     Va_p = 0f0  # cc/mol, activation volume
 )
 
+# ========================================================================================================== 
 # melts
 
 params_Ni2011 = (
@@ -148,14 +149,51 @@ params_Sifre2014 = (
 params_Gaillard2008 = (
     S = 3440, # S/m, pre-exponential conductivity
     H = 31.9 # KJ, activation enthalpy
-    )
+)
 
+# ========================================================================================================== 
+# orthopyroxene
+
+params_Dai_Karato2009 = (
+    A = 10f0 ^ 2.4f0,
+    Aw = 10f0 ^ 2.6f0,
+    H = 147f0,
+    Hw = 82f0,
+    r = 62f-2
+)
+
+params_Zhang2012 = (
+    S_pol = 3.99f0,
+    H_pol = 1.88f0,
+    S_hyd = 10f0 ^2.58f0,
+    H_hyd = 84f-2,
+    a = 8f-2,
+)
+
+# ========================================================================================================== 
+# clinopyroxene
+
+params_Yang2011 = (
+    A = 10f0 ^ 2.16f0,
+    Aw = 10f0 ^ 3.56f0,
+    H = 1.06f0,
+    Hw = 0.73f0,
+    r= 113f-2
+)
+
+# olivine
 const default_params_SEO3 = deepcopy(params_SEO3)
 const default_params_UHO2014 = deepcopy(params_UHO2014)
 const default_params_Jones2012 = deepcopy(params_Jones2012)
 const default_params_Poe2010 = deepcopy(params_Poe2010)
 const default_params_Wang2006 = deepcopy(params_Wang2006)
 const default_params_Yoshino2009 = deepcopy(params_Yoshino2009)
+# melts
 const default_params_Ni2011 = deepcopy(params_Ni2011)
 const default_params_Sifre2014 = deepcopy(params_Sifre2014)
 const default_params_Gaillard2008 = deepcopy(params_Gaillard2008)
+# orthopyroxene
+default_params_Dai_Karato2009 =deepcopy(params_Dai_Karato2009)
+default_params_Zhang_2012 = deepcopy(params_Zhang2012)
+#clinopyroxene
+default_params_Yang2011 =deepcopy(params_Yang2011)

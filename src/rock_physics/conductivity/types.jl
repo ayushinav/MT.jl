@@ -7,6 +7,9 @@ const global gas_R = 0.008314f0
 
 abstract type AbstractCondModel <: AbstractRockphyModel end
 
+# ========================================================================================================== 
+# olivine
+
 mutable struct RockphyCond{T} <: AbstractRockphyResponse
     σ::T
 end
@@ -204,7 +207,6 @@ mutable struct const_matrix{F} <: AbstractCondModel
 end
 
 # ========================================================================================================== 
-
 # melts
 """
     Ni2011(T, Ch2o_m)
@@ -296,6 +298,27 @@ log_cond = forward(model, [])
 """
 mutable struct Gaillard2008{F1} <: AbstractCondModel
     T::F1
+end
+
+# ========================================================================================================== 
+# orthopyroxene
+
+mutable struct Dai_Karato2009{F1, F2} <: AbstractCondModel
+    T::F1
+    Ch2o_opx::F2
+end
+
+mutable struct Zhang2012{F1, F2} <: AbstractCondModel
+    T::F1
+    Ch2o_opx::F2
+end
+
+# ========================================================================================================== 
+# clinopyroxene
+
+mutable struct Yang2011{F1, F2} <: AbstractCondModel
+    T::F1
+    Ch2o_cpx::F2
 end
 
 default_params(::Type{T}) where {T <: SEO3} = default_params_SEO3
