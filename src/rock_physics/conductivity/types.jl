@@ -303,11 +303,55 @@ end
 # ========================================================================================================== 
 # orthopyroxene
 
+"""
+    Dai_Karato2009(T, Ch2o_opx)
+
+Electrical conductivity model for olivine dependent on temperature and water concentration.
+
+## Arguments
+
+  - `T` : Temperature of olivine (in K)
+  - `Ch2o_opx` : water concentration in orthopyroxene (in ppm)
+
+## References
+
+  - todo
+
+## Usage
+
+```julia
+model = Dai_Karato2009(1000 + 273.0, 2e4)
+
+log_cond = forward(model, [])
+```
+"""
 mutable struct Dai_Karato2009{F1, F2} <: AbstractCondModel
     T::F1
     Ch2o_opx::F2
 end
 
+"""
+    Zhang2012(T, Ch2o_opx)
+
+Electrical conductivity model for olivine dependent on temperature and water concentration.
+
+## Arguments
+
+  - `T` : Temperature of olivine (in K)
+  - `Ch2o_opx` : water concentration in olivine (in ppm)
+
+## References
+
+  - todo
+
+## Usage
+
+```julia
+model = Zhang2012(1000 + 273.0, 2e4)
+
+log_cond = forward(model, [])
+```
+"""
 mutable struct Zhang2012{F1, F2} <: AbstractCondModel
     T::F1
     Ch2o_opx::F2
@@ -316,17 +360,43 @@ end
 # ========================================================================================================== 
 # clinopyroxene
 
+"""
+    Yang2011(T, Ch2o_cpx)
+
+Electrical conductivity model for olivine dependent on temperature and water concentration.
+
+## Arguments
+
+  - `T` : Temperature of olivine (in K)
+  - `Ch2o_cpx` : water concentration in olivine (in ppm)
+
+## References
+
+  - todo
+
+## Usage
+
+```julia
+model = Yang2011(1000 + 273.0, 2e4)
+
+log_cond = forward(model, [])
+```
+"""
 mutable struct Yang2011{F1, F2} <: AbstractCondModel
     T::F1
     Ch2o_cpx::F2
 end
 
-default_params(::Type{T}) where {T <: SEO3} = default_params_SEO3
-default_params(::Type{T}) where {T <: UHO2014} = default_params_UHO2014
-default_params(::Type{T}) where {T <: Jones2012} = default_params_Jones2012
-default_params(::Type{T}) where {T <: Poe2010} = default_params_Poe2010
-default_params(::Type{T}) where {T <: Wang2006} = default_params_Wang2006
-default_params(::Type{T}) where {T <: Yoshino2009} = default_params_Yoshino2009
-default_params(::Type{T}) where {T <: Ni2011} = default_params_Ni2011
-default_params(::Type{T}) where {T <: Sifre2014} = default_params_Sifre2014
-default_params(::Type{T}) where {T <: Gaillard2008} = default_params_Gaillard2008
+for k in subtypes(AbstractCondModel)
+    eval(Meta.parse("default_params(::Type{T}) where {T <: $k} = default_params_$k"))
+end
+
+# default_params(::Type{T}) where {T <: SEO3} = default_params_SEO3
+# default_params(::Type{T}) where {T <: UHO2014} = default_params_UHO2014
+# default_params(::Type{T}) where {T <: Jones2012} = default_params_Jones2012
+# default_params(::Type{T}) where {T <: Poe2010} = default_params_Poe2010
+# default_params(::Type{T}) where {T <: Wang2006} = default_params_Wang2006
+# default_params(::Type{T}) where {T <: Yoshino2009} = default_params_Yoshino2009
+# default_params(::Type{T}) where {T <: Ni2011} = default_params_Ni2011
+# default_params(::Type{T}) where {T <: Sifre2014} = default_params_Sifre2014
+# default_params(::Type{T}) where {T <: Gaillard2008} = default_params_Gaillard2008

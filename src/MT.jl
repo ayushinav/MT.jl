@@ -96,6 +96,8 @@ export MTModel, MTResponse
 export RockphyCond, RockphyElastic, RockphyViscous, RockPhyAnelastic
 export SEO3, UHO2014, Jones2012, Poe2010, Yoshino2009, Wang2006, const_matrix
 export Ni2011, Sifre2014, Gaillard2008
+export Dai_Karato2009, Zhang2012
+export Yang2011
 export anharmonic, anharmonic_poro, SLB2005
 export HZK2011, HK2003, xfit_premelt
 export andrade_psp, eburgers_psp, premelt_anelastic, xfit_mxw, andrade_analytical
@@ -131,7 +133,8 @@ export MTModelDistribution, MTResponseDistribution
 export RockphyCondDistribution, RockphyElasticDistribution, RockphyViscousDistribution,
        RockPhyAnelasticDistribution
 export SEO3Distribution, UHO2014Distribution, Jones2012Distribution, Poe2010Distribution,
-       Yoshino2009Distribution, Wang2006Distribution, const_matrixDistribution
+       Yoshino2009Distribution, Wang2006Distribution, Dai_Karato2009Distribution,
+       Zhang2012Distribution, Yang2011Distribution, const_matrixDistribution
 export Ni2011Distribution, Sifre2014Distribution, Gaillard2008Distribution
 export anharmonicDistribution, anharmonic_poroDistribution, SLB2005Distribution
 export HZK2011Distribution, HK2003Distribution, xfit_premeltDistribution

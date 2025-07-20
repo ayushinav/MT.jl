@@ -8,8 +8,8 @@ end
 for m in subtypes(AbstractCondModel)
     mstring = string(m)
     dstring = mstring * "Distribution"
-    eval(Meta.parse("sample_type(d::$dstring) = $mstring"))
-    eval(Meta.parse("sample_type(::Type{T}) where {T <:$dstring} = $mstring"))
+    eval(Meta.parse("sample_type(d::MT.$dstring) = $mstring"))
+    eval(Meta.parse("sample_type(::Type{T}) where {T <:MT.$dstring} = $mstring"))
 end
 
 for m in subtypes(AbstractElasticModel)

@@ -151,7 +151,7 @@ function forward(m::Dai_Karato2009, p, params=default_params_Zhang2012)
     σ_dry = @. arrh_dry(A, H, gas_R, m.T)
     σ_wet = @. arrh_wet(Aw, Hw, gas_R_k, m.T, m.Ch2o_opx, 0.0f0, r)
 
-    σ = @. σ_dry +σ_wet
+    σ = @. σ_dry + σ_wet
 
     return RockphyCond(log10.(σ))
 end
@@ -162,7 +162,7 @@ function forward(m::Zhang2012, p, params=default_params_Zhang2012)
     σ_pol = @. arrh_dry(S_pol, H_pol, boltz_k, m.T)
     σ_hyd = @. arrh_wet(S_hyd, H_hyd, boltz_k, m.T, m.Ch2o_opx, a, 1.0f0)
 
-    σ = @. σ_pol +σ_hyd
+    σ = @. σ_pol + σ_hyd
 
     return RockphyCond(log10.(σ))
 end
@@ -176,7 +176,7 @@ function forward(m::Yang2011, p, params=default_params_Yang2011)
     σ_dry = @. arrh_dry(A, H, boltz_k, m.T)
     σ_wet = @. arrh_wet(Aw, Hw, boltz_k, m.T, m.Ch2o_opx, 0.0f0, r)
 
-    σ = @. σ_dry +σ_wet
+    σ = @. σ_dry + σ_wet
 
     return RockphyCond(log10.(σ))
 end

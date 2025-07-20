@@ -205,3 +205,69 @@ mutable struct Gaillard2008Distribution{F <: Union{Distribution, AbstractArray}}
                AbstractRockphyModelDistribution
     T::F
 end
+
+"""
+    Dai_Karato2009Distribution(T, Ch2o_opx)
+
+Electrical conductivity model for olivine dependent on temperature and water concentration.
+
+## Arguments
+
+  - `T` : Temperature of olivine (in K)
+  - `Ch2o_opx` : water concentration in orthopyroxene (in ppm)
+
+## Usage
+
+Refer to the documentation for usage examples.
+"""
+mutable struct Dai_Karato2009Distribution{
+    F1 <: Union{Distribution, AbstractArray}, F2 <: Union{Distribution, AbstractArray}} <:
+               AbstractRockphyModelDistribution
+    T::F1
+    Ch2o_opx::F2
+end
+
+"""
+    Zhang2012Distribution(T, Ch2o_opx)
+
+Electrical conductivity model for olivine dependent on temperature and water concentration.
+
+## Arguments
+
+  - `T` : Temperature of olivine (in K)
+  - `Ch2o_opx` : water concentration in olivine (in ppm)
+
+## Usage
+
+Refer to the documentation for usage examples.
+"""
+mutable struct Zhang2012Distribution{
+    F1 <: Union{Distribution, AbstractArray}, F2 <: Union{Distribution, AbstractArray}} <:
+               AbstractRockphyModelDistribution
+    T::F1
+    Ch2o_opx::F2
+end
+
+# ========================================================================================================== 
+# clinopyroxene
+
+"""
+    Yang2011Yang2011Distribution(T, Ch2o_cpx)
+
+Electrical conductivity model for olivine dependent on temperature and water concentration.
+
+## Arguments
+
+  - `T` : Temperature of olivine (in K)
+  - `Ch2o_cpx` : water concentration in olivine (in ppm)
+
+## Usage
+
+Refer to the documentation for usage examples.
+"""
+mutable struct Yang2011Distribution{
+    F1 <: Union{Distribution, AbstractArray}, F2 <: Union{Distribution, AbstractArray}} <:
+               AbstractRockphyModelDistribution
+    T::F1
+    Ch2o_cpx::F2
+end
