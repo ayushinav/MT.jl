@@ -102,7 +102,7 @@ export anharmonic, anharmonic_poro, SLB2005
 export HZK2011, HK2003, xfit_premelt
 export andrade_psp, eburgers_psp, premelt_anelastic, xfit_mxw, andrade_analytical
 export HS1962_plus, HS1962_minus, single_phase, MAL
-export two_phase_modelType, two_phase_model
+export two_phase_modelType, two_phase_model, multi_phase_modelType, multi_phase_model
 export multi_rp_modelType, multi_rp_model, multi_rp_response
 export tune_rp_modelType
 

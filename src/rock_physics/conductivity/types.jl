@@ -387,16 +387,15 @@ mutable struct Yang2011{F1, F2} <: AbstractCondModel
     Ch2o_cpx::F2
 end
 
-for k in subtypes(AbstractCondModel)
-    eval(Meta.parse("default_params(::Type{T}) where {T <: $k} = default_params_$k"))
-end
-
-# default_params(::Type{T}) where {T <: SEO3} = default_params_SEO3
-# default_params(::Type{T}) where {T <: UHO2014} = default_params_UHO2014
-# default_params(::Type{T}) where {T <: Jones2012} = default_params_Jones2012
-# default_params(::Type{T}) where {T <: Poe2010} = default_params_Poe2010
-# default_params(::Type{T}) where {T <: Wang2006} = default_params_Wang2006
-# default_params(::Type{T}) where {T <: Yoshino2009} = default_params_Yoshino2009
-# default_params(::Type{T}) where {T <: Ni2011} = default_params_Ni2011
-# default_params(::Type{T}) where {T <: Sifre2014} = default_params_Sifre2014
-# default_params(::Type{T}) where {T <: Gaillard2008} = default_params_Gaillard2008
+default_params(::Type{T}) where {T <: SEO3} = default_params_SEO3
+default_params(::Type{T}) where {T <: UHO2014} = default_params_UHO2014
+default_params(::Type{T}) where {T <: Jones2012} = default_params_Jones2012
+default_params(::Type{T}) where {T <: Poe2010} = default_params_Poe2010
+default_params(::Type{T}) where {T <: Wang2006} = default_params_Wang2006
+default_params(::Type{T}) where {T <: Yoshino2009} = default_params_Yoshino2009
+default_params(::Type{T}) where {T <: Ni2011} = default_params_Ni2011
+default_params(::Type{T}) where {T <: Sifre2014} = default_params_Sifre2014
+default_params(::Type{T}) where {T <: Gaillard2008} = default_params_Gaillard2008
+default_params(::Type{T}) where {T <: Dai_Karato2009} = default_params_Dai_Karato2009
+default_params(::Type{T}) where {T <: Zhang2012} = default_params_Zhang2012
+default_params(::Type{T}) where {T <: Yang2011} = default_params_Yang2011

@@ -59,14 +59,21 @@ Check out the relevant rock physics documentation.
     "A Modified Archie’s Law for two conducting phases", Earth and Planetary Science Letters, 180(3–4), 369–383, 
     doi: https://doi.org/10.1016/S0012-821X(00)00168-0
 """
-mutable struct MAL <: phase_mixing
-    m
+mutable struct MAL{T} <: phase_mixing
+    m::T
 end
 
-mutable struct HSn_plus <: phase_mixing end
+mutable struct HS_plus_multi_phase <: phase_mixing end
 
-mutable struct HSn_minus <: phase_mixing end
+mutable struct HS_minus_multi_phase <: phase_mixing end
 
+"""
+    GAL(m)
+Generalized Archie's law
+"""
+mutable struct GAL{T} <: phase_mixing
+    m::T
+end
 """
     single_phase
 
@@ -75,6 +82,9 @@ Single phase only conductivity. Assumes the rock matrix is composed of a single 
 mutable struct single_phase <: phase_mixing end
 
 # mixing functions
+
+two_phase_mix_types = Union{HS1962_plus, HS1962_minus, MAL}
+multi_phase_mix_types = Union{HS_plus_multi_phase, HS_minus_multi_phase, GAL}
 
 function mix_models(σs, ϕ, ::HS1962_plus)
     σ_max = maximum(σs)
@@ -118,4 +128,35 @@ end
 function mix_models(σs, ϕ, ::single_phase)
     @assert length(σs) == 1
     return first(σs)
+end
+
+
+function mix_models(σs, ϕ, ::HS_plus_multi_phase)
+    σ_min = minimum(σs)
+
+    σ = inv(sum([
+        ϕ[i]* inv(σs[i] + 2σ_min) for i in eachindex(σs)
+    ])) - 2σ_min
+
+    return σ
+
+end
+
+function mix_models(σs, ϕ, ::HS_minus_multi_phase)
+    σ_max = maximum(σs)
+
+    σ = inv(sum([
+        ϕ[i]* inv(σs[i] + 2σ_max) for i in eachindex(σs)
+    ])) - 2σ_max
+
+    return σ
+
+end
+
+function mix_models(σs, ϕ, m::GAL)
+    
+    σ = sum(σs[i] * (ϕ[i]^m.m[i]))
+
+    return σ
+
 end

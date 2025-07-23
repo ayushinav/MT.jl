@@ -1,4 +1,4 @@
-mutable struct tune_rp_modelType{K, M} #<: AbstractRockphyModel
+mutable struct tune_rp_modelType{K, M} <: AbstractRockphyModel
     fn_list::K
     model::Type{M}
 end

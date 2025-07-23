@@ -75,3 +75,65 @@ function from_nt(m::Type{T}, nt::NamedTuple) where {T <: two_phase_modelDistribu
 
     return two_phase_modelDistribution(ϕ, model1, model2, mix())
 end
+
+
+# =========
+
+mutable struct multi_phase_modelDistributionType{T1, T2, T3, T4, T5, T6, T7, T8, M}
+    m1::Type{T1}
+    m2::Type{T2}
+    m3::Type{T3}
+    m4::Type{T4}
+    m5::Type{T5}
+    m6::Type{T6}
+    m7::Type{T7}
+    m8::Type{T8}
+    mix::M
+end
+
+multi_phase_modelDistributionType(m1) = m1
+multi_phase_modelDistributionType(m1, m::phase_mixing) = m1
+
+for i in 2:7
+    args = [Symbol("m$k") for k in 1:i]
+    last_args = :(m::phase_mixing)
+    expr_lhs = Expr(:call, :multi_phase_modelDistributionType, args..., last_args)
+
+    args2 = [Nothing for k in i+1:8]
+    expr_rhs = Expr(:call, :multi_phase_modelDistributionType, args..., args2..., last_args)
+
+    expr = Expr(:function, expr_lhs, expr_rhs)
+    eval(expr)
+end
+
+mutable struct multi_phase_modelDistribution{V, T1, T2, T3, T4, T5, T6, T7, T8, M} <: AbstractRockphyModelDistribution
+    ϕ::V
+    m1::T1
+    m2::T2
+    m3::T3
+    m4::T4
+    m5::T5
+    m6::T6
+    m7::T7
+    m8::T8
+    mix::M
+end
+
+function (model::multi_phase_modelDistributionType)(ps::NamedTuple)
+    
+    pnames = propertynames(model)
+    mix = model.mix
+    ϕ = ps.ϕ
+
+    # ϕ_vec = rearrange_ϕ(ps.ϕ, model)
+
+    v1 = from_nt(getproperty(model, pnames[1]), ps)
+    v2 = from_nt(getproperty(model, pnames[2]), ps)
+    v3 = from_nt(getproperty(model, pnames[3]), ps)
+    v4 = from_nt(getproperty(model, pnames[4]), ps)
+    v5 = from_nt(getproperty(model, pnames[5]), ps)
+    v6 = from_nt(getproperty(model, pnames[6]), ps)
+    v7 = from_nt(getproperty(model, pnames[7]), ps)
+    v8 = from_nt(getproperty(model, pnames[8]), ps)
+    return multi_phase_modelDistribution(ϕ, v1, v2, v3, v4, v5, v6, v7, v8, mix)
+end
