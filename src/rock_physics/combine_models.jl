@@ -98,6 +98,7 @@ function from_nt(m::Type{T}, nt::NamedTuple) where {T <: multi_rp_model}
 
     # @show m.types[1]
     # @show typeof(m)
+    @show "HEREE"
     m1 = m.types[1]
     m2 = m.types[2]
     m3 = m.types[3]

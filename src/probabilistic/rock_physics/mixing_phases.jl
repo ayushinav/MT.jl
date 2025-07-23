@@ -66,6 +66,9 @@ end
 
 function from_nt(m::Type{T}, nt::NamedTuple) where {T <: two_phase_modelDistributionType}
     ϕ = nt.ϕ
+
+    @show "CXVXCVXCVV"
+
     m1 = m.types[1].parameters[1]
     m2 = m.types[2].parameters[1]
     mix = m.types[3] #.parameters[1]
@@ -75,7 +78,6 @@ function from_nt(m::Type{T}, nt::NamedTuple) where {T <: two_phase_modelDistribu
 
     return two_phase_modelDistribution(ϕ, model1, model2, mix())
 end
-
 
 # =========
 
@@ -99,14 +101,15 @@ for i in 2:7
     last_args = :(m::phase_mixing)
     expr_lhs = Expr(:call, :multi_phase_modelDistributionType, args..., last_args)
 
-    args2 = [Nothing for k in i+1:8]
+    args2 = [Nothing for k in (i + 1):8]
     expr_rhs = Expr(:call, :multi_phase_modelDistributionType, args..., args2..., last_args)
 
     expr = Expr(:function, expr_lhs, expr_rhs)
     eval(expr)
 end
 
-mutable struct multi_phase_modelDistribution{V, T1, T2, T3, T4, T5, T6, T7, T8, M} <: AbstractRockphyModelDistribution
+mutable struct multi_phase_modelDistribution{V, T1, T2, T3, T4, T5, T6, T7, T8, M} <:
+               AbstractRockphyModelDistribution
     ϕ::V
     m1::T1
     m2::T2
@@ -120,7 +123,6 @@ mutable struct multi_phase_modelDistribution{V, T1, T2, T3, T4, T5, T6, T7, T8, 
 end
 
 function (model::multi_phase_modelDistributionType)(ps::NamedTuple)
-    
     pnames = propertynames(model)
     mix = model.mix
     ϕ = ps.ϕ
@@ -136,4 +138,33 @@ function (model::multi_phase_modelDistributionType)(ps::NamedTuple)
     v7 = from_nt(getproperty(model, pnames[7]), ps)
     v8 = from_nt(getproperty(model, pnames[8]), ps)
     return multi_phase_modelDistribution(ϕ, v1, v2, v3, v4, v5, v6, v7, v8, mix)
+end
+
+function from_nt(m::Type{T}, nt::NamedTuple) where {T <: multi_phase_modelDistributionType}
+    ϕ = nt.ϕ
+
+    @show "CXVXCVXCVV"
+
+    ϕ = nt.ϕ
+    m1 = m.types[1].parameters[1]
+    m2 = m.types[2].parameters[1]
+    m3 = m.types[3].parameters[1]
+    m4 = m.types[4].parameters[1]
+    m5 = m.types[5].parameters[1]
+    m6 = m.types[6].parameters[1]
+    m7 = m.types[7].parameters[1]
+    m8 = m.types[8].parameters[1]
+    mix = m.types[9]
+
+    model1 = MT.from_nt(m1, nt)
+    model2 = MT.from_nt(m2, nt)
+    model3 = MT.from_nt(m3, nt)
+    model4 = MT.from_nt(m4, nt)
+    model5 = MT.from_nt(m5, nt)
+    model6 = MT.from_nt(m6, nt)
+    model7 = MT.from_nt(m7, nt)
+    model8 = MT.from_nt(m8, nt)
+
+    return multi_phase_modelDistribution(
+        ϕ, model1, model2, model3, model4, model5, model6, model7, model8, mix())
 end

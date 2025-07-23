@@ -141,6 +141,7 @@ export HZK2011Distribution, HK2003Distribution, xfit_premeltDistribution
 export andrade_pspDistribution, eburgers_pspDistribution, premelt_anelasticDistribution,
        xfit_mxwDistribution, andrade_analyticalDistribution
 export two_phase_modelDistributionType, two_phase_modelDistribution
+export multi_phase_modelDistributionType, multi_phase_modelDistribution
 export multi_rp_modelDistributionType, multi_rp_modelDistribution
 export tune_rp_modelDistributionType, tune_rp_modelDistribution
 

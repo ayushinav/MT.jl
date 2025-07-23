@@ -69,6 +69,7 @@ mutable struct HS_minus_multi_phase <: phase_mixing end
 
 """
     GAL(m)
+
 Generalized Archie's law
 """
 mutable struct GAL{T} <: phase_mixing
@@ -130,33 +131,24 @@ function mix_models(σs, ϕ, ::single_phase)
     return first(σs)
 end
 
-
 function mix_models(σs, ϕ, ::HS_plus_multi_phase)
     σ_min = minimum(σs)
 
-    σ = inv(sum([
-        ϕ[i]* inv(σs[i] + 2σ_min) for i in eachindex(σs)
-    ])) - 2σ_min
+    σ = inv(sum([ϕ[i] * inv(σs[i] + 2σ_min) for i in eachindex(σs)])) - 2σ_min
 
     return σ
-
 end
 
 function mix_models(σs, ϕ, ::HS_minus_multi_phase)
     σ_max = maximum(σs)
 
-    σ = inv(sum([
-        ϕ[i]* inv(σs[i] + 2σ_max) for i in eachindex(σs)
-    ])) - 2σ_max
+    σ = inv(sum([ϕ[i] * inv(σs[i] + 2σ_max) for i in eachindex(σs)])) - 2σ_max
 
     return σ
-
 end
 
 function mix_models(σs, ϕ, m::GAL)
-    
     σ = sum(σs[i] * (ϕ[i]^m.m[i]))
 
     return σ
-
 end

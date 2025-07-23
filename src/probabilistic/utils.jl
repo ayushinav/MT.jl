@@ -45,7 +45,8 @@ function sample_type(d::two_phase_modelDistribution{V, T1, T2, M}) where {V, T1,
     two_phase_model{v, t1, t2, m}
 end
 
-function sample_type(d::multi_phase_modelDistribution{V, T1, T2, T3, T4, T5, T6, T7, T8, M}) where {V, T1, T2, T3, T4, T5, T6, T7, T8, M}
+function sample_type(d::multi_phase_modelDistribution{
+        V, T1, T2, T3, T4, T5, T6, T7, T8, M}) where {V, T1, T2, T3, T4, T5, T6, T7, T8, M}
     if typeof(V) <: Distribution
         v = typeof(rand(d.ϕ))
     else
@@ -71,19 +72,20 @@ function sample_type(::Type{two_phase_modelDistribution{V, T1, T2, M}}) where {V
     two_phase_model{v, t1, t2, m}
 end
 
-# function sample_type(::Type{multi_phase_modelDistribution{V, T1, T2, T3, T4, T5, T6, T7, T8, M}}) where {V, T1, T2, T3, T4, T5, T6, T7, T8, M}
-#     v = Vector{Float64}
-#     t1 = sample_type(T1)
-#     t2 = sample_type(T2)
-#     t3 = sample_type(T3)
-#     t4 = sample_type(T4)
-#     t5 = sample_type(T5)
-#     t6 = sample_type(T6)
-#     t7 = sample_type(T7)
-#     t8 = sample_type(T8)
-#     m = M
-#     two_phase_model{v, t1, t2, t3, t4, t5, t6, t7, t8, m}
-# end
+function sample_type(::Type{multi_phase_modelDistribution{
+        V, T1, T2, T3, T4, T5, T6, T7, T8, M}}) where {V, T1, T2, T3, T4, T5, T6, T7, T8, M}
+    v = Vector{Float64}
+    t1 = sample_type(T1)
+    t2 = sample_type(T2)
+    t3 = sample_type(T3)
+    t4 = sample_type(T4)
+    t5 = sample_type(T5)
+    t6 = sample_type(T6)
+    t7 = sample_type(T7)
+    t8 = sample_type(T8)
+    m = M
+    multi_phase_model{v, t1, t2, t3, t4, t5, t6, t7, t8, m}
+end
 
 function sample_type(::Type{two_phase_modelDistributionType{T1, T2, M}}) where {T1, T2, M}
     v = Vector{Float64}

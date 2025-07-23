@@ -4,9 +4,10 @@
 Rock physics model to combine two phases.
 
 ## Arguments
- - `m1` : model type corresponding to phase 1
- - `m2` : model type corresponding to phase 2
- - `mix` : mixing type, available options are `HS_1962_plus()`, `HS1962_minus`, `MAL(m)`
+
+  - `m1` : model type corresponding to phase 1
+  - `m2` : model type corresponding to phase 2
+  - `mix` : mixing type, available options are `HS_1962_plus()`, `HS1962_minus`, `MAL(m)`
 
 ## Usage
 
@@ -26,16 +27,18 @@ end
 Rock physics model to combine two phases, usually constructed through `two_phase_modelType`[@ref]
 
 ## Arguments
- - `ϕ` : Vol. fraction of the **second** phase
- - `m1` : model corresponding to phase 1
- - `m2` : model corresponding to phase 2
- - `mix` : mixing type, available options are `HS_1962_plus()`, `HS1962_minus`, `MAL(m)`
+
+  - `ϕ` : Vol. fraction of the **second** phase
+  - `m1` : model corresponding to phase 1
+  - `m2` : model corresponding to phase 2
+  - `mix` : mixing type, available options are `HS_1962_plus()`, `HS1962_minus`, `MAL(m)`
 
 ## Usage
 
 ```julia
 m = two_phase_modelType(SEO3, Ni2011, HS1962_plus())
-ps_nt = ps_nt = (; T=[800.0f0, 1000.0f0] .+ 273, P=3.0f0, ρ=3300.0f0, Ch2o_m=1000.0f0, ϕ=0.1f0)
+ps_nt = ps_nt = (;
+    T=[800.0f0, 1000.0f0] .+ 273, P=3.0f0, ρ=3300.0f0, Ch2o_m=1000.0f0, ϕ=0.1f0)
 model = m(ps_nt)
 
 resp = forward(model)
@@ -60,7 +63,8 @@ function (model::two_phase_modelType)(ps::NamedTuple)
 end
 
 function forward(model::two_phase_model{V, T1, T2, M},
-        p) where {V, M <: two_phase_mix_types, T1 <: AbstractCondModel, T2 <: AbstractCondModel}
+        p) where {
+        V, M <: two_phase_mix_types, T1 <: AbstractCondModel, T2 <: AbstractCondModel}
     σ1 = MT.forward(model.m1, []).σ
     σ2 = MT.forward(model.m2, []).σ
 
@@ -98,7 +102,6 @@ end
 # following is needed for combine_models
 
 function from_nt(m::Type{T}, nt::NamedTuple) where {T <: two_phase_modelType}
-
     ϕ = nt.ϕ
     m1 = m.types[1].parameters[1]
     m2 = m.types[2].parameters[1]
@@ -111,7 +114,6 @@ function from_nt(m::Type{T}, nt::NamedTuple) where {T <: two_phase_modelType}
 end
 
 function from_nt(m::Type{T}, nt::NamedTuple) where {T <: two_phase_model}
-
     ϕ = nt.ϕ
     m1 = T.parameters[2]
     m2 = T.parameters[3]
@@ -146,14 +148,15 @@ for i in 2:7
     last_args = :(m::phase_mixing)
     expr_lhs = Expr(:call, :multi_phase_modelType, args..., last_args)
 
-    args2 = [Nothing for k in i+1:8]
+    args2 = [Nothing for k in (i + 1):8]
     expr_rhs = Expr(:call, :multi_phase_modelType, args..., args2..., last_args)
 
     expr = Expr(:function, expr_lhs, expr_rhs)
     eval(expr)
 end
 
-mutable struct multi_phase_model{T, T1, T2, T3, T4, T5, T6, T7, T8, M} <: AbstractRockphyModel
+mutable struct multi_phase_model{T, T1, T2, T3, T4, T5, T6, T7, T8, M} <:
+               AbstractRockphyModel
     ϕ::T
     m1::T1
     m2::T2
@@ -207,9 +210,8 @@ function (model::multi_phase_modelType)(ps::NamedTuple)
 end
 
 function forward(model::multi_phase_model{V, T1, T2, T3, T4, T5, T6, T7, T8, M},
-    p) where {V, M <: multi_phase_mix_types,
-    T1 <: AbstractCondModel, T2, T3, T4, T5, T6, T7, T8}
-
+        p) where {
+        V, M <: multi_phase_mix_types, T1 <: AbstractCondModel, T2, T3, T4, T5, T6, T7, T8}
     fnames = propertynames(model)[2:(end - 1)]
     fnames = filter(f -> !isnothing(getfield(model, f)), fnames)
 
@@ -221,16 +223,15 @@ function forward(model::multi_phase_model{V, T1, T2, T3, T4, T5, T6, T7, T8, M},
         @. σ_vec[i] = exp10(σ_vec[i])
     end
 
-    σ = broadcast(
-        (sig...) -> mix_models(sig, model.ϕ, model.mix), σ_vec...)
+    σ = broadcast((sig...) -> mix_models(sig, model.ϕ, model.mix), σ_vec...)
 
     return RockphyCond(log10.(σ))
 end
 
 function forward(model::multi_phase_model{V, T1, T2, T3, T4, T5, T6, T7, T8, M},
-    p, params) where {V, M <: multi_phase_mix_types,
-    T1 <: AbstractCondModel, T2, T3, T4, T5, T6, T7, T8}
-
+        p,
+        params) where {
+        V, M <: multi_phase_mix_types, T1 <: AbstractCondModel, T2, T3, T4, T5, T6, T7, T8}
     fnames = propertynames(model)[2:(end - 1)]
     fnames = filter(f -> !isnothing(getfield(model, f)), fnames)
 
@@ -242,18 +243,82 @@ function forward(model::multi_phase_model{V, T1, T2, T3, T4, T5, T6, T7, T8, M},
         @. σ_vec[i] = exp10(σ_vec[i])
     end
 
-    σ = broadcast(
-        (sig...) -> mix_models(sig, model.ϕ, model.mix), σ_vec...)
+    σ = broadcast((sig...) -> mix_models(sig, model.ϕ, model.mix), σ_vec...)
 
     return RockphyCond(log10.(σ))
 end
 
-function default_params(::Type{multi_phase_model{V, T1, T2, T3, T4, T5, T6, T7, T8, M}}) where {V, T1, T2, T3, T4, T5, T6, T7, T8, M}
-    (; zip(
-        [:m1, :m2, :m3, :m4, :m5, :m6, :m7, :m8], 
-        [default_params(T1), default_params(T2), default_params(T3), default_params(T4), default_params(T5), default_params(T6), default_params(T7), default_params(T8)])...)
+function default_params(::Type{multi_phase_model{
+        V, T1, T2, T3, T4, T5, T6, T7, T8, M}}) where {V, T1, T2, T3, T4, T5, T6, T7, T8, M}
+    (;
+        zip([:m1, :m2, :m3, :m4, :m5, :m6, :m7, :m8],
+            [default_params(T1), default_params(T2), default_params(T3),
+                default_params(T4), default_params(T5), default_params(T6),
+                default_params(T7), default_params(T8)])...)
 end
 
 # function default_params(::Type{two_phase_modelType{T1, T2, M}}) where {T1, T2, M}
 #     (; zip([:m1, :m2], [default_params(T1), default_params(T2)])...)
 # end
+
+function from_nt(m::Type{T}, nt::NamedTuple) where {T <: multi_phase_model}
+    ϕ = nt.ϕ
+    m1 = T.parameters[2]
+    m2 = T.parameters[3]
+    m3 = T.parameters[4]
+    m4 = T.parameters[5]
+    m5 = T.parameters[6]
+    m6 = T.parameters[7]
+    m7 = T.parameters[8]
+    m8 = T.parameters[9]
+    mix = T.parameters[10]
+
+    model1 = from_nt(m1, nt)
+    model2 = from_nt(m2, nt)
+    model3 = from_nt(m3, nt)
+    model4 = from_nt(m4, nt)
+    model5 = from_nt(m5, nt)
+    model6 = from_nt(m6, nt)
+    model7 = from_nt(m7, nt)
+    model8 = from_nt(m8, nt)
+
+    ϕ_vec = rearrange_ϕ(ϕ,
+        multi_phase_modelType(
+            typeof.([model1, model2, model3, model4, model5, model6, model7, model8])...,
+            mix()))
+
+    return multi_phase_model(
+        ϕ_vec, model1, model2, model3, model4, model5, model6, model7, model8, mix())
+end
+
+function from_nt(m::Type{T}, nt::NamedTuple) where {T <: multi_phase_modelType}
+    ϕ = nt.ϕ
+    m1 = m.types[1].parameters[1]
+    m2 = m.types[2].parameters[1]
+    m3 = m.types[3].parameters[1]
+    m4 = m.types[4].parameters[1]
+    m5 = m.types[5].parameters[1]
+    m6 = m.types[6].parameters[1]
+    m7 = m.types[7].parameters[1]
+    m8 = m.types[8].parameters[1]
+    mix = m.types[9]
+
+    model1 = MT.from_nt(m1, nt)
+    model2 = MT.from_nt(m2, nt)
+    model3 = MT.from_nt(m3, nt)
+    model4 = MT.from_nt(m4, nt)
+    model5 = MT.from_nt(m5, nt)
+    model6 = MT.from_nt(m6, nt)
+    model7 = MT.from_nt(m7, nt)
+    model8 = MT.from_nt(m8, nt)
+
+    ϕ_vec = rearrange_ϕ(ϕ,
+        multi_phase_modelType(
+            typeof.([model1, model2, model3, model4, model5, model6, model7, model8])...,
+            mix()))
+
+    # todo (the following won't work for GAL([...]))
+
+    return multi_phase_model(
+        ϕ_vec, model1, model2, model3, model4, model5, model6, model7, model8, mix())
+end
