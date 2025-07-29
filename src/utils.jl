@@ -61,28 +61,20 @@ function forward_helper(
 end
 
 function forward_helper(
-        ::Type{T}, m0, vars, response_trans_utils, params) where {T <: two_phase_model}
-    m = two_phase_modelType(T.parameters[2], T.parameters[3], from_nt(T.parameters[4], m0))
-    model = m(m0)
+    m::Type{T}, m0, vars, response_trans_utils, params) where {T <: two_phase_modelType}
+    model = from_nt(m, m0)
     to_resp_nt(forward(model, vars, params))
 end
 
 function forward_helper(
-        ::Type{T}, m0, vars, response_trans_utils, params) where {T <: multi_phase_model}
-    m = multi_phase_modelType(
-        T.parameters[2], T.parameters[3], T.parameters[4], T.parameters[5], T.parameters[6],
-        T.parameters[7], T.parameters[8], T.parameters[9], from_nt(T.parameters[10], m0))
-
-    # @show m0
-    model = m(m0)
+    m::Type{T}, m0, vars, response_trans_utils, params) where {T <: multi_phase_modelType}
+    model = from_nt(m, m0)
     to_resp_nt(forward(model, vars, params))
 end
 
 function forward_helper(
-        ::Type{T}, m0, vars, response_trans_utils, params) where {T <: multi_rp_model}
-    m = multi_rp_modelType(
-        T.parameters[1], T.parameters[2], T.parameters[3], T.parameters[4])
-    model = from_nt(typeof(m), m0)
+    m::Type{T}, m0, vars, response_trans_utils, params) where {T <: multi_rp_modelType}
+    model = from_nt(m, m0)
     to_resp_nt(forward(model, vars, params))
 end
 

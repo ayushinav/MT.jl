@@ -166,15 +166,6 @@ function from_nt(m::Type{T}, ps::NamedTuple) where {T <: GAL}
     return m(ps.m_GAL)
 end
 
-function sample_type(m::Type{T}) where {T <: Union{
-        HS1962_plus, HS1962_minus, HS_plus_multi_phase, HS_minus_multi_phase}}
+function sample_type(m::Type{T}) where {T <: phase_mixing}
     T
-end
-
-function sample_type(m::Type{T}) where {T <: MAL}
-    (T.name.wrapper){Vector{Float64}}
-end
-
-function sample_type(m::T) where {T <: GAL}
-    (T.name.wrapper){Vector{Float64}}
 end

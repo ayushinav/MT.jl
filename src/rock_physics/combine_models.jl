@@ -41,7 +41,7 @@ mutable struct multi_rp_modelType2{T1, T2, T3, T4}
 end
 
 """
-    multi_rp_model(con, elastic, visc, anelastic)
+    multi_rp_model(cond, elastic, visc, anelastic)
 
 Rock physics model to capture multiple rock physics models,
 usually constructed through `multi_rp_modelType`[@ref]
@@ -94,35 +94,16 @@ function forward(model::multi_rp_model{T1, T2, T3, T4}, p) where {T1, T2, T3, T4
     multi_rp_response(resp_cond, resp_elastic, resp_visc, resp_anelastic)
 end
 
-function default_params(::Type{multi_rp_model{T1, T2, T3, T4}}) where {T1, T2, T3, T4}
+
+function default_params(::Type{multi_rp_modelType{T1, T2, T3, T4}}) where {T1, T2, T3, T4}
     (;
         zip([:cond, :elastic, :visc, :anelastic],
             [default_params(T1), default_params(T2),
                 default_params(T3), default_params(T4)])...)
 end
 
-function from_nt(m::Type{T}, nt::NamedTuple) where {T <: multi_rp_model}
-
-    # @show m.types[1]
-    # @show typeof(m)
-    # @show "HEREE"
-    m1 = m.types[1]
-    m2 = m.types[2]
-    m3 = m.types[3]
-    m4 = m.types[4]
-
-    model1 = MT.from_nt(m1, nt)
-    model2 = MT.from_nt(m2, nt)
-    model3 = MT.from_nt(m3, nt)
-    model4 = MT.from_nt(m4, nt)
-
-    return multi_rp_model(model1, model2, model3, model4)
-end
-
 function from_nt(m::Type{T}, nt::NamedTuple) where {T <: multi_rp_modelType}
 
-    # ϕ = nt.ϕ
-    # @show nt
     m1 = T.parameters[1]
     m2 = T.parameters[2]
     m3 = T.parameters[3]

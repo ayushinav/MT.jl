@@ -91,10 +91,6 @@ function forward(model::two_phase_model{V, T1, T2, M}, p,
     return RockphyCond(log10.(σ))
 end
 
-function default_params(::Type{two_phase_model{V, T1, T2, M}}) where {V, T1, T2, M}
-    (; zip([:m1, :m2], [default_params(T1), default_params(T2)])...)
-end
-
 function default_params(::Type{two_phase_modelType{T1, T2, M}}) where {T1, T2, M}
     (; zip([:m1, :m2], [default_params(T1), default_params(T2)])...)
 end
@@ -111,23 +107,6 @@ function from_nt(m::Type{T}, nt::NamedTuple) where {T <: two_phase_modelType}
     model2 = from_nt(m2, nt)
     # @show m.types[3]
     mix = from_nt(m.types[3], nt)
-
-    return two_phase_model(ϕ, model1, model2, mix)
-end
-
-# for combine models during inference
-function from_nt(m::Type{T}, nt::NamedTuple) where {T <: two_phase_model}
-    ϕ = nt.ϕ
-    m1 = T.parameters[2]
-    m2 = T.parameters[3]
-
-    model1 = MT.from_nt(m1, nt)
-    model2 = MT.from_nt(m2, nt)
-
-    # @show T.parameters[4]
-    # @show keys(nt)
-
-    mix = from_nt(T.parameters[4], nt)
 
     return two_phase_model(ϕ, model1, model2, mix)
 end
@@ -254,51 +233,13 @@ function forward(model::multi_phase_model{V, T1, T2, T3, T4, T5, T6, T7, T8, M},
     return RockphyCond(log10.(σ))
 end
 
-function default_params(::Type{multi_phase_model{
-        V, T1, T2, T3, T4, T5, T6, T7, T8, M}}) where {V, T1, T2, T3, T4, T5, T6, T7, T8, M}
+function default_params(::Type{multi_phase_modelType{
+        T1, T2, T3, T4, T5, T6, T7, T8, M}}) where {T1, T2, T3, T4, T5, T6, T7, T8, M}
     (;
         zip([:m1, :m2, :m3, :m4, :m5, :m6, :m7, :m8],
             [default_params(T1), default_params(T2), default_params(T3),
                 default_params(T4), default_params(T5), default_params(T6),
                 default_params(T7), default_params(T8)])...)
-end
-
-# function default_params(::Type{two_phase_modelType{T1, T2, M}}) where {T1, T2, M}
-#     (; zip([:m1, :m2], [default_params(T1), default_params(T2)])...)
-# end
-
-function from_nt(m::Type{T}, nt::NamedTuple) where {T <: multi_phase_model}
-    ϕ = nt.ϕ
-    m1 = T.parameters[2]
-    m2 = T.parameters[3]
-    m3 = T.parameters[4]
-    m4 = T.parameters[5]
-    m5 = T.parameters[6]
-    m6 = T.parameters[7]
-    m7 = T.parameters[8]
-    m8 = T.parameters[9]
-
-    model1 = from_nt(m1, nt)
-    model2 = from_nt(m2, nt)
-    model3 = from_nt(m3, nt)
-    model4 = from_nt(m4, nt)
-    model5 = from_nt(m5, nt)
-    model6 = from_nt(m6, nt)
-    model7 = from_nt(m7, nt)
-    model8 = from_nt(m8, nt)
-
-    # @show T.parameters[10]
-    # @show keys(nt)
-
-    mix = from_nt(T.parameters[10], nt)
-
-    ϕ_vec = rearrange_ϕ(ϕ,
-        multi_phase_modelType(
-            typeof.([model1, model2, model3, model4, model5, model6, model7, model8])...,
-            mix))
-
-    return multi_phase_model(
-        ϕ_vec, model1, model2, model3, model4, model5, model6, model7, model8, mix)
 end
 
 function from_nt(m::Type{T}, nt::NamedTuple) where {T <: multi_phase_modelType}
@@ -327,8 +268,6 @@ function from_nt(m::Type{T}, nt::NamedTuple) where {T <: multi_phase_modelType}
         multi_phase_modelType(
             typeof.([model1, model2, model3, model4, model5, model6, model7, model8])...,
             mix))
-
-    # todo (the following won't work for GAL([...]))
 
     return multi_phase_model(
         ϕ_vec, model1, model2, model3, model4, model5, model6, model7, model8, mix)

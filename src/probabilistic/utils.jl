@@ -34,24 +34,14 @@ for m in subtypes(AbstractAnelasticModel)
 end
 
 function sample_type(d::two_phase_modelDistribution{V, T1, T2, M}) where {V, T1, T2, M}
-    if typeof(V) <: Distribution
-        v = typeof(rand(d.ϕ))
-    else
-        v = V
-    end
     t1 = sample_type(T1)
     t2 = sample_type(T2)
     m = M
-    two_phase_model{v, t1, t2, m}
+    two_phase_modelType{t1, t2, m}
 end
 
 function sample_type(d::multi_phase_modelDistribution{
         V, T1, T2, T3, T4, T5, T6, T7, T8, M}) where {V, T1, T2, T3, T4, T5, T6, T7, T8, M}
-    if typeof(V) <: Distribution
-        v = typeof(rand(d.ϕ))
-    else
-        v = V
-    end
     t1 = sample_type(T1)
     t2 = sample_type(T2)
     t3 = sample_type(T3)
@@ -61,20 +51,20 @@ function sample_type(d::multi_phase_modelDistribution{
     t7 = sample_type(T7)
     t8 = sample_type(T8)
     m = M
-    multi_phase_model{v, t1, t2, t3, t4, t5, t6, t7, t8, m}
+    multi_phase_modelType{t1, t2, t3, t4, t5, t6, t7, t8, m}
 end
 
 function sample_type(::Type{two_phase_modelDistribution{V, T1, T2, M}}) where {V, T1, T2, M}
-    v = Vector{Float64}
+    # needed for higher models
     t1 = sample_type(T1)
     t2 = sample_type(T2)
     m = sample_type(M)
-    two_phase_model{v, t1, t2, m}
+    two_phase_modelType{t1, t2, m}
 end
 
 function sample_type(::Type{multi_phase_modelDistribution{
         V, T1, T2, T3, T4, T5, T6, T7, T8, M}}) where {V, T1, T2, T3, T4, T5, T6, T7, T8, M}
-    v = Vector{Float64}
+    # needed for higher models
     t1 = sample_type(T1)
     t2 = sample_type(T2)
     t3 = sample_type(T3)
@@ -83,27 +73,14 @@ function sample_type(::Type{multi_phase_modelDistribution{
     t6 = sample_type(T6)
     t7 = sample_type(T7)
     t8 = sample_type(T8)
-    m = M
-    multi_phase_model{v, t1, t2, t3, t4, t5, t6, t7, t8, m}
-end
-
-function sample_type(::Type{two_phase_modelDistributionType{T1, T2, M}}) where {T1, T2, M}
-    v = Vector{Float64}
-    t1 = sample_type(T1)
-    t2 = sample_type(T2)
     m = sample_type(M)
-    two_phase_model{v, t1, t2, m}
+    multi_phase_modelType{t1, t2, t3, t4, t5, t6, t7, t8, m}
 end
 
 sample_type(::Type{Nothing}) = Nothing
 
 function sample_type(::multi_rp_modelDistribution{T1, T2, T3, T4}) where {T1, T2, T3, T4}
-    multi_rp_model{sample_type(T1), sample_type(T2), sample_type(T3), sample_type(T4)}
-end
-
-function sample_type(::Type{multi_rp_modelDistributionType{
-        T1, T2, T3, T4}}) where {T1, T2, T3, T4}
-    multi_rp_model{sample_type(T1), sample_type(T2), sample_type(T3), sample_type(T4)}
+    multi_rp_modelType{sample_type(T1), sample_type(T2), sample_type(T3), sample_type(T4)}
 end
 
 function sample_type(d::tune_rp_modelDistribution{K, M}) where {K, M}
@@ -121,8 +98,6 @@ function to_dist_nt(d::T) where {T <: two_phase_modelDistribution}
     m1 = to_nt(d.m1)
     m2 = to_nt(d.m2)
     mix = to_nt(d.mix)
-    nt1_ = (; ϕ=d.ϕ, m1..., m2..., mix...)
-    @show keys(nt1_)
     return (; ϕ=d.ϕ, m1..., m2..., mix...)
 end
 
@@ -136,21 +111,7 @@ function to_dist_nt(d::T) where {T <: multi_phase_modelDistribution}
     m7 = to_nt(d.m7)
     m8 = to_nt(d.m8)
     mix = to_nt(d.mix)
-    # nt1_ =(; ϕ=d.ϕ, m1..., m2..., mix...)
-    # @show keys(nt1_)
     return (; ϕ=d.ϕ, m1..., m2..., m3..., m4..., m5..., m6..., m7..., m8..., mix...)
-end
-
-function to_dist_nt(d::T) where {T <: multi_phase_modelDistribution}
-    m1 = to_nt(d.m1)
-    m2 = to_nt(d.m2)
-    m3 = to_nt(d.m3)
-    m4 = to_nt(d.m4)
-    m5 = to_nt(d.m5)
-    m6 = to_nt(d.m6)
-    m7 = to_nt(d.m7)
-    m8 = to_nt(d.m8)
-    return (; ϕ=d.ϕ, m1..., m2..., m3..., m4..., m5..., m6..., m7..., m8...)
 end
 
 function to_dist_nt(d::T) where {T <: multi_rp_modelDistribution}
