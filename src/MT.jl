@@ -93,14 +93,17 @@ export AbstractCondModel, AbstractElasticModel, AbstractViscousModel, AbstractAn
 export MTModel, MTResponse
 
 # rock physics
-export RockphyCond, RockphyElastic, RockphyViscous, RockPhyAnelastic
+export RockphyCond, RockphyElastic, RockphyViscous, RockphyAnelastic
 export SEO3, UHO2014, Jones2012, Poe2010, Yoshino2009, Wang2006, const_matrix
 export Ni2011, Sifre2014, Gaillard2008
+export Dai_Karato2009, Zhang2012
+export Yang2011
 export anharmonic, anharmonic_poro, SLB2005
 export HZK2011, HK2003, xfit_premelt
 export andrade_psp, eburgers_psp, premelt_anelastic, xfit_mxw, andrade_analytical
 export HS1962_plus, HS1962_minus, single_phase, MAL
-export two_phase_modelType, two_phase_model
+export HS_plus_multi_phase, HS_minus_multi_phase, GAL
+export two_phase_modelType, two_phase_model, multi_phase_modelType, multi_phase_model
 export multi_rp_modelType, multi_rp_model, multi_rp_response
 export tune_rp_modelType
 
@@ -130,16 +133,19 @@ export MTModelDistribution, MTResponseDistribution
 
 ## rock physics
 export RockphyCondDistribution, RockphyElasticDistribution, RockphyViscousDistribution,
-       RockPhyAnelasticDistribution
+       RockphyAnelasticDistribution
 export SEO3Distribution, UHO2014Distribution, Jones2012Distribution, Poe2010Distribution,
-       Yoshino2009Distribution, Wang2006Distribution, const_matrixDistribution
+       Yoshino2009Distribution, Wang2006Distribution, Dai_Karato2009Distribution,
+       Zhang2012Distribution, Yang2011Distribution, const_matrixDistribution
 export Ni2011Distribution, Sifre2014Distribution, Gaillard2008Distribution
 export anharmonicDistribution, anharmonic_poroDistribution, SLB2005Distribution
 export HZK2011Distribution, HK2003Distribution, xfit_premeltDistribution
 export andrade_pspDistribution, eburgers_pspDistribution, premelt_anelasticDistribution,
        xfit_mxwDistribution, andrade_analyticalDistribution
 export two_phase_modelDistributionType, two_phase_modelDistribution
-export multi_rp_modelDistributionType, multi_rp_modelDistribution
+export multi_phase_modelDistributionType, multi_phase_modelDistribution
+export multi_rp_modelDistributionType, multi_rp_modelDistribution,
+       multi_rp_responseDistributionType, multi_rp_responseDistribution
 export tune_rp_modelDistributionType, tune_rp_modelDistribution
 
 # plots

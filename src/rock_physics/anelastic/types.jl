@@ -1,6 +1,6 @@
 abstract type AbstractAnelasticModel <: AbstractRockphyModel end
 
-mutable struct RockPhyAnelastic{T1, T2, T3, T4, T5, T6} <: AbstractRockphyResponse
+mutable struct RockphyAnelastic{T1, T2, T3, T4, T5, T6} <: AbstractRockphyResponse
     J1::T1
     J2::T2
     Qinv::T3
@@ -76,7 +76,7 @@ end
 """
     eburgers_psp(T, P, dg, σ, ϕ, ρ, Ch2o_ol, T_solidus, f)
 
-Calculate anelastic properties stored in `RockPhyAnelastic` using the
+Calculate anelastic properties stored in `RockphyAnelastic` using the
 Extended Burgers model with pseudo-scaling per Jackson and Faul (2010)
 
 ## Arguments

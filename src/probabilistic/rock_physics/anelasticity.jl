@@ -1,4 +1,4 @@
-struct RockPhyAnelasticDistribution{
+struct RockphyAnelasticDistribution{
     T1 <: Union{Function, Nothing}, T2 <: Union{Function, Nothing},
     T3 <: Union{Function, Nothing}, T4 <: Union{Function, Nothing},
     T5 <: Union{Function, Nothing}, T6 <: Union{Function, Nothing}} <:
