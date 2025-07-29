@@ -1,4 +1,4 @@
-struct RockPhyAnelasticDistribution{
+struct RockPhyanelasticDistribution{
     T1 <: Union{Distribution, AbstractArray}, T2 <: Union{Distribution, AbstractArray},
     T3 <: Union{Distribution, AbstractArray}, T4 <: Union{Distribution, AbstractArray},
     T5 <: Union{Distribution, AbstractArray}, T6 <: Union{Distribution, AbstractArray}} <:

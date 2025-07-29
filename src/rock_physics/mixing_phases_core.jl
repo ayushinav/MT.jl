@@ -152,27 +152,29 @@ function mix_models(σs, ϕ, m::GAL)
     return σ
 end
 
-
-function from_nt(m::T, ps::NamedTuple) where T <: Union{HS1962_plus, HS1962_minus, HS_plus_multi_phase, HS_minus_multi_phase}
+function from_nt(m::T,
+        ps::NamedTuple) where {T <: Union{
+        HS1962_plus, HS1962_minus, HS_plus_multi_phase, HS_minus_multi_phase}}
     return m()
 end
 
-function from_nt(m::Type{T}, ps::NamedTuple) where T <: MAL
+function from_nt(m::Type{T}, ps::NamedTuple) where {T <: MAL}
     return m(ps.m_MAL)
 end
 
-function from_nt(m::Type{T}, ps::NamedTuple) where T <: GAL
+function from_nt(m::Type{T}, ps::NamedTuple) where {T <: GAL}
     return m(ps.m_GAL)
 end
 
-function sample_type(m::Type{T}) where T <: Union{HS1962_plus, HS1962_minus, HS_plus_multi_phase, HS_minus_multi_phase}
+function sample_type(m::Type{T}) where {T <: Union{
+        HS1962_plus, HS1962_minus, HS_plus_multi_phase, HS_minus_multi_phase}}
     T
 end
 
-function sample_type(m::Type{T}) where T <: MAL
+function sample_type(m::Type{T}) where {T <: MAL}
     (T.name.wrapper){Vector{Float64}}
 end
 
-function sample_type(m::T) where T <: GAL
+function sample_type(m::T) where {T <: GAL}
     (T.name.wrapper){Vector{Float64}}
 end

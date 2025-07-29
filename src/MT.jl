@@ -93,7 +93,7 @@ export AbstractCondModel, AbstractElasticModel, AbstractViscousModel, AbstractAn
 export MTModel, MTResponse
 
 # rock physics
-export RockphyCond, RockphyElastic, RockphyViscous, RockPhyAnelastic
+export RockphyCond, RockphyElastic, RockphyViscous, RockPhyanelastic
 export SEO3, UHO2014, Jones2012, Poe2010, Yoshino2009, Wang2006, const_matrix
 export Ni2011, Sifre2014, Gaillard2008
 export Dai_Karato2009, Zhang2012
@@ -132,7 +132,7 @@ export MTModelDistribution, MTResponseDistribution
 
 ## rock physics
 export RockphyCondDistribution, RockphyElasticDistribution, RockphyViscousDistribution,
-       RockPhyAnelasticDistribution
+       RockPhyanelasticDistribution
 export SEO3Distribution, UHO2014Distribution, Jones2012Distribution, Poe2010Distribution,
        Yoshino2009Distribution, Wang2006Distribution, Dai_Karato2009Distribution,
        Zhang2012Distribution, Yang2011Distribution, const_matrixDistribution

@@ -219,7 +219,6 @@ end
 function forward(model::multi_phase_model{V, T1, T2, T3, T4, T5, T6, T7, T8, M},
         p) where {
         V, M <: multi_phase_mix_types, T1 <: AbstractCondModel, T2, T3, T4, T5, T6, T7, T8}
-
     σ1 = (isnothing(model.m1)) ? nothing : forward(model.m1, []).σ .|> exp10
     σ2 = (isnothing(model.m2)) ? nothing : forward(model.m2, []).σ .|> exp10
     σ3 = (isnothing(model.m3)) ? nothing : forward(model.m3, []).σ .|> exp10
@@ -239,7 +238,6 @@ function forward(model::multi_phase_model{V, T1, T2, T3, T4, T5, T6, T7, T8, M},
         p,
         params) where {
         V, M <: multi_phase_mix_types, T1 <: AbstractCondModel, T2, T3, T4, T5, T6, T7, T8}
-
     σ1 = (isnothing(model.m1)) ? Nothing : forward(model.m1, params.m1).σ .|> exp10
     σ2 = (isnothing(model.m2)) ? Nothing : forward(model.m2, params.m2).σ .|> exp10
     σ3 = (isnothing(model.m3)) ? Nothing : forward(model.m3, params.m3).σ .|> exp10

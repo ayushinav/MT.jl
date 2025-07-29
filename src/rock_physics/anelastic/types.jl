@@ -1,6 +1,6 @@
 abstract type AbstractAnelasticModel <: AbstractRockphyModel end
 
-mutable struct RockPhyAnelastic{T1, T2, T3, T4, T5, T6} <: AbstractRockphyResponse
+mutable struct RockPhyanelastic{T1, T2, T3, T4, T5, T6} <: AbstractRockphyResponse
     J1::T1
     J2::T2
     Qinv::T3
@@ -12,7 +12,7 @@ end
 """
     andrade_psp(T, P, dg, σ, ϕ, ρ, f)
 
-Calculate anelastic properties stored in `RockPhyAnelastic` using the
+Calculate anelastic properties stored in `RockPhyanelastic` using the
 Andrade model with pseudo-scaling per Jackson and Faul (2010)
 
 ## Arguments
@@ -76,7 +76,7 @@ end
 """
     eburgers_psp(T, P, dg, σ, ϕ, ρ, Ch2o_ol, T_solidus, f)
 
-Calculate anelastic properties stored in `RockPhyAnelastic` using the
+Calculate anelastic properties stored in `RockPhyanelastic` using the
 Extended Burgers model with pseudo-scaling per Jackson and Faul (2010)
 
 ## Arguments
@@ -170,7 +170,7 @@ eburgers_psp(T, P, dg, σ, ϕ, ρ, f) = eburgers_psp(T, P, dg, σ, ϕ, ρ, 0.0f0
 """
     premelt_anelastic(T, P, dg, σ, ϕ, ρ, T_solidus, Ch2o_ol, f)
 
-Calculate anelastic properties stored in `RockPhyAnelastic` using the
+Calculate anelastic properties stored in `RockPhyanelastic` using the
 Master curve maxwell scaling per near-solidus parametrization of Yamauchi and Takei (2016),
 with optional extension to include direct melt effects of Yamauchi and Takei (2024)
 
@@ -253,7 +253,7 @@ end # TODO : args... ?
 """
     xfit_mxw(T, P, dg, σ, ϕ, ρ, T_solidus, Ch2o_ol, f)
 
-Calculate anelastic properties stored in `RockPhyAnelastic` using the
+Calculate anelastic properties stored in `RockPhyanelastic` using the
 Master curve maxwell scaling per McCarthy, Takei and Hiraga (2011)
 
 ## Arguments
@@ -326,7 +326,7 @@ end
 """
     andrade_analytical(T, P, dg, σ, ϕ, ρ, f)
 
-Calculate anelastic properties stored in `RockPhyAnelastic` using the
+Calculate anelastic properties stored in `RockPhyanelastic` using the
 Master curve maxwell scaling per McCarthy, Takei and Hiraga (2011)
 
 ## Arguments

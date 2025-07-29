@@ -62,7 +62,7 @@ end
 
 function forward_helper(
         ::Type{T}, m0, vars, response_trans_utils, params) where {T <: two_phase_model}
-    m = two_phase_modelType(T.parameters[2], T.parameters[3], T.parameters[4]())
+    m = two_phase_modelType(T.parameters[2], T.parameters[3], from_nt(T.parameters[4], m0))
     model = m(m0)
     to_resp_nt(forward(model, vars, params))
 end

@@ -121,11 +121,10 @@ function to_dist_nt(d::T) where {T <: two_phase_modelDistribution}
     m1 = to_nt(d.m1)
     m2 = to_nt(d.m2)
     mix = to_nt(d.mix)
-    nt1_ =(; ϕ=d.ϕ, m1..., m2..., mix...)
+    nt1_ = (; ϕ=d.ϕ, m1..., m2..., mix...)
     @show keys(nt1_)
     return (; ϕ=d.ϕ, m1..., m2..., mix...)
 end
-
 
 function to_dist_nt(d::T) where {T <: multi_phase_modelDistribution}
     m1 = to_nt(d.m1)
