@@ -193,7 +193,7 @@ const default_params_Ni2011 = deepcopy(params_Ni2011)
 const default_params_Sifre2014 = deepcopy(params_Sifre2014)
 const default_params_Gaillard2008 = deepcopy(params_Gaillard2008)
 # orthopyroxene
-default_params_Dai_Karato2009 =deepcopy(params_Dai_Karato2009)
-default_params_Zhang2012 = deepcopy(params_Zhang2012)
+const default_params_Dai_Karato2009 =deepcopy(params_Dai_Karato2009)
+const default_params_Zhang2012 = deepcopy(params_Zhang2012)
 #clinopyroxene
-default_params_Yang2011 =deepcopy(params_Yang2011)
+const default_params_Yang2011 =deepcopy(params_Yang2011)

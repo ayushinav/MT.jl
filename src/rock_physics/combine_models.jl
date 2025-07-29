@@ -33,6 +33,13 @@ mutable struct multi_rp_modelType{T1, T2, T3, T4}
     anelastic::Type{T4}
 end
 
+mutable struct multi_rp_modelType2{T1, T2, T3, T4}
+    cond::T1
+    elastic::T2
+    visc::T3
+    anelastic::T4
+end
+
 """
     multi_rp_model(con, elastic, visc, anelastic)
 
@@ -98,7 +105,7 @@ function from_nt(m::Type{T}, nt::NamedTuple) where {T <: multi_rp_model}
 
     # @show m.types[1]
     # @show typeof(m)
-    @show "HEREE"
+    # @show "HEREE"
     m1 = m.types[1]
     m2 = m.types[2]
     m3 = m.types[3]

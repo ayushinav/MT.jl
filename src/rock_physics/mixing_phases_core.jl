@@ -60,7 +60,7 @@ Check out the relevant rock physics documentation.
     doi: https://doi.org/10.1016/S0012-821X(00)00168-0
 """
 mutable struct MAL{T} <: phase_mixing
-    m::T
+    m_MAL::T
 end
 
 mutable struct HS_plus_multi_phase <: phase_mixing end
@@ -73,7 +73,7 @@ mutable struct HS_minus_multi_phase <: phase_mixing end
 Generalized Archie's law
 """
 mutable struct GAL{T} <: phase_mixing
-    m::T
+    m_GAL::T
 end
 """
     single_phase
@@ -119,8 +119,8 @@ function mix_models(σs, ϕ, mal::MAL)
     sig = σ_fluid
 
     if phi < 1
-        p = log10(1 - phi^mal.m) * inv(log10(1 - phi))
-        sig = σ_fluid * phi^mal.m + σ_matrix * (1 - phi)^p
+        p = log10(1 - phi^mal.m_MAL[1]) * inv(log10(1 - phi))
+        sig = σ_fluid * phi^mal.m_MAL[1] + σ_matrix * (1 - phi)^p
     end
 
     return sig
@@ -148,7 +148,31 @@ function mix_models(σs, ϕ, ::HS_minus_multi_phase)
 end
 
 function mix_models(σs, ϕ, m::GAL)
-    σ = sum(σs[i] * (ϕ[i]^m.m[i]))
-
+    σ = sum([σs[i] * (ϕ[i]^m.m_GAL[i]) for i in eachindex(m.m_GAL)])
     return σ
+end
+
+
+function from_nt(m::T, ps::NamedTuple) where T <: Union{HS1962_plus, HS1962_minus, HS_plus_multi_phase, HS_minus_multi_phase}
+    return m()
+end
+
+function from_nt(m::Type{T}, ps::NamedTuple) where T <: MAL
+    return m(ps.m_MAL)
+end
+
+function from_nt(m::Type{T}, ps::NamedTuple) where T <: GAL
+    return m(ps.m_GAL)
+end
+
+function sample_type(m::Type{T}) where T <: Union{HS1962_plus, HS1962_minus, HS_plus_multi_phase, HS_minus_multi_phase}
+    T
+end
+
+function sample_type(m::Type{T}) where T <: MAL
+    (T.name.wrapper){Vector{Float64}}
+end
+
+function sample_type(m::T) where T <: GAL
+    (T.name.wrapper){Vector{Float64}}
 end

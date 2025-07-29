@@ -68,7 +68,7 @@ function sample_type(::Type{two_phase_modelDistribution{V, T1, T2, M}}) where {V
     v = Vector{Float64}
     t1 = sample_type(T1)
     t2 = sample_type(T2)
-    m = M
+    m = sample_type(M)
     two_phase_model{v, t1, t2, m}
 end
 
@@ -91,7 +91,7 @@ function sample_type(::Type{two_phase_modelDistributionType{T1, T2, M}}) where {
     v = Vector{Float64}
     t1 = sample_type(T1)
     t2 = sample_type(T2)
-    m = M
+    m = sample_type(M)
     two_phase_model{v, t1, t2, m}
 end
 
@@ -120,7 +120,26 @@ to_nt(::Nothing) = (;)
 function to_dist_nt(d::T) where {T <: two_phase_modelDistribution}
     m1 = to_nt(d.m1)
     m2 = to_nt(d.m2)
-    return (; ϕ=d.ϕ, m1..., m2...)
+    mix = to_nt(d.mix)
+    nt1_ =(; ϕ=d.ϕ, m1..., m2..., mix...)
+    @show keys(nt1_)
+    return (; ϕ=d.ϕ, m1..., m2..., mix...)
+end
+
+
+function to_dist_nt(d::T) where {T <: multi_phase_modelDistribution}
+    m1 = to_nt(d.m1)
+    m2 = to_nt(d.m2)
+    m3 = to_nt(d.m3)
+    m4 = to_nt(d.m4)
+    m5 = to_nt(d.m5)
+    m6 = to_nt(d.m6)
+    m7 = to_nt(d.m7)
+    m8 = to_nt(d.m8)
+    mix = to_nt(d.mix)
+    # nt1_ =(; ϕ=d.ϕ, m1..., m2..., mix...)
+    # @show keys(nt1_)
+    return (; ϕ=d.ϕ, m1..., m2..., m3..., m4..., m5..., m6..., m7..., m8..., mix...)
 end
 
 function to_dist_nt(d::T) where {T <: multi_phase_modelDistribution}
