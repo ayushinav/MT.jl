@@ -3,6 +3,8 @@ const model_names_definition = (
     ϕ="Porosity", dg="grain size(μm)", σ="Shear stress (GPa)",
     f="Frequency (Hz)", Ch2o_m="Water concentration in melt (ppm)",
     Ch2o_ol="Water concentration in olivine (ppm)",
+    Ch2o_opx="Water concentration in orthopyroxene (ppm)",
+    Ch2o_cpx="Water concentration in clinopyroxene (ppm)",
     Cco2_m="CO₂ concentration in melt (ppm)")
 
 function Base.show(io::IO, m::model) where {model <: AbstractRockphyModel}
@@ -33,6 +35,19 @@ function Base.show(io::IO, m::model) where {model <: two_phase_model}
     println("* ϕ₁ → ", 1 - first(m.ϕ), " : ", m.m1)
     println()
     println("* ϕ₂ → ", first(m.ϕ), " : ", m.m2)
+end
+
+function Base.show(io::IO, m::model) where {model <: multi_phase_model}
+    println("N-phase composition using ", m.mix, "\n")
+
+    fnames = propertynames(m)[2:(end - 1)]
+    fnames = filter(f -> !isnothing(getfield(m, f)), fnames)
+
+    for i in eachindex(fnames)
+        sub = Char(0x2080 + i)
+        println("* ϕ$sub → ", m.ϕ[i], " : ", getfield(m, fnames[i]))
+        println()
+    end
 end
 
 function Base.show(io::IO, m::model) where {model <: multi_rp_model}

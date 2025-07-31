@@ -20,6 +20,7 @@ end
 # NamedTuple manipulation
 
 @generated function from_nt(::Type{T}, nt::NamedTuple) where {T}
+    # @show T
     fnames = fieldnames(T)
     args = [:(getproperty(nt, $(QuoteNode(f)))) for f in fnames]
     return :(T($(args...)))
@@ -60,17 +61,20 @@ function forward_helper(
 end
 
 function forward_helper(
-        ::Type{T}, m0, vars, response_trans_utils, params) where {T <: two_phase_model}
-    m = two_phase_modelType(T.parameters[2], T.parameters[3], T.parameters[4]())
-    model = m(m0)
+        m::Type{T}, m0, vars, response_trans_utils, params) where {T <: two_phase_modelType}
+    model = from_nt(m, m0)
+    to_resp_nt(forward(model, vars, params))
+end
+
+function forward_helper(m::Type{T}, m0, vars, response_trans_utils,
+        params) where {T <: multi_phase_modelType}
+    model = from_nt(m, m0)
     to_resp_nt(forward(model, vars, params))
 end
 
 function forward_helper(
-        ::Type{T}, m0, vars, response_trans_utils, params) where {T <: multi_rp_model}
-    m = multi_rp_modelType(
-        T.parameters[1], T.parameters[2], T.parameters[3], T.parameters[4])
-    model = m(m0)
+        m::Type{T}, m0, vars, response_trans_utils, params) where {T <: multi_rp_modelType}
+    model = from_nt(m, m0)
     to_resp_nt(forward(model, vars, params))
 end
 

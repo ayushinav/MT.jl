@@ -1,4 +1,4 @@
-# minerals
+# olivine
 
 function forward(m::SEO3, p, params=default_params_SEO3)
     @unpack S_bfe, H_bfe, S_bmg, H_bmg, S_ufe, H_ufe, S_umg, H_umg = params
@@ -96,8 +96,6 @@ end
 function forward(m::Wang2006, p, params=default_params_Wang2006)
     @unpack S_H, H_H, a_H, r_H, S_A, H_A = params
 
-    # anhydrous
-
     σ_A = @. arrh_dry(S_A, H_A, gas_R, m.T)
     σ_H = @. arrh_wet(S_H, H_H, gas_R, m.T, m.Ch2o_ol * 1.0f-4, a_H, r_H)
 
@@ -106,6 +104,7 @@ function forward(m::Wang2006, p, params=default_params_Wang2006)
     return RockphyCond(log10.(σ))
 end
 
+# ========================================================================================================== 
 # melt
 
 function forward(m::Ni2011, p, params=default_params_Ni2011)
@@ -140,6 +139,45 @@ end
 function forward(m::Gaillard2008, p, params=default_params_Gaillard2008)
     @unpack S, H = params
     σ = @. arrh_dry(S, H, gas_R, m.T)
+    return RockphyCond(log10.(σ))
+end
+
+# ========================================================================================================== 
+# orthopyroxene
+
+function forward(m::Dai_Karato2009, p, params=default_params_Zhang2012)
+    @unpack A, Aw, H, Hw, r = params
+
+    σ_dry = @. arrh_dry(A, H, gas_R, m.T)
+    σ_wet = @. arrh_wet(Aw, Hw, gas_R_k, m.T, m.Ch2o_opx, 0.0f0, r)
+
+    σ = @. σ_dry + σ_wet
+
+    return RockphyCond(log10.(σ))
+end
+
+function forward(m::Zhang2012, p, params=default_params_Zhang2012)
+    @unpack S_pol, H_pol, S_hyd, H_hyd, a = params
+
+    σ_pol = @. arrh_dry(S_pol, H_pol, boltz_k, m.T)
+    σ_hyd = @. arrh_wet(S_hyd, H_hyd, boltz_k, m.T, m.Ch2o_opx, a, 1.0f0)
+
+    σ = @. σ_pol + σ_hyd
+
+    return RockphyCond(log10.(σ))
+end
+
+# ========================================================================================================== 
+# clinopyroxene
+
+function forward(m::Yang2011, p, params=default_params_Yang2011)
+    @unpack A, Aw, H, Hw, r = params
+
+    σ_dry = @. arrh_dry(A, H, boltz_k, m.T)
+    σ_wet = @. arrh_wet(Aw, Hw, boltz_k, m.T, m.Ch2o_opx, 0.0f0, r)
+
+    σ = @. σ_dry + σ_wet
+
     return RockphyCond(log10.(σ))
 end
 
