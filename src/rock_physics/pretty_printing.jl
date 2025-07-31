@@ -5,7 +5,7 @@ const model_names_definition = (
     Ch2o_ol="Water concentration in olivine (ppm)",
     Ch2o_opx="Water concentration in orthopyroxene (ppm)",
     Ch2o_cpx="Water concentration in clinopyroxene (ppm)",
-    Cco2_m="CO₂ concentration in melt (ppm)")
+    Cco2_m="CO₂ concentration in melt (ppm)", T_solidus="Solidus Temperature (K)")
 
 function Base.show(io::IO, m::model) where {model <: AbstractRockphyModel}
     println("Model : ", typeof(m).name.name)

@@ -65,7 +65,7 @@ function stochastic_inverse(r_obs::resp1,
         alg_cache::rto_cache;
         model_trans_utils::NamedTuple=(m=sigmoid_tf, h=lin_tf),
         response_trans_utils::NamedTuple=(ρₐ=lin_tf, ϕ=lin_tf),
-        verbose=true) where {
+        progress_bar=true) where {
         resp1 <: AbstractGeophyResponse, resp2 <: AbstractGeophyResponse}
     W = Diagonal(vcat([inv.(getfield(err_resp, k)) .^ 2
                        for k in fieldnames(typeof(err_resp))]...))
@@ -84,7 +84,8 @@ function stochastic_inverse(r_obs::resp1,
     μ_chains = zeros(1, alg_cache.n_samples)
 
     i = 1
-    (verbose) && (prog = Progress(alg_cache.n_samples; enabled=true))
+    # (!(verbose==false)) && (prog = Progress(alg_cache.n_samples; enabled=true))
+    (progress_bar) && (prog = Progress(alg_cache.n_samples; enabled=true))
 
     while i <= (alg_cache.n_samples)
 
@@ -105,6 +106,7 @@ function stochastic_inverse(r_obs::resp1,
         rmul!(reg_term, μ) # μ * L'L * ξ 
 
         fill!(alg_cache.m₀.m, 2.0)
+        # @show norm(alg_cache.m₀.m)
 
         if typeof(alg_cache.alg) <: occam_cache
             ret_code = inverse!(alg_cache.m₀, pert_resp, vars, Occam(; μgrid=[μ, μ]);
@@ -201,10 +203,12 @@ function stochastic_inverse(r_obs::resp1,
 
         i += 1
 
-        (verbose) && (next!(prog; showvalues=[(Symbol("#samples"), i)]))
+        (progress_bar) && (next!(prog; showvalues=[(Symbol("#samples"), i)]))
+        # @show i
     end
 
     idcs = broadcast(!isnan, view(m_chains, 1, :))
+    @show sum(idcs)
 
     return Turing.Chains(
         vcat(m_chains[:, idcs], μ_chains[:, idcs])', [Symbol("m[$i]") for i in 1:(n + 1)])

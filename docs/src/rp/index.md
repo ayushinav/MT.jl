@@ -1,8 +1,35 @@
-# Modeling
+# Introduction
 
 ```@setup rp_intro
 using MT
 ```
+
+## Types and subtypes
+
+```mermaid
+graph TD;
+    subgraph L[ ]
+        AbstractCondModel
+        AbstractElasticModel
+        AbstractViscousModel
+        AbstractAnelasticModel
+    end
+
+    AbstractCondModel["AbstractCondModel <br/> (eg., SEO3, Ni2011) "] --> Matrix_conductivity;
+    AbstractCondModel --> Melt_conductivity;
+    Matrix_conductivity -.-> two_phase_model;
+    Melt_conductivity -.-> two_phase_model;
+    two_phase_model --> combine_rp_model;
+    AbstractCondModel --> combine_rp_model;
+    AbstractElasticModel --> combine_rp_model;
+    AbstractViscousModel --> combine_rp_model;
+    AbstractAnelasticModel --> combine_rp_model;
+    combine_rp_model --> tune_rp_model;
+
+    style L fill:#fff,stroke:#fff
+```
+
+## Modeling
 
 Modeling for all the functions can be done by calling the `forward` function on the rock physics models.
 

@@ -1,12 +1,14 @@
 
 function forward(m::anharmonic, p, params=default_params_anharmonic)
-    @unpack T_K_ref, P_Pa_ref, Gu_0_ol, dG_dT, dG_dP, ν, Gu_0_crust, dG_dT_crust, dG_dP_crust, Gu_TP, Ku_TP = params
+    @unpack T_K_ref, P_Pa_ref, Gu_0_ol, dG_dT, dG_dP, ν, Gu_0_crust, dG_dT_crust, dG_dP_crust, Gu_tp_fn, Ku_tp_fn = params
 
     Gu₀, dG_dT₀, dG_dP₀ = @. calc_Gu₀(
         Gu_0_ol, dG_dT, dG_dP, Gu_0_crust, dG_dT_crust, dG_dP_crust) #since χ is 1., we are always using ol
 
     ΔT = @. m.T - T_K_ref # K
     ΔP = @. m.P * 1.0f9 - P_Pa_ref # Pa
+    Gu_TP = @. Gu_tp_fn(m.T, m.P, m.ρ)
+    Ku_TP = @. Ku_tp_fn(m.T, m.P, m.ρ)
     Gu_tp = @. calc_Gu(Gu₀, ΔT, ΔP, dG_dT₀, dG_dP₀, Gu_TP)
     Ku_tp = @. calc_Ku(Gu_tp, ν, Ku_TP)
 

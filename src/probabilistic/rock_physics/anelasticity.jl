@@ -1,7 +1,7 @@
 struct RockphyAnelasticDistribution{
-    T1 <: Union{Distribution, AbstractArray}, T2 <: Union{Distribution, AbstractArray},
-    T3 <: Union{Distribution, AbstractArray}, T4 <: Union{Distribution, AbstractArray},
-    T5 <: Union{Distribution, AbstractArray}, T6 <: Union{Distribution, AbstractArray}} <:
+    T1 <: Union{Function, Nothing}, T2 <: Union{Function, Nothing},
+    T3 <: Union{Function, Nothing}, T4 <: Union{Function, Nothing},
+    T5 <: Union{Function, Nothing}, T6 <: Union{Function, Nothing}} <:
        AbstractRockphyResponseDistribution
     J1::T1
     J2::T2

@@ -9,7 +9,7 @@ Specifying a model is easy. Let's say you want to add a resistivity distribution
   - Layer 3: 10 $\Omega m$, thickness= 3000 $m$
   - Layer 4: 100 $\Omega m$, half-space
 
-Define the model using `model` and you are done.
+Define the `model` :
 
 ```@example model_demo
 using MT

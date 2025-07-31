@@ -2,7 +2,7 @@
 
 julia_version = "1.10.9"
 manifest_format = "2.0"
-project_hash = "86b9d45c5bd5e73ca60de7438d80abbd1db8074e"
+project_hash = "6ac5a689bf844b8efc8aa4ce5beeeb73532e7e11"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "e2478490447631aedba0823d4d7a80b2cc8cdb32"
@@ -753,6 +753,12 @@ deps = ["ANSIColoredPrinters", "AbstractTrees", "Base64", "CodecZlib", "Dates", 
 git-tree-sha1 = "9d733459cea04dcf1c41522ec25c31576387be8a"
 uuid = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 version = "1.10.1"
+
+[[deps.DocumenterMermaid]]
+deps = ["Documenter", "MarkdownAST"]
+git-tree-sha1 = "c0c408289a505a15496d914b19204e272a7e8b0f"
+uuid = "a078cd44-4d9c-4618-b545-3ab9d77f9177"
+version = "0.2.0"
 
 [[deps.Downloads]]
 deps = ["ArgTools", "FileWatching", "LibCURL", "NetworkOptions"]
@@ -1759,10 +1765,10 @@ uuid = "f1f71cc9-e9ae-5b93-9b94-4fe0e1ad3748"
 version = "5.5.3+0"
 
 [[deps.MT]]
-deps = ["BenchmarkTools", "CairoMakie", "ConcreteStructs", "DifferentiationInterface", "Distributions", "Enzyme", "InteractiveUtils", "JET", "LinearAlgebra", "LinearSolve", "NonlinearSolve", "Optimization", "OptimizationOptimJL", "Pigeons", "ProgressMeter", "PyCall", "QuadGK", "ReTestItems", "Revise", "SpecialFunctions", "Statistics", "Turing", "UnPack"]
+deps = ["BenchmarkTools", "CairoMakie", "ConcreteStructs", "DifferentiationInterface", "Distributions", "Enzyme", "InteractiveUtils", "JET", "LinearAlgebra", "LinearSolve", "NonlinearSolve", "Optimization", "OptimizationOptimJL", "Pigeons", "PreallocationTools", "ProgressMeter", "PyCall", "QuadGK", "ReTestItems", "Revise", "SpecialFunctions", "Statistics", "Turing", "UnPack"]
 path = ".."
 uuid = "333b7055-2ef7-4b1e-a2ef-5fb1688f630d"
-version = "0.6.1"
+version = "0.6.2"
 
 [[deps.MacroTools]]
 git-tree-sha1 = "72aebe0b5051e5143a079a4685a46da330a40472"
@@ -2287,6 +2293,20 @@ deps = ["LinearAlgebra"]
 git-tree-sha1 = "17275485f373e6673f7e7f97051f703ed5b15b20"
 uuid = "85a6dd25-e78a-55b7-8502-1745935b8125"
 version = "0.2.4"
+
+[[deps.PreallocationTools]]
+deps = ["Adapt", "ArrayInterface", "ForwardDiff"]
+git-tree-sha1 = "7a5e02659e293b25a4bfaeeb6cd268acd0742eba"
+uuid = "d236fae5-4411-538c-8e31-a6e3d9e00b46"
+version = "0.4.28"
+
+    [deps.PreallocationTools.extensions]
+    PreallocationToolsReverseDiffExt = "ReverseDiff"
+    PreallocationToolsSparseConnectivityTracerExt = "SparseConnectivityTracer"
+
+    [deps.PreallocationTools.weakdeps]
+    ReverseDiff = "37e2e3b7-166d-5795-8a7a-e32c996b4267"
+    SparseConnectivityTracer = "9f842d2f-2579-4b1d-911e-f412cf18a3f5"
 
 [[deps.PrecompileTools]]
 deps = ["Preferences"]

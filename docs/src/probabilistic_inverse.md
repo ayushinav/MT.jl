@@ -128,31 +128,3 @@ The list of models can then be obtained from chains using
 ```
 model_list = get_model_list(mcmc_chains, modelD)
 ```
-
-We can then easily check the fit of the response curves
-
-```
-plt_resps = prepare_plot(r_obs, ω, alpha = 0.);
-resp_models = forward(model_list[1], ω);
-
-for i in 1:(length(model_list) > 50 ? 50 : length(model_list))
-   forward!(resp_models, model_list[i], ω);
-   prepare_plot!(resp_models, ω, alpha = 0.4); 
-end
-
-prepare_plot!(r_obs, ω, d_err = err_resp, markersize = 3, color = :orange);
-plot_response(plt_resps)
-```
-
-The posterior distribution can then be obtained as:
-
-```julia
-pre_img = pre_image(m_dist, mt_chain);
-kde_img = get_kde_image(pre_img..., false; xscale=:identity, yscale=:identity, yflip=true)
-```
-
-We can also obtain the mean and 1 std deviation bounds as:
-
-```julia
-mean_std_plt_lin = get_mean_std_image(pre_img...; yscale=:identity)
-```

@@ -10,7 +10,7 @@ For various rock physics models, we require the bulk property by combing multipl
     
     Bulk electrical conductivity of two phases is only supported at the moment.
 
-Hashin-Shtrikman bounds, provided through [`HS1962_plus`](@ref) and [`HS1962_minus`](@ref), are often used to estimate the bulk conductivity when two phases are mixed. For conductivity, modified Archie's law is also provided through `MAL`[@ref].
+Hashin-Shtrikman bounds, provided through [`HS1962_plus`](@ref) and [`HS1962_minus`](@ref), are often used to estimate the bulk conductivity when two phases are mixed. For conductivity, modified Archie's law is also provided through [`MAL`](@ref).
 
 To get things started, we first need to define the phases we need to mix the models and the mixing law. This is conveniently done using [`two_phase_modelType`](@ref)
 

@@ -20,9 +20,9 @@ import Base: show
 include("abstract_types.jl")
 include("probabilistic/init_distributions.jl")
 include("inverse/bounds_transformation.jl")
-include("models/mt.jl")
-include("response/1dmt.jl")
-include("forward/1dmt.jl")
+include("geophysics/mt/types.jl")
+include("geophysics/mt/forward.jl")
+include("geophysics/pretty_printing.jl")
 
 include("rock_physics/conductivity/cache.jl")
 include("rock_physics/conductivity/types.jl")
@@ -116,7 +116,8 @@ export get_Cco2_m, get_Ch2o_m, get_melt_fraction
 export get_Z, get_appres, get_phase, forward!, forward
 
 #inverse
-export sigmoid, d_sigmoid, inverse_sigmoid, transform_utils, default_tf, log_tf, lin_tf
+export transform_utils, default_tf, log_tf, lin_tf, sigmoid_tf, log_sigmoid_tf, pow_tf,
+       pow_sigmoid_tf, phi_scale_tf
 export mt_jacobian_cache, jacobian_mt, jacobian!
 export occam_cache, Occam, nl_cache, NonlinearAlg, opt_cache, OptAlg, linsolve!, occam_step!
 export inverse!

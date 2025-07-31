@@ -243,6 +243,15 @@ function ΔT_h2o_Blatter2022(ps_nt)
     return (; T_solidus=T_wet)
 end
 
+function get_Cco2_m_core(ϕ, Cco2, Cco2_sat)
+    Cco2_m = Cco2 * inv(ϕ)
+    if Cco2_m > Cco2_sat
+        return Cco2_sat
+    else
+        return Cco2_m
+    end
+end
+
 """
     get Cco2_m(ps_nt)
 
@@ -252,6 +261,7 @@ returns the amount of CO₂ in melt
 
   - `ϕ` : melt fraction
   - `Cco2` : bulk CO₂ conc.
+  - `Cco2_sat` : saturation limit of CO₂ conc. in melt
 
 ## Usage
 
@@ -265,8 +275,8 @@ get_Cco2_m(ps_nt)
 ```
 """
 function get_Cco2_m(ps_nt)
-    @unpack ϕ, Cco2 = ps_nt
-    Cco2_m = @. Cco2 * inv(ϕ)
+    @unpack ϕ, Cco2, Cco2_sat = ps_nt
+    Cco2_m = @. get_Cco2_m_core(ϕ, Cco2, Cco2_sat)
     return (; Cco2_m)
 end
 

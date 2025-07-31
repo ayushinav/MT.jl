@@ -12,7 +12,7 @@ makedocs(;
     authors="Abhinav Pratap Singh",
     repo="https://github.com/ayushinav/MT.jl", #.jl/blob/{commit}{path}#{line}",
     sitename="MT.jl",
-    doctest=false,
+    doctest=true,
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
         canonical="https://ayushinav.github.io/MT.jl",
