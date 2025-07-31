@@ -23,7 +23,7 @@ function forward(m::andrade_psp, p, params=default_params_andrade_psp)
     d_ = length(size(Va))
     Vave = dropdims(sum(Va; dims=d_); dims=d_) * Float32(inv(length(m.f)))
 
-    return RockPhyanelastic(J1, J2, Qinv, Ma, Va, Vave)
+    return RockphyAnelastic(J1, J2, Qinv, Ma, Va, Vave)
 end
 
 function forward(m::eburgers_psp, p, params=MT.default_params_eburgers_psp)
@@ -102,7 +102,7 @@ function forward(m::eburgers_psp, p, params=MT.default_params_eburgers_psp)
     d_ = length(size(Va))
     Vave = dropdims(sum(Va; dims=d_); dims=d_) * Float32(inv(length(m.f)))
 
-    return MT.RockPhyanelastic(J1, J2, Qinv, Ma, Va, Vave)
+    return MT.RockphyAnelastic(J1, J2, Qinv, Ma, Va, Vave)
 end
 
 function forward(m::premelt_anelastic, p, params=default_params_premelt_anelastic)
@@ -150,7 +150,7 @@ function forward(m::premelt_anelastic, p, params=default_params_premelt_anelasti
     d_ = length(size(Va))
     Vave = dropdims(sum(Va; dims=d_); dims=d_) * Float32(inv(length(m.f)))
 
-    return MT.RockPhyanelastic(J1, J2, Qinv, Ma, Va, Vave)
+    return MT.RockphyAnelastic(J1, J2, Qinv, Ma, Va, Vave)
 end
 
 function forward(m::xfit_mxw, p, params=default_params_xfit_mxw)
@@ -191,7 +191,7 @@ function forward(m::xfit_mxw, p, params=default_params_xfit_mxw)
     d_ = length(size(Va))
     Vave = dropdims(sum(Va; dims=d_); dims=d_) * Float32(inv(length(m.f)))
 
-    return RockPhyanelastic(J1, J2, Qinv, Ma, Va, Vave)
+    return RockphyAnelastic(J1, J2, Qinv, Ma, Va, Vave)
 end
 
 function forward(m::andrade_analytical, p, params=default_params_andrade_analytical)
@@ -226,5 +226,5 @@ function forward(m::andrade_analytical, p, params=default_params_andrade_analyti
     d_ = length(size(Va))
     Vave = dropdims(sum(Va; dims=d_); dims=d_) * Float32(inv(length(m.f)))
 
-    return RockPhyanelastic(J1, J2, Qinv, Ma, Va, Vave)
+    return RockphyAnelastic(J1, J2, Qinv, Ma, Va, Vave)
 end

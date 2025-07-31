@@ -6,9 +6,6 @@ using MT
 
 ## Types and subtypes
 
-
-
-
 ```mermaid
 graph TD;
     subgraph L[ ]

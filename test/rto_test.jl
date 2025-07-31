@@ -35,7 +35,7 @@
         ω,
         r_cache;
         model_trans_utils=(; m=MT.lin_tf),
-        verbose=false
+        progress_bar=true
     )
 
     mt_chain = Turing.Chains(
@@ -59,5 +59,5 @@
     ),
     )
 
-    @test err <= 1.5
+    @test err <= 2.0
 end

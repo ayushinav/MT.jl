@@ -124,7 +124,7 @@ const log_tf = transform_utils(
 """
     pow_sigmoid_tf
 
-A [`transform_utils`](@ref) constant similar to `sigmoid_tf`(@ref) but futher performs `exp10` to convert into model domain \n
+A [`transform_utils`](@ref) constant similar to `sigmoid_tf`(@ref) but further performs `exp10` to convert into model domain \n
 
   - computational domain to model domain : `m = exp10(-3 + 9σ(x))` \n
   - model domain to computational domain : x` = σ⁻¹((log10(m)+3)/9)` \n
