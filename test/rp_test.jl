@@ -484,7 +484,7 @@ end
         andrade_psp, eburgers_psp, premelt_anelastic, xfit_mxw, andrade_analytical]
 
     outs = (
-        andrade_psp=Rockphyanelastic(
+        andrade_psp=RockphyAnelastic(
             [
                 1.352f-11,
                 1.361f-11,
@@ -564,7 +564,7 @@ end
                 3.9943f03
             ]
         ),
-        eburgers_psp=Rockphyanelastic(
+        eburgers_psp=RockphyAnelastic(
             [
                 1.353f-11,
                 1.362f-11,
@@ -644,7 +644,7 @@ end
                 3.9729f03
             ]
         ),
-        premelt_anelastic=Rockphyanelastic(
+        premelt_anelastic=RockphyAnelastic(
             [
                 1.351f-11,
                 1.360f-11,
@@ -724,7 +724,7 @@ end
                 3.8412f03
             ]
         ),
-        xfit_mxw=Rockphyanelastic(
+        xfit_mxw=RockphyAnelastic(
             [
                 1.412f-11,
                 1.432f-11,
@@ -804,7 +804,7 @@ end
                 3.7373f03
             ]
         ),
-        andrade_analytical=Rockphyanelastic(
+        andrade_analytical=RockphyAnelastic(
             [
                 1.3500f-11,
                 1.3570f-11,
@@ -892,7 +892,7 @@ end
         out_ = forward(model, [])
         # @inferred forward(model, []) (cannot infer using quadgk)
         @report_call forward(model, [])
-        for k in fieldnames(Rockphyanelastic)
+        for k in fieldnames(RockphyAnelastic)
             @test all(
                 isapprox.(
                 log10.(getfield(out_, k)),
@@ -916,8 +916,8 @@ end
 @testitem "multi_phase" tags=[:rp] begin
     using JET
     m1 = multi_phase_modelType(SEO3, Sifre2014, Zhang2012, HS_minus_multi_phase())
-    ps_nt = (; T=[1200.0f0] .+ 273; Ch2o_ol=1.0f0; Ch2o_m=1000.0f0;
-        Cco2_m=1000.0f0; Ch2o_opx=100.0f0; Cco2_m=10.0f0; ϕ=[0.1f0, 0.2f0])
+    ps_nt = (; T=[1200.0f0] .+ 273, Ch2o_ol=1.0f0, Ch2o_m=1000.0f0,
+        Cco2_m=1000.0f0, Ch2o_opx=100.0f0, ϕ=[0.1f0, 0.2f0])
     model = m1(ps_nt)
     @inferred m1(ps_nt)
     @inferred forward(model, [])

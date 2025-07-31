@@ -21,6 +21,8 @@ jobs:
           - "forward"
           - "occam"
           - "rp"
+          - "mcmc"
+          - "rto"
     steps:
       - uses: actions/checkout@v4
 

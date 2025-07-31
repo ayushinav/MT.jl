@@ -3,7 +3,9 @@ mutable struct tune_rp_modelDistributionType{K, M}
     model::Type{M}
 end
 
-tune_rp_modelDistributionType(fn_list, model) = tune_rp_modelDistributionType(fn_list, typeof(model))
+function tune_rp_modelDistributionType(fn_list, model)
+    tune_rp_modelDistributionType(fn_list, typeof(model))
+end
 
 mutable struct tune_rp_modelDistribution{K, M, names} <: AbstractRockphyModelDistribution
     fn_list::K

@@ -61,19 +61,19 @@ function forward_helper(
 end
 
 function forward_helper(
-    m::Type{T}, m0, vars, response_trans_utils, params) where {T <: two_phase_modelType}
+        m::Type{T}, m0, vars, response_trans_utils, params) where {T <: two_phase_modelType}
+    model = from_nt(m, m0)
+    to_resp_nt(forward(model, vars, params))
+end
+
+function forward_helper(m::Type{T}, m0, vars, response_trans_utils,
+        params) where {T <: multi_phase_modelType}
     model = from_nt(m, m0)
     to_resp_nt(forward(model, vars, params))
 end
 
 function forward_helper(
-    m::Type{T}, m0, vars, response_trans_utils, params) where {T <: multi_phase_modelType}
-    model = from_nt(m, m0)
-    to_resp_nt(forward(model, vars, params))
-end
-
-function forward_helper(
-    m::Type{T}, m0, vars, response_trans_utils, params) where {T <: multi_rp_modelType}
+        m::Type{T}, m0, vars, response_trans_utils, params) where {T <: multi_rp_modelType}
     model = from_nt(m, m0)
     to_resp_nt(forward(model, vars, params))
 end
