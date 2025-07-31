@@ -484,7 +484,7 @@ end
         andrade_psp, eburgers_psp, premelt_anelastic, xfit_mxw, andrade_analytical]
 
     outs = (
-        andrade_psp=RockPhyAnelastic(
+        andrade_psp=Rockphyanelastic(
             [
                 1.352f-11,
                 1.361f-11,
@@ -564,7 +564,7 @@ end
                 3.9943f03
             ]
         ),
-        eburgers_psp=RockPhyAnelastic(
+        eburgers_psp=Rockphyanelastic(
             [
                 1.353f-11,
                 1.362f-11,
@@ -644,7 +644,7 @@ end
                 3.9729f03
             ]
         ),
-        premelt_anelastic=RockPhyAnelastic(
+        premelt_anelastic=Rockphyanelastic(
             [
                 1.351f-11,
                 1.360f-11,
@@ -724,7 +724,7 @@ end
                 3.8412f03
             ]
         ),
-        xfit_mxw=RockPhyAnelastic(
+        xfit_mxw=Rockphyanelastic(
             [
                 1.412f-11,
                 1.432f-11,
@@ -804,7 +804,7 @@ end
                 3.7373f03
             ]
         ),
-        andrade_analytical=RockPhyAnelastic(
+        andrade_analytical=Rockphyanelastic(
             [
                 1.3500f-11,
                 1.3570f-11,
@@ -892,7 +892,7 @@ end
         out_ = forward(model, [])
         # @inferred forward(model, []) (cannot infer using quadgk)
         @report_call forward(model, [])
-        for k in fieldnames(RockPhyAnelastic)
+        for k in fieldnames(Rockphyanelastic)
             @test all(
                 isapprox.(
                 log10.(getfield(out_, k)),
@@ -904,10 +904,20 @@ end
     end
 end
 
-@testitem "mixing_phases" tags=[:rp] begin
+@testitem "two_phase" tags=[:rp] begin
     using JET
     m1 = two_phase_modelType(SEO3, Ni2011, HS1962_plus())
     ps_nt = (; T=[1200.0f0, 1400.0f0] .+ 273, P=3.0f0, ρ=3300.0f0, Ch2o_m=100.0f0, ϕ=0.1f0)
+    model = m1(ps_nt)
+    @inferred m1(ps_nt)
+    @inferred forward(model, [])
+end
+
+@testitem "multi_phase" tags=[:rp] begin
+    using JET
+    m1 = multi_phase_modelType(SEO3, Sifre2014, Zhang2012, HS_minus_multi_phase())
+    ps_nt = (; T=[1200.0f0] .+ 273; Ch2o_ol=1.0f0; Ch2o_m=1000.0f0;
+        Cco2_m=1000.0f0; Ch2o_opx=100.0f0; Cco2_m=10.0f0; ϕ=[0.1f0, 0.2f0])
     model = m1(ps_nt)
     @inferred m1(ps_nt)
     @inferred forward(model, [])

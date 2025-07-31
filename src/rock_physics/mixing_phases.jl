@@ -207,9 +207,10 @@ function forward(model::multi_phase_model{V, T1, T2, T3, T4, T5, T6, T7, T8, M},
     σ7 = (isnothing(model.m7)) ? nothing : forward(model.m7, []).σ .|> exp10
     σ8 = (isnothing(model.m8)) ? nothing : forward(model.m8, []).σ .|> exp10
 
-    σ_vec = filter(f -> isa(f, AbstractArray), [σ1, σ2, σ3, σ4, σ5, σ6, σ7, σ8]) |> Tuple
+    σ_tup_ = (σ1, σ2, σ3, σ4, σ5, σ6, σ7, σ8)
+    σ_tup = filter(f -> isa(f, AbstractArray), σ_tup_) |> Tuple
 
-    σ = broadcast((sig...) -> mix_models(sig, model.ϕ, model.mix), σ_vec...)
+    σ = broadcast_helper_(σ_tup, model.ϕ, model.mix, Val{length(σ_tup)}())
     return RockphyCond(log10.(σ))
 end
 
@@ -226,11 +227,56 @@ function forward(model::multi_phase_model{V, T1, T2, T3, T4, T5, T6, T7, T8, M},
     σ7 = (isnothing(model.m7)) ? Nothing : forward(model.m7, params.m7).σ .|> exp10
     σ8 = (isnothing(model.m8)) ? Nothing : forward(model.m8, params.m8).σ .|> exp10
 
-    σ_vec = filter(f -> isa(f, AbstractArray), [σ1, σ2, σ3, σ4, σ5, σ6, σ7, σ8]) |> Tuple
+    σ_tup_ = (σ1, σ2, σ3, σ4, σ5, σ6, σ7, σ8)
+    σ_tup = filter(f -> isa(f, AbstractArray), σ_tup_) |> Tuple
 
-    σ = broadcast((sig...) -> mix_models(sig, model.ϕ, model.mix), σ_vec...)
+    σ = broadcast_helper_(σ_tup, model.ϕ, model.mix, Val{length(σ_tup)}())
 
     return RockphyCond(log10.(σ))
+end
+
+function broadcast_helper_(m_tup, phi, mix, ::Val{2})
+    broadcast((m1, m2) -> mix_models((m1, m2), phi, mix), m_tup[1], m_tup[2])
+end
+
+function broadcast_helper_(m_tup, phi, mix, ::Val{3})
+    broadcast(
+        (m1, m2, m3) -> mix_models((m1, m2, m3), phi, mix), m_tup[1], m_tup[2], m_tup[3])
+end
+
+function broadcast_helper_(m_tup, phi, mix, ::Val{4})
+    broadcast((m1, m2, m3, m4) -> mix_models((m1, m2, m3, m4), phi, mix),
+        m_tup[1], m_tup[2], m_tup[3], m_tup[4])
+end
+
+function broadcast_helper_(m_tup, phi, mix, ::Val{5})
+    broadcast((m1, m2, m3, m4, m5) -> mix_models((m1, m2, m3, m4, m5), phi, mix),
+        m_tup[1], m_tup[2], m_tup[3], m_tup[4], m_tup[5])
+end
+
+function broadcast_helper_(m_tup, phi, mix, ::Val{6})
+    broadcast((m1, m2, m3, m4, m5, m6) -> mix_models((m1, m2, m3, m4, m5, m6), phi, mix),
+        m_tup[1], m_tup[2], m_tup[3], m_tup[4], m_tup[5], m_tup[6])
+end
+
+function broadcast_helper_(m_tup, phi, mix, ::Val{7})
+    broadcast(
+        (m1, m2, m3, m4, m5, m6, m7) -> mix_models((m1, m2, m3, m4, m5, m6, m7), phi, mix),
+        m_tup[1], m_tup[2], m_tup[3], m_tup[4], m_tup[5], m_tup[6], m_tup[7])
+end
+
+function broadcast_helper_(m_tup, phi, mix, ::Val{8})
+    broadcast(
+        (m1, m2, m3, m4, m5, m6, m7, m8) -> mix_models(
+            (m1, m2, m3, m4, m5, m6, m7, m8), phi, mix),
+        m_tup[1],
+        m_tup[2],
+        m_tup[3],
+        m_tup[4],
+        m_tup[5],
+        m_tup[6],
+        m_tup[7],
+        m_tup[8])
 end
 
 function default_params(::Type{multi_phase_modelType{
