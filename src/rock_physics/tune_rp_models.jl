@@ -3,6 +3,8 @@ mutable struct tune_rp_modelType{K, M} <: AbstractRockphyModel
     model::Type{M}
 end
 
+tune_rp_modelType(fn_list, model) = tune_rp_modelType(fn_list, typeof(model))
+
 function (m::tune_rp_modelType{K, M})(ps_nt) where {K, M}
     for fn in m.fn_list
         nt = fn(ps_nt)

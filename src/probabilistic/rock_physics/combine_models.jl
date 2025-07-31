@@ -38,6 +38,14 @@ mutable struct multi_rp_modelDistributionType{T1, T2, T3, T4}
     anelastic::Type{T4}
 end
 
+function multi_rp_modelDistributionType(cond, elastic, visc, anelastic)
+    cond_ = isa(cond, Type) ? cond : typeof(cond)
+    elastic_ = isa(elastic, Type) ? elastic : typeof(elastic)
+    visc_ = isa(visc, Type) ? visc : typeof(visc)
+    anelastic_ = isa(anelastic, Type) ? anelastic : typeof(anelastic)
+    return multi_rp_modelDistributionType(cond_, elastic_, visc_, anelastic_)
+end
+
 """
     multi_rp_model(con, elastic, visc, anelastic)
 

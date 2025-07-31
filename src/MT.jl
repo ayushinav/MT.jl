@@ -143,7 +143,8 @@ export andrade_pspDistribution, eburgers_pspDistribution, premelt_anelasticDistr
        xfit_mxwDistribution, andrade_analyticalDistribution
 export two_phase_modelDistributionType, two_phase_modelDistribution
 export multi_phase_modelDistributionType, multi_phase_modelDistribution
-export multi_rp_modelDistributionType, multi_rp_modelDistribution
+export multi_rp_modelDistributionType, multi_rp_modelDistribution,
+       multi_rp_modelDistributionType, multi_rp_modelDistribution
 export tune_rp_modelDistributionType, tune_rp_modelDistribution
 
 # plots

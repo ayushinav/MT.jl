@@ -33,11 +33,12 @@ mutable struct multi_rp_modelType{T1, T2, T3, T4}
     anelastic::Type{T4}
 end
 
-mutable struct multi_rp_modelType2{T1, T2, T3, T4}
-    cond::T1
-    elastic::T2
-    visc::T3
-    anelastic::T4
+function multi_rp_modelType(cond, elastic, visc, anelastic)
+    cond_ = isa(cond, Type) ? cond : typeof(cond)
+    elastic_ = isa(elastic, Type) ? elastic : typeof(elastic)
+    visc_ = isa(visc, Type) ? visc : typeof(visc)
+    anelastic_ = isa(anelastic, Type) ? anelastic : typeof(anelastic)
+    return multi_rp_modelType(cond_, elastic_, visc_, anelastic_)
 end
 
 """
@@ -94,7 +95,6 @@ function forward(model::multi_rp_model{T1, T2, T3, T4}, p) where {T1, T2, T3, T4
     multi_rp_response(resp_cond, resp_elastic, resp_visc, resp_anelastic)
 end
 
-
 function default_params(::Type{multi_rp_modelType{T1, T2, T3, T4}}) where {T1, T2, T3, T4}
     (;
         zip([:cond, :elastic, :visc, :anelastic],
@@ -103,7 +103,6 @@ function default_params(::Type{multi_rp_modelType{T1, T2, T3, T4}}) where {T1, T
 end
 
 function from_nt(m::Type{T}, nt::NamedTuple) where {T <: multi_rp_modelType}
-
     m1 = T.parameters[1]
     m2 = T.parameters[2]
     m3 = T.parameters[3]
