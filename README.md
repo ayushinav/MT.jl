@@ -1,10 +1,7 @@
-# MT.jl
+# MT.jl : DEPRECATED
+**This package is deprecated. Similar and extended features are now made available through more stable packages [`Porosity.jl`](https://github.com/ayushinav/Porosity.jl/) and [`PrISM.jl`](https://github.com/ayushinav/PrISM.jl/)**
 
-[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://ayushinav.github.io/MT.jl/stable/)
-[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://ayushinav.github.io/MT.jl/dev/)
-[![Build Status](https://travis-ci.com/ayushinav/MT.jl.svg?branch=main)](https://travis-ci.com/ayushinav/MT.jl)
-[![Coverage](https://codecov.io/gh/ayushinav/MT.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/ayushinav/MT.jl)
-[![Coverage](https://coveralls.io/repos/github/ayushinav/MT.jl/badge.svg?branch=main)](https://coveralls.io/github/ayushinav/MT.jl?branch=main)
+_____
 
 `MT.jl` is supposed to be a high performance code for doing forward and inverse modeling in geophysics using julia. We hope to write the code structure such that any other geophysical survey can also be used and we can tend towards a joint forward and inverse modeling library.
 
